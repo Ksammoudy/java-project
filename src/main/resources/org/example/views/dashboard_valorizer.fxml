@@ -7,104 +7,144 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Priority?>
 <?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="org.example.controllers.DashboardValorizerController"
             prefWidth="1200.0" prefHeight="750.0"
-            styleClass="user-dashboard-root">
+            styleClass="dashboard-root">
 
     <left>
-        <VBox prefWidth="270.0" spacing="12.0" styleClass="user-sidebar">
+        <VBox prefWidth="260.0" spacing="12.0" styleClass="sidebar">
             <padding>
-                <Insets top="20" right="16" bottom="20" left="16"/>
+                <Insets top="24" right="18" bottom="24" left="18"/>
             </padding>
 
-            <VBox spacing="4.0">
-                <Label text="♻ WasteWise TN" styleClass="user-brand-title"/>
-                <Label text="Espace Valorisateur" styleClass="user-brand-subtitle"/>
-            </VBox>
+            <HBox spacing="10.0" styleClass="brand-box">
+                <StackPane prefWidth="42.0" prefHeight="42.0" styleClass="brand-logo">
+                    <Label text="♻" style="-fx-text-fill: white; -fx-font-size: 20px;"/>
+                </StackPane>
+
+                <VBox spacing="2">
+                    <Label text="WasteWise" styleClass="brand-title"/>
+                    <Label text="Valorizer panel" styleClass="brand-subtitle"/>
+                </VBox>
+            </HBox>
 
             <VBox spacing="8.0">
-                <Button text="🏠 Dashboard" onAction="#handleDashboard" maxWidth="Infinity" styleClass="user-nav-btn active"/>
-                <Button text="👤 Mon profil" onAction="#handleProfile" maxWidth="Infinity" styleClass="user-nav-btn"/>
-                <Button text="✏ Modifier profil" onAction="#handleEditProfile" maxWidth="Infinity" styleClass="user-nav-btn"/>
+                <Button text="🏭 Dashboard" onAction="#handleDashboard" maxWidth="Infinity" styleClass="sidebar-btn active"/>
+                <Button text="👤 Mon profil" onAction="#handleProfile" maxWidth="Infinity" styleClass="sidebar-btn"/>
+                <Button text="✏ Modifier profil" onAction="#handleEditProfile" maxWidth="Infinity" styleClass="sidebar-btn"/>
             </VBox>
 
             <Region VBox.vgrow="ALWAYS"/>
 
-            <Button text="🚪 Déconnexion" onAction="#handleLogout" maxWidth="Infinity" styleClass="user-nav-btn logout-btn"/>
+            <Button text="🚪 Déconnexion" onAction="#handleLogout" maxWidth="Infinity" styleClass="sidebar-btn logout-btn"/>
         </VBox>
     </left>
 
     <center>
-        <VBox spacing="20.0" styleClass="user-main">
-            <padding>
-                <Insets top="20" right="24" bottom="24" left="24"/>
-            </padding>
+        <VBox spacing="20.0" styleClass="main-area">
 
-            <HBox alignment="CENTER_LEFT">
-                <VBox spacing="5.0">
-                    <Label fx:id="welcomeLabel" text="Bienvenue 👋" styleClass="user-page-title"/>
-                    <Label text="Gestion du compte valorisateur" styleClass="user-page-subtitle"/>
+            <!-- Header -->
+            <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="top-header">
+                <VBox spacing="3.0">
+                    <Label text="Valorisateur" styleClass="page-title"/>
+                    <Label text="WasteWise TN • Espace valorisateur" styleClass="page-subtitle"/>
                 </VBox>
 
                 <Region HBox.hgrow="ALWAYS"/>
 
-                <HBox spacing="10.0">
-                    <Button text="👤 Mon profil" onAction="#handleProfile" styleClass="user-top-btn"/>
-                    <Button text="✏ Modifier" onAction="#handleEditProfile" styleClass="user-top-btn primary"/>
-                </HBox>
-            </HBox>
-
-            <HBox spacing="16.0">
-                <VBox HBox.hgrow="ALWAYS" spacing="8.0" styleClass="user-stat-card">
-                    <Label text="Email" styleClass="user-stat-label"/>
-                    <Label fx:id="emailLabel" text="—" styleClass="user-stat-value-small"/>
-                    <Label text="Identifiant de connexion" styleClass="user-stat-hint"/>
-                </VBox>
-
-                <VBox HBox.hgrow="ALWAYS" spacing="8.0" styleClass="user-stat-card">
-                    <Label text="Type" styleClass="user-stat-label"/>
-                    <Label fx:id="typeLabel" text="VALORIZER" styleClass="user-stat-value-small"/>
-                    <Label text="Profil actuel" styleClass="user-stat-hint"/>
-                </VBox>
-
-                <VBox HBox.hgrow="ALWAYS" spacing="8.0" styleClass="user-stat-card">
-                    <Label text="Statut du compte" styleClass="user-stat-label"/>
-                    <Label fx:id="statusLabel" text="Actif" styleClass="user-stat-value-small"/>
-                    <Label text="Activation / désactivation" styleClass="user-stat-hint"/>
+                <VBox spacing="3.0" alignment="CENTER_RIGHT">
+                    <Label fx:id="headerEmailLabel" text="valorizer@email.com" styleClass="admin-email"/>
+                    <Label text="Valorizer" styleClass="page-subtitle"/>
                 </VBox>
             </HBox>
 
-            <VBox spacing="16.0" styleClass="user-big-card">
-                <HBox alignment="CENTER_LEFT">
-                    <Label text="Informations du profil" styleClass="user-card-title"/>
+            <VBox spacing="20.0" styleClass="content-wrapper">
+                <padding>
+                    <Insets top="24" right="26" bottom="26" left="26"/>
+                </padding>
+
+                <!-- Hero -->
+                <HBox alignment="CENTER_LEFT" spacing="20.0" styleClass="hero-box">
+                    <VBox spacing="6.0">
+                        <Label fx:id="welcomeLabel" text="Bienvenue 👋" styleClass="hero-title"/>
+                        <Label text="Gestion du compte utilisateur valorisateur" styleClass="hero-subtitle"/>
+                    </VBox>
+
                     <Region HBox.hgrow="ALWAYS"/>
-                    <Label text="Lecture seule" styleClass="user-muted"/>
+
+                    <HBox spacing="10.0">
+                        <Button text="👤 Mon profil" onAction="#handleProfile" styleClass="hero-btn"/>
+                    </HBox>
                 </HBox>
 
-                <HBox spacing="20.0">
-                    <VBox spacing="6.0" HBox.hgrow="ALWAYS">
-                        <Label text="Nom" styleClass="user-field-label"/>
-                        <Label fx:id="nomLabel" text="—" styleClass="user-field-value"/>
+                <!-- Stats -->
+                <HBox spacing="16.0">
+                    <VBox spacing="8.0" HBox.hgrow="ALWAYS" styleClass="stat-card">
+                        <Label text="Email" styleClass="stat-label"/>
+                        <Label fx:id="emailLabel" text="—" styleClass="stat-value"/>
+                        <Label text="Identifiant de connexion" styleClass="stat-small"/>
                     </VBox>
 
-                    <VBox spacing="6.0" HBox.hgrow="ALWAYS">
-                        <Label text="Prénom" styleClass="user-field-label"/>
-                        <Label fx:id="prenomLabel" text="—" styleClass="user-field-value"/>
+                    <VBox spacing="8.0" HBox.hgrow="ALWAYS" styleClass="stat-card">
+                        <Label text="Type" styleClass="stat-label"/>
+                        <Label fx:id="typeLabel" text="VALORIZER" styleClass="stat-value"/>
+                        <Label text="Profil actuel" styleClass="stat-small"/>
                     </VBox>
 
-                    <VBox spacing="6.0" HBox.hgrow="ALWAYS">
-                        <Label text="Téléphone" styleClass="user-field-label"/>
-                        <Label fx:id="telephoneLabel" text="—" styleClass="user-field-value"/>
+                    <VBox spacing="8.0" HBox.hgrow="ALWAYS" styleClass="stat-card">
+                        <Label text="Statut du compte" styleClass="stat-label"/>
+                        <Label fx:id="statusLabel" text="Actif" styleClass="stat-email"/>
+                        <Label text="Activation / désactivation" styleClass="stat-small"/>
                     </VBox>
                 </HBox>
 
-                <Label text="Ce dashboard est actuellement centré sur la gestion du compte utilisateur."
-                       wrapText="true"
-                       styleClass="user-muted"/>
+                <!-- Bottom -->
+                <HBox spacing="16.0">
+                    <VBox spacing="12.0" HBox.hgrow="ALWAYS" styleClass="big-card">
+                        <HBox spacing="10.0">
+                            <Label text="📌 Informations du profil" styleClass="card-title"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                        </HBox>
+
+                        <Label text="Voici les informations principales de votre compte valorisateur."
+                               wrapText="true"
+                               styleClass="card-text"/>
+
+                        <VBox spacing="10.0">
+                            <VBox spacing="4.0" styleClass="small-box">
+                                <Label text="Nom" styleClass="small-box-title"/>
+                                <Label fx:id="nomLabel" text="—" styleClass="small-box-text"/>
+                            </VBox>
+
+                            <VBox spacing="4.0" styleClass="small-box">
+                                <Label text="Prénom" styleClass="small-box-title"/>
+                                <Label fx:id="prenomLabel" text="—" styleClass="small-box-text"/>
+                            </VBox>
+
+                            <VBox spacing="4.0" styleClass="small-box">
+                                <Label text="Téléphone" styleClass="small-box-title"/>
+                                <Label fx:id="telephoneLabel" text="—" styleClass="small-box-text"/>
+                            </VBox>
+                        </VBox>
+                    </VBox>
+
+                    <VBox spacing="12.0" prefWidth="320.0" styleClass="big-card">
+                        <Label text="⚡ Raccourcis" styleClass="card-title"/>
+
+                        <Button text="👤 Voir mon profil" onAction="#handleProfile" maxWidth="Infinity" styleClass="shortcut-btn"/>
+                        <Button text="✏ Modifier mon profil" onAction="#handleEditProfile" maxWidth="Infinity" styleClass="shortcut-btn"/>
+                        <Button text="🚪 Déconnexion" onAction="#handleLogout" maxWidth="Infinity" styleClass="shortcut-btn logout-shortcut"/>
+
+                        <Label text="Ce dashboard est centré sur la gestion du compte utilisateur."
+                               wrapText="true"
+                               styleClass="card-text"/>
+                    </VBox>
+                </HBox>
             </VBox>
         </VBox>
     </center>

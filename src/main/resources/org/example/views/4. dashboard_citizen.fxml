@@ -14,131 +14,138 @@
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="org.example.controllers.DashboardCitizenController"
             prefWidth="1200.0" prefHeight="750.0"
-            styleClass="citizen-root">
+            styleClass="dashboard-root">
 
     <left>
-        <VBox prefWidth="280.0" styleClass="citizen-sidebar" spacing="0.0">
-            <children>
+        <VBox prefWidth="260.0" spacing="12.0" styleClass="sidebar">
+            <padding>
+                <Insets top="24" right="18" bottom="24" left="18"/>
+            </padding>
 
-                <VBox spacing="6.0" styleClass="sidebar-section">
-                    <padding>
-                        <Insets top="18" right="18" bottom="18" left="18"/>
-                    </padding>
+            <HBox spacing="10.0" styleClass="brand-box">
+                <StackPane prefWidth="42.0" prefHeight="42.0" styleClass="brand-logo">
+                    <Label text="♻" style="-fx-text-fill: white; -fx-font-size: 20px;"/>
+                </StackPane>
 
-                    <HBox spacing="8.0" alignment="CENTER_LEFT">
-                        <Label text="🍃" style="-fx-font-size: 18px;"/>
-                        <Label text="WasteWise TN" styleClass="side-brand"/>
-                    </HBox>
-
-                    <Label text="Espace Citoyen" styleClass="side-subtitle"/>
+                <VBox spacing="2">
+                    <Label text="WasteWise" styleClass="brand-title"/>
+                    <Label text="Citizen panel" styleClass="brand-subtitle"/>
                 </VBox>
+            </HBox>
 
-                <VBox spacing="8.0" styleClass="sidebar-section user-box">
-                    <padding>
-                        <Insets top="18" right="18" bottom="18" left="18"/>
-                    </padding>
+            <VBox spacing="8.0">
+                <Button text="🏠 Dashboard" onAction="#handleDashboard" maxWidth="Infinity" styleClass="sidebar-btn active"/>
+                <Button text="👤 Mon profil" onAction="#handleProfile" maxWidth="Infinity" styleClass="sidebar-btn"/>
+                <Button text="✏ Modifier profil" onAction="#handleEditProfile" maxWidth="Infinity" styleClass="sidebar-btn"/>
+            </VBox>
 
-                    <HBox spacing="10.0" alignment="CENTER_LEFT">
-                        <StackPane prefWidth="42.0" prefHeight="42.0" styleClass="side-avatar">
-                            <Label text="U" style="-fx-text-fill: #2f6b4f; -fx-font-weight: bold;"/>
-                        </StackPane>
+            <Region VBox.vgrow="ALWAYS"/>
 
-                        <VBox spacing="2.0">
-                            <Label fx:id="sidebarUserLabel" text="Invité" styleClass="side-user-label"/>
-                            <Label fx:id="sidebarTypeLabel" text="CITOYEN" styleClass="side-user-type"/>
-                        </VBox>
-                    </HBox>
-                </VBox>
-
-                <VBox spacing="8.0" styleClass="nav-box">
-                    <padding>
-                        <Insets top="16" right="12" bottom="16" left="12"/>
-                    </padding>
-
-                    <Button text="🏠 Dashboard" onAction="#handleDashboard" maxWidth="Infinity" styleClass="citizen-nav-btn active"/>
-                    <Button text="👤 Mon Profil" onAction="#handleViewProfile" maxWidth="Infinity" styleClass="citizen-nav-btn"/>
-                    <Button text="🚪 Déconnexion" onAction="#handleLogout" maxWidth="Infinity" styleClass="citizen-nav-btn logout-red"/>
-                </VBox>
-
-            </children>
+            <Button text="🚪 Déconnexion" onAction="#handleLogout" maxWidth="Infinity" styleClass="sidebar-btn logout-btn"/>
         </VBox>
     </left>
 
     <center>
-        <VBox styleClass="citizen-page-wrapper" spacing="0.0">
-            <children>
+        <VBox spacing="20.0" styleClass="main-area">
 
-                <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="citizen-header">
-                    <Label text="Espace Citoyen" styleClass="citizen-header-title"/>
+            <!-- Header -->
+            <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="top-header">
+                <VBox spacing="3.0">
+                    <Label text="Citoyen" styleClass="page-title"/>
+                    <Label text="WasteWise TN • Espace citoyen" styleClass="page-subtitle"/>
+                </VBox>
+
+                <Region HBox.hgrow="ALWAYS"/>
+
+                <VBox spacing="3.0" alignment="CENTER_RIGHT">
+                    <Label fx:id="headerEmailLabel" text="citizen@email.com" styleClass="admin-email"/>
+                    <Label text="Citizen" styleClass="page-subtitle"/>
+                </VBox>
+            </HBox>
+
+            <VBox spacing="20.0" styleClass="content-wrapper">
+                <padding>
+                    <Insets top="24" right="26" bottom="26" left="26"/>
+                </padding>
+
+                <!-- Hero -->
+                <HBox alignment="CENTER_LEFT" spacing="20.0" styleClass="hero-box">
+                    <VBox spacing="6.0">
+                        <Label fx:id="welcomeLabel" text="Bienvenue 👋" styleClass="hero-title"/>
+                        <Label text="Gestion du compte utilisateur citoyen" styleClass="hero-subtitle"/>
+                    </VBox>
+
                     <Region HBox.hgrow="ALWAYS"/>
 
-                    <HBox alignment="CENTER" spacing="10.0">
-                        <Label fx:id="headerUserLabel" text="Invité" styleClass="citizen-header-user"/>
-                        <Button text="✏ Modifier" onAction="#handleEditProfile" styleClass="header-edit-btn"/>
+                    <HBox spacing="10.0">
+                        <Button text="👤 Mon profil" onAction="#handleProfile" styleClass="hero-btn"/>
                     </HBox>
                 </HBox>
 
-                <VBox spacing="18.0" styleClass="citizen-content">
-                    <padding>
-                        <Insets top="24" right="24" bottom="24" left="24"/>
-                    </padding>
-
-                    <VBox spacing="4.0">
-                        <Label fx:id="titleLabel" text="🏠 Dashboard Citoyen" styleClass="citizen-title"/>
-                        <Label text="Espace utilisateur (module gestion du compte)" styleClass="citizen-subtitle"/>
+                <!-- Stats -->
+                <HBox spacing="16.0">
+                    <VBox spacing="8.0" HBox.hgrow="ALWAYS" styleClass="stat-card">
+                        <Label text="Email" styleClass="stat-label"/>
+                        <Label fx:id="emailLabel" text="—" styleClass="stat-value"/>
+                        <Label text="Identifiant de connexion" styleClass="stat-small"/>
                     </VBox>
 
-                    <!-- Ligne 1 -->
-                    <HBox spacing="16.0">
-                        <VBox HBox.hgrow="ALWAYS" spacing="8.0" styleClass="ww-card-fx">
-                            <Label text="Email" styleClass="card-muted"/>
-                            <Label fx:id="emailLabel" text="—" styleClass="card-value"/>
-                            <Label text="Identifiant de connexion" styleClass="card-small"/>
-                        </VBox>
+                    <VBox spacing="8.0" HBox.hgrow="ALWAYS" styleClass="stat-card">
+                        <Label text="Type" styleClass="stat-label"/>
+                        <Label fx:id="typeLabel" text="CITIZEN" styleClass="stat-value"/>
+                        <Label text="Profil actuel" styleClass="stat-small"/>
+                    </VBox>
 
-                        <VBox HBox.hgrow="ALWAYS" spacing="8.0" styleClass="ww-card-fx">
-                            <Label text="Rôle" styleClass="card-muted"/>
-                            <Label fx:id="roleLabel" text="Utilisateur" styleClass="card-value"/>
-                            <Label text="Profil actuel" styleClass="card-small"/>
-                        </VBox>
+                    <VBox spacing="8.0" HBox.hgrow="ALWAYS" styleClass="stat-card">
+                        <Label text="Statut du compte" styleClass="stat-label"/>
+                        <Label fx:id="statusLabel" text="Actif" styleClass="stat-email"/>
+                        <Label text="Activation / désactivation" styleClass="stat-small"/>
+                    </VBox>
+                </HBox>
 
-                        <VBox HBox.hgrow="ALWAYS" spacing="8.0" styleClass="ww-card-fx">
-                            <Label text="Statut du compte" styleClass="card-muted"/>
-                            <Label fx:id="statusLabel" text="Actif" styleClass="card-value"/>
-                            <Label text="Activation / Désactivation" styleClass="card-small"/>
-                        </VBox>
-                    </HBox>
-
-                    <!-- Bloc profil -->
-                    <VBox spacing="16.0" styleClass="ww-big-card">
-                        <Label text="Informations du profil" styleClass="ww-big-card-title"/>
-
-                        <HBox spacing="20.0">
-                            <VBox HBox.hgrow="ALWAYS" spacing="6.0">
-                                <Label text="Nom" styleClass="profile-label"/>
-                                <Label fx:id="nomLabel" text="—" styleClass="profile-value"/>
-                            </VBox>
-
-                            <VBox HBox.hgrow="ALWAYS" spacing="6.0">
-                                <Label text="Prénom" styleClass="profile-label"/>
-                                <Label fx:id="prenomLabel" text="—" styleClass="profile-value"/>
-                            </VBox>
-
-                            <VBox HBox.hgrow="ALWAYS" spacing="6.0">
-                                <Label text="Téléphone" styleClass="profile-label"/>
-                                <Label fx:id="telephoneLabel" text="—" styleClass="profile-value"/>
-                            </VBox>
-                        </HBox>
-
+                <!-- Bottom -->
+                <HBox spacing="16.0">
+                    <VBox spacing="12.0" HBox.hgrow="ALWAYS" styleClass="big-card">
                         <HBox spacing="10.0">
-                            <Button text="👤 Voir mon profil" onAction="#handleViewProfile" styleClass="outline-btn"/>
-                            <Button text="✏ Modifier mon profil" onAction="#handleEditProfile" styleClass="green-btn"/>
+                            <Label text="📌 Informations du profil" styleClass="card-title"/>
+                            <Region HBox.hgrow="ALWAYS"/>
                         </HBox>
+
+                        <Label text="Voici les informations principales de votre compte citoyen."
+                               wrapText="true"
+                               styleClass="card-text"/>
+
+                        <VBox spacing="10.0">
+                            <VBox spacing="4.0" styleClass="small-box">
+                                <Label text="Nom" styleClass="small-box-title"/>
+                                <Label fx:id="nomLabel" text="—" styleClass="small-box-text"/>
+                            </VBox>
+
+                            <VBox spacing="4.0" styleClass="small-box">
+                                <Label text="Prénom" styleClass="small-box-title"/>
+                                <Label fx:id="prenomLabel" text="—" styleClass="small-box-text"/>
+                            </VBox>
+
+                            <VBox spacing="4.0" styleClass="small-box">
+                                <Label text="Téléphone" styleClass="small-box-title"/>
+                                <Label fx:id="telephoneLabel" text="—" styleClass="small-box-text"/>
+                            </VBox>
+                        </VBox>
                     </VBox>
 
-                </VBox>
+                    <VBox spacing="12.0" prefWidth="320.0" styleClass="big-card">
+                        <Label text="⚡ Raccourcis" styleClass="card-title"/>
 
-            </children>
+                        <Button text="👤 Voir mon profil" onAction="#handleProfile" maxWidth="Infinity" styleClass="shortcut-btn"/>
+                        <Button text="✏ Modifier mon profil" onAction="#handleEditProfile" maxWidth="Infinity" styleClass="shortcut-btn"/>
+                        <Button text="🚪 Déconnexion" onAction="#handleLogout" maxWidth="Infinity" styleClass="shortcut-btn logout-shortcut"/>
+
+                        <Label text="Ce dashboard est centré sur la gestion du compte utilisateur."
+                               wrapText="true"
+                               styleClass="card-text"/>
+                    </VBox>
+                </HBox>
+            </VBox>
         </VBox>
     </center>
 

@@ -492,3 +492,109 @@
     -fx-font-size: 13px;
     -fx-text-fill: #64748b;
 }
+.user-dashboard-root {
+    -fx-background-color: #f8fafc;
+}
+
+.user-sidebar {
+    -fx-background-color: white;
+    -fx-border-color: transparent #e5e7eb transparent transparent;
+    -fx-border-width: 0 1 0 0;
+}
+
+.user-brand-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #16a34a;
+}
+
+.user-brand-subtitle {
+    -fx-font-size: 12px;
+    -fx-text-fill: #64748b;
+}
+
+.user-nav-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #334155;
+    -fx-alignment: CENTER-LEFT;
+    -fx-padding: 12px 14px;
+    -fx-background-radius: 10px;
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+    -fx-cursor: hand;
+}
+
+.user-nav-btn:hover {
+    -fx-background-color: #f1f5f9;
+}
+
+.user-nav-btn.active {
+    -fx-background-color: #16a34a;
+    -fx-text-fill: white;
+}
+
+.logout-btn {
+    -fx-text-fill: #dc2626;
+}
+
+.user-main {
+    -fx-background-color: #f8fafc;
+}
+
+.user-page-title {
+    -fx-font-size: 26px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #0f172a;
+}
+
+.user-page-subtitle {
+    -fx-font-size: 13px;
+    -fx-text-fill: #64748b;
+}
+
+.user-top-btn {
+    -fx-background-color: white;
+    -fx-border-color: #dbe3ee;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-text-fill: #0f172a;
+    -fx-font-weight: 700;
+    -fx-padding: 10px 14px;
+    -fx-cursor: hand;
+}
+
+.user-top-btn.primary {
+    -fx-background-color: #16a34a;
+    -fx-border-color: #16a34a;
+    -fx-text-fill: white;
+}
+
+.user-stat-card,
+.user-big-card {
+    -fx-background-color: white;
+    -fx-background-radius: 18px;
+    -fx-border-color: #e5e7eb;
+    -fx-border-radius: 18px;
+    -fx-padding: 20px;
+}
+
+.user-stat-label,
+.user-field-label,
+.user-muted,
+.user-stat-hint {
+    -fx-font-size: 12px;
+    -fx-text-fill: #64748b;
+}
+
+.user-stat-value-small,
+.user-field-value {
+    -fx-font-size: 16px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #0f172a;
+}
+
+.user-card-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #0f172a;
+}
