@@ -19,6 +19,9 @@ public class Main extends Application {
         primaryStage.show();
     }
 
+    // =========================
+    // AUTH PAGES
+    // =========================
     public static void showLoginPage() {
         loadPage("/org/example/views/login.fxml", "Connexion | WasteWise TN", 1100, 700);
     }
@@ -35,6 +38,9 @@ public class Main extends Application {
         loadPage("/org/example/views/reset_password.fxml", "Nouveau mot de passe | WasteWise TN", 900, 600);
     }
 
+    // =========================
+    // DASHBOARDS
+    // =========================
     public static void showDashboardAdmin() {
         loadPage("/org/example/views/dashboard_admin.fxml", "Dashboard Admin | WasteWise TN", 1200, 750);
     }
@@ -47,9 +53,39 @@ public class Main extends Application {
         loadPage("/org/example/views/dashboard_valorizer.fxml", "Dashboard Valorisateur | WasteWise TN", 1200, 750);
     }
 
+    // =========================
+    // PROFILE PAGES
+    // =========================
+    public static void showProfileViewPage() {
+        loadPage("/org/example/views/profile_view.fxml", "Mon Profil | WasteWise TN", 1200, 750);
+    }
+
+    public static void showProfileEditPage() {
+        loadPage("/org/example/views/profile_edit.fxml", "Modifier Profil | WasteWise TN", 1200, 750);
+    }
+
+    // =========================
+    // ADMIN USER MANAGEMENT
+    // =========================
+    public static void showAdminUsersPage() {
+        loadPage("/org/example/views/admin_users.fxml", "Utilisateurs | WasteWise TN", 1200, 750);
+    }
+
+    public static void showAdminUserFormPage() {
+        loadPage("/org/example/views/admin_user_form.fxml", "Formulaire utilisateur | WasteWise TN", 900, 650);
+    }
+
+    public static void showAdminUserDeletePage() {
+        loadPage("/org/example/views/admin_user_delete.fxml", "Supprimer utilisateur | WasteWise TN", 700, 400);
+    }
+
+    // =========================
+    // GENERIC LOADER
+    // =========================
     private static void loadPage(String fxmlPath, String title, int width, int height) {
         try {
             URL fxmlUrl = Main.class.getResource(fxmlPath);
+
             if (fxmlUrl == null) {
                 throw new RuntimeException("FXML introuvable : " + fxmlPath);
             }

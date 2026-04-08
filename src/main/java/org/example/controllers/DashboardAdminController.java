@@ -42,7 +42,8 @@ public class DashboardAdminController {
         }
 
         if (welcomeLabel != null) {
-            welcomeLabel.setText("Bienvenue Admin 👋");
+            String prenom = user.getPrenom() != null ? user.getPrenom() : "Admin";
+            welcomeLabel.setText("Bienvenue " + prenom + " 👋");
         }
 
         if (todayDateLabel != null) {
@@ -61,7 +62,7 @@ public class DashboardAdminController {
 
     @FXML
     public void handleUsers() {
-        System.out.println("Ouvrir gestion utilisateurs");
+        Main.showAdminUsersPage();
     }
 
     @FXML

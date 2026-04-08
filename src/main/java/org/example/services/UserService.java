@@ -24,18 +24,68 @@ public class UserService {
     }
 
     public boolean addUser(User user) {
+        if (user == null) {
+            System.out.println("❌ Utilisateur null.");
+            return false;
+        }
+
+        String email = user.getEmail() != null ? user.getEmail().trim().toLowerCase() : "";
+        String nom = user.getNom() != null ? user.getNom().trim() : "";
+        String prenom = user.getPrenom() != null ? user.getPrenom().trim() : "";
+        String telephone = user.getTelephone() != null ? user.getTelephone().trim() : "";
+        String type = user.getType() != null ? user.getType().trim().toUpperCase() : "CITIZEN";
+        String password = user.getPassword();
+
+        if (email.isEmpty() || !isValidEmail(email)) {
+            System.out.println("❌ Email invalide.");
+            return false;
+        }
+
+        if (nom.isEmpty() || !isValidName(nom)) {
+            System.out.println("❌ Nom invalide.");
+            return false;
+        }
+
+        if (prenom.isEmpty() || !isValidName(prenom)) {
+            System.out.println("❌ Prénom invalide.");
+            return false;
+        }
+
+        if (!telephone.isEmpty() && !isValidPhone(telephone)) {
+            System.out.println("❌ Téléphone invalide.");
+            return false;
+        }
+
+        if (!isValidType(type)) {
+            System.out.println("❌ Type utilisateur invalide.");
+            return false;
+        }
+
+        if (password == null || password.isBlank() || password.length() < 6) {
+            System.out.println("❌ Mot de passe invalide.");
+            return false;
+        }
+
+        if (getUserByEmail(email) != null) {
+            System.out.println("❌ Email déjà utilisé.");
+            return false;
+        }
+
         String sql = "INSERT INTO user (email, roles, password, nom, prenom, telephone, type, created_at, is_active, face_embedding, face_updated_at, last_seen_at, google_authenticator_secret, is_two_factor_enabled, is_verified) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement ps = DBConnection.getInstance().getConnection().prepareStatement(sql)) {
 
-            ps.setString(1, user.getEmail());
-            ps.setString(2, user.getRoles() == null ? "[]" : user.getRoles());
-            ps.setString(3, PasswordUtil.hashPassword(user.getPassword()));
-            ps.setString(4, user.getNom());
-            ps.setString(5, user.getPrenom());
-            ps.setString(6, user.getTelephone());
-            ps.setString(7, user.getType());
+            ps.setString(1, email);
+            ps.setString(2, user.getRoles() == null || user.getRoles().isBlank() ? "[]" : user.getRoles());
+
+            // Hash une seule fois ici
+            ps.setString(3, PasswordUtil.hashPassword(password));
+
+            ps.setString(4, nom);
+            ps.setString(5, prenom);
+            ps.setString(6, telephone.isEmpty() ? null : telephone);
+            ps.setString(7, type);
             ps.setTimestamp(8, Timestamp.valueOf(
                     user.getCreatedAt() != null ? user.getCreatedAt() : LocalDateTime.now()
             ));
@@ -47,11 +97,7 @@ public class UserService {
             ps.setBoolean(14, user.isTwoFactorEnabled());
             ps.setBoolean(15, user.isVerified());
 
-            int rows = ps.executeUpdate();
-            if (rows > 0) {
-                System.out.println("✅ Utilisateur ajouté avec succès.");
-                return true;
-            }
+            return ps.executeUpdate() > 0;
 
         } catch (SQLIntegrityConstraintViolationException e) {
             System.out.println("❌ Erreur : email déjà utilisé.");
@@ -70,38 +116,34 @@ public class UserService {
         prenom = prenom != null ? prenom.trim() : "";
         email = email != null ? email.trim().toLowerCase() : "";
         telephone = telephone != null ? telephone.trim() : "";
-        type = type != null ? type.trim().toUpperCase() : "";
+        type = type != null ? type.trim().toUpperCase() : "CITIZEN";
 
         if (nom.isEmpty()) {
             return "Veuillez saisir votre nom.";
         }
-        if (nom.length() < 2 || nom.length() > 120) {
-            return "Le nom doit contenir entre 2 et 120 caractères.";
+        if (!isValidName(nom)) {
+            return "Nom invalide.";
         }
 
         if (prenom.isEmpty()) {
             return "Veuillez saisir votre prénom.";
         }
-        if (prenom.length() < 2 || prenom.length() > 120) {
-            return "Le prénom doit contenir entre 2 et 120 caractères.";
+        if (!isValidName(prenom)) {
+            return "Prénom invalide.";
         }
 
         if (email.isEmpty()) {
             return "Veuillez saisir un email.";
         }
-        if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+        if (!isValidEmail(email)) {
             return "Email invalide.";
         }
 
-        if (!telephone.isEmpty() && !telephone.matches("^[0-9+\\s\\-]{8,30}$")) {
-            return "Téléphone invalide (8 à 30 caractères, chiffres + espaces + + -).";
+        if (!telephone.isEmpty() && !isValidPhone(telephone)) {
+            return "Téléphone invalide.";
         }
 
-        if (type.isEmpty()) {
-            type = "CITIZEN";
-        }
-
-        if (!type.equals("CITIZEN") && !type.equals("VALORIZER")) {
+        if (!isValidType(type)) {
             return "Type d'utilisateur invalide.";
         }
 
@@ -113,8 +155,8 @@ public class UserService {
             return "Veuillez saisir un mot de passe.";
         }
 
-        if (password.length() < 8) {
-            return "Votre mot de passe doit contenir au moins 8 caractères.";
+        if (password.length() < 6) {
+            return "Votre mot de passe doit contenir au moins 6 caractères.";
         }
 
         if (confirmPassword == null || !password.equals(confirmPassword)) {
@@ -132,7 +174,7 @@ public class UserService {
         user.setTelephone(telephone.isEmpty() ? null : telephone);
         user.setType(type);
         user.setRoles("[]");
-        user.setPassword(password);
+        user.setPassword(password); // mot de passe brut ici, hash dans addUser()
         user.setCreatedAt(LocalDateTime.now());
         user.setActive(true);
         user.setVerified(false);
@@ -211,16 +253,52 @@ public class UserService {
     }
 
     public boolean updateUser(User user) {
+        if (user == null) {
+            System.out.println("❌ Utilisateur null.");
+            return false;
+        }
+
+        String email = user.getEmail() != null ? user.getEmail().trim().toLowerCase() : "";
+        String nom = user.getNom() != null ? user.getNom().trim() : "";
+        String prenom = user.getPrenom() != null ? user.getPrenom().trim() : "";
+        String telephone = user.getTelephone() != null ? user.getTelephone().trim() : "";
+        String type = user.getType() != null ? user.getType().trim().toUpperCase() : "";
+
+        if (email.isEmpty() || !isValidEmail(email)) {
+            System.out.println("❌ Email invalide.");
+            return false;
+        }
+
+        if (nom.isEmpty() || !isValidName(nom)) {
+            System.out.println("❌ Nom invalide.");
+            return false;
+        }
+
+        if (prenom.isEmpty() || !isValidName(prenom)) {
+            System.out.println("❌ Prénom invalide.");
+            return false;
+        }
+
+        if (!telephone.isEmpty() && !isValidPhone(telephone)) {
+            System.out.println("❌ Téléphone invalide.");
+            return false;
+        }
+
+        if (!isValidType(type)) {
+            System.out.println("❌ Type utilisateur invalide.");
+            return false;
+        }
+
         String sql = "UPDATE user SET email=?, roles=?, nom=?, prenom=?, telephone=?, type=?, created_at=?, is_active=?, face_embedding=?, face_updated_at=?, last_seen_at=?, google_authenticator_secret=?, is_two_factor_enabled=?, is_verified=? WHERE id=?";
 
         try (PreparedStatement ps = DBConnection.getInstance().getConnection().prepareStatement(sql)) {
 
-            ps.setString(1, user.getEmail());
+            ps.setString(1, email);
             ps.setString(2, user.getRoles() == null ? "[]" : user.getRoles());
-            ps.setString(3, user.getNom());
-            ps.setString(4, user.getPrenom());
-            ps.setString(5, user.getTelephone());
-            ps.setString(6, user.getType());
+            ps.setString(3, nom);
+            ps.setString(4, prenom);
+            ps.setString(5, telephone.isEmpty() ? null : telephone);
+            ps.setString(6, type);
             ps.setTimestamp(7, Timestamp.valueOf(
                     user.getCreatedAt() != null ? user.getCreatedAt() : LocalDateTime.now()
             ));
@@ -233,16 +311,82 @@ public class UserService {
             ps.setBoolean(14, user.isVerified());
             ps.setInt(15, user.getId());
 
-            int rows = ps.executeUpdate();
-            if (rows > 0) {
-                System.out.println("✅ Utilisateur mis à jour avec succès.");
-                return true;
-            } else {
-                System.out.println("⚠️ Utilisateur introuvable.");
-            }
+            return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
             System.out.println("❌ Erreur updateUser : " + e.getMessage());
+        }
+
+        return false;
+    }
+
+    public boolean updateProfile(User user) {
+        if (user == null) {
+            System.out.println("❌ Utilisateur null.");
+            return false;
+        }
+
+        String nom = user.getNom() != null ? user.getNom().trim() : "";
+        String prenom = user.getPrenom() != null ? user.getPrenom().trim() : "";
+        String email = user.getEmail() != null ? user.getEmail().trim().toLowerCase() : "";
+        String telephone = user.getTelephone() != null ? user.getTelephone().trim() : "";
+
+        if (nom.isEmpty() || !isValidName(nom)) {
+            System.out.println("❌ Nom invalide.");
+            return false;
+        }
+
+        if (prenom.isEmpty() || !isValidName(prenom)) {
+            System.out.println("❌ Prénom invalide.");
+            return false;
+        }
+
+        if (email.isEmpty() || !isValidEmail(email)) {
+            System.out.println("❌ Email invalide.");
+            return false;
+        }
+
+        if (!telephone.isEmpty() && !isValidPhone(telephone)) {
+            System.out.println("❌ Téléphone invalide.");
+            return false;
+        }
+
+        String sql = "UPDATE user SET nom = ?, prenom = ?, email = ?, telephone = ?, password = ? WHERE id = ?";
+
+        try (PreparedStatement ps = DBConnection.getInstance().getConnection().prepareStatement(sql)) {
+            ps.setString(1, nom);
+            ps.setString(2, prenom);
+            ps.setString(3, email);
+            ps.setString(4, telephone.isEmpty() ? null : telephone);
+            ps.setString(5, user.getPassword());
+            ps.setInt(6, user.getId());
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            System.out.println("❌ Erreur updateProfile : " + e.getMessage());
+        }
+
+        return false;
+    }
+
+    public boolean emailExistsForAnotherUser(String email, int currentUserId) {
+        if (email == null || email.isBlank()) {
+            return false;
+        }
+
+        String sql = "SELECT id FROM user WHERE email = ? AND id <> ?";
+
+        try (PreparedStatement ps = DBConnection.getInstance().getConnection().prepareStatement(sql)) {
+            ps.setString(1, email.trim().toLowerCase());
+            ps.setInt(2, currentUserId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+
+        } catch (SQLException e) {
+            System.out.println("❌ Erreur emailExistsForAnotherUser : " + e.getMessage());
         }
 
         return false;
@@ -254,19 +398,18 @@ public class UserService {
             return false;
         }
 
+        if (newPlainPassword.length() < 6) {
+            System.out.println("❌ Nouveau mot de passe trop court.");
+            return false;
+        }
+
         String sql = "UPDATE user SET password = ? WHERE id = ?";
 
         try (PreparedStatement ps = DBConnection.getInstance().getConnection().prepareStatement(sql)) {
             ps.setString(1, PasswordUtil.hashPassword(newPlainPassword));
             ps.setInt(2, id);
 
-            int rows = ps.executeUpdate();
-            if (rows > 0) {
-                System.out.println("✅ Mot de passe mis à jour.");
-                return true;
-            } else {
-                System.out.println("⚠️ Utilisateur introuvable.");
-            }
+            return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
             System.out.println("❌ Erreur updatePassword : " + e.getMessage());
@@ -280,14 +423,7 @@ public class UserService {
 
         try (PreparedStatement ps = DBConnection.getInstance().getConnection().prepareStatement(sql)) {
             ps.setInt(1, id);
-
-            int rows = ps.executeUpdate();
-            if (rows > 0) {
-                System.out.println("✅ Utilisateur supprimé.");
-                return true;
-            } else {
-                System.out.println("⚠️ Utilisateur introuvable.");
-            }
+            return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
             System.out.println("❌ Erreur deleteUser : " + e.getMessage());
@@ -301,17 +437,53 @@ public class UserService {
 
         try (PreparedStatement ps = DBConnection.getInstance().getConnection().prepareStatement(sql)) {
             ps.setInt(1, id);
-
-            int rows = ps.executeUpdate();
-            if (rows > 0) {
-                System.out.println("✅ Statut utilisateur modifié.");
-                return true;
-            } else {
-                System.out.println("⚠️ Utilisateur introuvable.");
-            }
+            return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
             System.out.println("❌ Erreur toggleActive : " + e.getMessage());
+        }
+
+        return false;
+    }
+
+    public boolean setUserActiveStatus(int targetUserId, boolean active, User currentAdmin) {
+        if (currentAdmin == null) {
+            System.out.println("❌ Aucun admin connecté.");
+            return false;
+        }
+
+        if (currentAdmin.getType() == null || !currentAdmin.getType().equalsIgnoreCase("ADMIN")) {
+            System.out.println("❌ Accès refusé : ADMIN requis.");
+            return false;
+        }
+
+        User targetUser = getUserById(targetUserId);
+        if (targetUser == null) {
+            System.out.println("❌ Utilisateur introuvable.");
+            return false;
+        }
+
+        if (currentAdmin.getId() == targetUser.getId()) {
+            System.out.println("❌ Impossible de modifier votre propre compte.");
+            return false;
+        }
+
+        String type = targetUser.getType() != null ? targetUser.getType().toUpperCase() : "";
+        if (!type.equals("CITIZEN") && !type.equals("VALORIZER")) {
+            System.out.println("❌ Action autorisée seulement sur citoyen / valorisateur.");
+            return false;
+        }
+
+        String sql = "UPDATE user SET is_active = ? WHERE id = ?";
+
+        try (PreparedStatement ps = DBConnection.getInstance().getConnection().prepareStatement(sql)) {
+            ps.setBoolean(1, active);
+            ps.setInt(2, targetUserId);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            System.out.println("❌ Erreur setUserActiveStatus : " + e.getMessage());
         }
 
         return false;
@@ -400,5 +572,21 @@ public class UserService {
         user.setVerified(rs.getBoolean("is_verified"));
 
         return user;
+    }
+
+    private boolean isValidEmail(String email) {
+        return email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
+    }
+
+    private boolean isValidName(String value) {
+        return value.matches("[A-Za-zÀ-ÿ\\s-]{2,30}");
+    }
+
+    private boolean isValidPhone(String phone) {
+        return phone.matches("\\d{8}");
+    }
+
+    private boolean isValidType(String type) {
+        return "ADMIN".equals(type) || "VALORIZER".equals(type) || "CITIZEN".equals(type);
     }
 }

@@ -21,38 +21,49 @@ public class ForgotPasswordController {
     private final ResetPasswordService resetPasswordService = ResetPasswordService.getInstance();
 
     @FXML
-    public void handleSendLink() {
-        String email = emailField.getText() != null ? emailField.getText().trim().toLowerCase() : "";
+    public void initialize() {
+        if (messageLabel != null) {
+            messageLabel.setText("");
+        }
+    }
 
+    @FXML
+    public void handleSendLink() {
+        String email = emailField != null && emailField.getText() != null
+                ? emailField.getText().trim().toLowerCase()
+                : "";
+
+        // Contrôle de saisie
         if (email.isEmpty()) {
-            messageLabel.setStyle("-fx-text-fill: red;");
-            messageLabel.setText("Veuillez saisir votre email.");
+            showError("Veuillez saisir votre email.");
             return;
         }
 
-        User user = userService.findByEmail(email);
+        if (!isValidEmail(email)) {
+            showError("Veuillez saisir une adresse email valide.");
+            return;
+        }
 
-        // Message générique comme Symfony
+        User user = userService.getUserByEmail(email);
+
+        // Message générique pour éviter de révéler si l'email existe ou non
         if (user != null) {
             ResetPasswordToken token = resetPasswordService.createToken(user, 30);
             boolean sent = resetPasswordService.sendResetEmail(user, token);
 
             if (sent) {
-                messageLabel.setStyle("-fx-text-fill: green;");
-                messageLabel.setText(
-                        "Si un compte existe avec cet email, un code de réinitialisation a été envoyé.\n"
-                                + "Consultez votre boîte mail puis ouvrez la page de réinitialisation."
+                showSuccess(
+                        "Si un compte existe avec cet email, un code de réinitialisation a été envoyé.\n" +
+                                "Consultez votre boîte mail puis ouvrez la page de réinitialisation."
                 );
             } else {
-                messageLabel.setStyle("-fx-text-fill: red;");
-                messageLabel.setText(
-                        "Le code a été généré, mais l'email n'a pas pu être envoyé.\n"
-                                + "Vérifiez la configuration SMTP dans MailUtil.java."
+                showError(
+                        "Le code a été généré, mais l'email n'a pas pu être envoyé.\n" +
+                                "Vérifiez la configuration SMTP dans MailUtil.java."
                 );
             }
         } else {
-            messageLabel.setStyle("-fx-text-fill: green;");
-            messageLabel.setText("Si un compte existe avec cet email, un code de réinitialisation a été envoyé.");
+            showSuccess("Si un compte existe avec cet email, un code de réinitialisation a été envoyé.");
         }
     }
 
@@ -64,5 +75,23 @@ public class ForgotPasswordController {
     @FXML
     public void handleOpenResetPage() {
         Main.showResetPasswordPage();
+    }
+
+    private boolean isValidEmail(String email) {
+        return email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
+    }
+
+    private void showError(String message) {
+        if (messageLabel != null) {
+            messageLabel.setStyle("-fx-text-fill: red;");
+            messageLabel.setText(message);
+        }
+    }
+
+    private void showSuccess(String message) {
+        if (messageLabel != null) {
+            messageLabel.setStyle("-fx-text-fill: green;");
+            messageLabel.setText(message);
+        }
     }
 }

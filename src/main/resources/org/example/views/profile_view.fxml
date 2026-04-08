@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane fx:id="rootPane"
+            xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.example.controllers.ProfileController"
+            styleClass="root-container">
+
+    <center>
+        <VBox spacing="20.0" styleClass="main-area">
+            <padding>
+                <Insets top="30" right="30" bottom="30" left="30"/>
+            </padding>
+
+            <HBox spacing="20" alignment="CENTER_LEFT">
+                <VBox spacing="5">
+                    <Label text="👤 Mon profil" styleClass="page-title"/>
+                    <Label text="Consulte et mets à jour tes informations" styleClass="page-subtitle"/>
+                </VBox>
+
+                <Button text="✏ Modifier"
+                        onAction="#handleEditProfilePage"
+                        styleClass="primary-button"/>
+            </HBox>
+
+            <VBox spacing="15" styleClass="big-card">
+                <Label text="Informations" styleClass="card-title"/>
+
+                <HBox spacing="16">
+                    <VBox spacing="4" styleClass="small-box">
+                        <Label text="Nom" styleClass="small-box-title"/>
+                        <Label fx:id="nomLabel" text="--" styleClass="small-box-text"/>
+                    </VBox>
+
+                    <VBox spacing="4" styleClass="small-box">
+                        <Label text="Prénom" styleClass="small-box-title"/>
+                        <Label fx:id="prenomLabel" text="--" styleClass="small-box-text"/>
+                    </VBox>
+                </HBox>
+
+                <HBox spacing="16">
+                    <VBox spacing="4" styleClass="small-box">
+                        <Label text="Téléphone" styleClass="small-box-title"/>
+                        <Label fx:id="telephoneLabel" text="--" styleClass="small-box-text"/>
+                    </VBox>
+
+                    <VBox spacing="4" styleClass="small-box">
+                        <Label text="Email" styleClass="small-box-title"/>
+                        <Label fx:id="emailLabel" text="--" styleClass="small-box-text"/>
+                    </VBox>
+                </HBox>
+
+                <HBox spacing="16">
+                    <VBox spacing="4" styleClass="small-box">
+                        <Label text="Type" styleClass="small-box-title"/>
+                        <Label fx:id="roleLabel" text="--" styleClass="small-box-text"/>
+                    </VBox>
+                </HBox>
+
+                <HBox spacing="12">
+                    <Button text="✏ Modifier mon profil"
+                            onAction="#handleEditProfilePage"
+                            styleClass="primary-button"/>
+
+                    <Button text="↩ Retour au dashboard"
+                            onAction="#handleBackToDashboard"
+                            styleClass="secondary-button"/>
+                </HBox>
+            </VBox>
+        </VBox>
+    </center>
+</BorderPane>

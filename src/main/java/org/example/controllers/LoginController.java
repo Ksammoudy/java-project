@@ -35,11 +35,32 @@ public class LoginController {
 
     @FXML
     public void handleLogin() {
-        String email = emailField.getText() != null ? emailField.getText().trim().toLowerCase() : "";
-        String password = passwordField.getText() != null ? passwordField.getText() : "";
+        String email = emailField != null && emailField.getText() != null
+                ? emailField.getText().trim().toLowerCase()
+                : "";
 
-        if (email.isEmpty() || password.isEmpty()) {
-            showError("Veuillez remplir l'email et le mot de passe.");
+        String password = passwordField != null && passwordField.getText() != null
+                ? passwordField.getText()
+                : "";
+
+        // Contrôle de saisie
+        if (email.isEmpty()) {
+            showError("Le champ email est obligatoire.");
+            return;
+        }
+
+        if (!isValidEmail(email)) {
+            showError("Veuillez saisir une adresse email valide.");
+            return;
+        }
+
+        if (password.isEmpty()) {
+            showError("Le champ mot de passe est obligatoire.");
+            return;
+        }
+
+        if (password.length() < 6) {
+            showError("Le mot de passe doit contenir au moins 6 caractères.");
             return;
         }
 
@@ -58,6 +79,12 @@ public class LoginController {
 
         SessionManager.setCurrentUser(user);
 
+        // Option remember me
+        if (rememberMeCheckBox != null && rememberMeCheckBox.isSelected()) {
+            System.out.println("Option 'Se souvenir de moi' cochée.");
+            // Tu pourras ajouter ici la logique plus tard
+        }
+
         String type = user.getType() != null ? user.getType().trim().toUpperCase() : "";
 
         if ("ADMIN".equals(type)) {
@@ -66,9 +93,12 @@ public class LoginController {
         } else if ("VALORIZER".equals(type) || "VALORISATEUR".equals(type)) {
             System.out.println("Ouverture dashboard VALORIZER");
             Main.showDashboardValorizer();
-        } else {
+        } else if ("CITIZEN".equals(type) || "CITOYEN".equals(type)) {
             System.out.println("Ouverture dashboard CITIZEN");
             Main.showDashboardCitizen();
+        } else {
+            showError("Type utilisateur inconnu.");
+            System.out.println("Type utilisateur inconnu : " + type);
         }
     }
 
@@ -100,6 +130,10 @@ public class LoginController {
     @FXML
     public void handleRegister() {
         Main.showRegisterPage();
+    }
+
+    private boolean isValidEmail(String email) {
+        return email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
     }
 
     private void showError(String message) {

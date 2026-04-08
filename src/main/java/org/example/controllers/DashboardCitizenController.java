@@ -57,12 +57,12 @@ public class DashboardCitizenController {
 
     @FXML
     public void handleProfile() {
-        System.out.println("Ouvrir profil citoyen");
+        Main.showProfileViewPage();
     }
 
     @FXML
     public void handleEditProfile() {
-        System.out.println("Ouvrir modification profil citoyen");
+        Main.showProfileEditPage();
     }
 
     @FXML

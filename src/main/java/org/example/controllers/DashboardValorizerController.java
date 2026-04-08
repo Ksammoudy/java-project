@@ -57,12 +57,12 @@ public class DashboardValorizerController {
 
     @FXML
     public void handleProfile() {
-        System.out.println("Ouvrir profil valorisateur");
+        Main.showProfileViewPage();
     }
 
     @FXML
     public void handleEditProfile() {
-        System.out.println("Ouvrir modification profil valorisateur");
+        Main.showProfileEditPage();
     }
 
     @FXML
