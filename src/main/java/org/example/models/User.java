@@ -1,6 +1,7 @@
 package org.example.models;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 public class User {
     private int id;
@@ -23,16 +24,17 @@ public class User {
     public User() {
     }
 
+    // Constructeur complet avec id
     public User(int id, String email, String roles, String password, String nom, String prenom,
                 String telephone, String type, LocalDateTime createdAt, boolean isActive,
                 String faceEmbedding, LocalDateTime faceUpdatedAt, LocalDateTime lastSeenAt,
                 String googleAuthenticatorSecret, boolean isTwoFactorEnabled, boolean isVerified) {
         this.id = id;
-        this.email = email;
+        this.email = email != null ? email.trim().toLowerCase() : null;
         this.roles = roles;
         this.password = password;
-        this.nom = nom;
-        this.prenom = prenom;
+        this.nom = nom != null ? nom.trim() : null;
+        this.prenom = prenom != null ? prenom.trim() : null;
         this.telephone = telephone;
         this.type = type;
         this.createdAt = createdAt;
@@ -45,6 +47,38 @@ public class User {
         this.isVerified = isVerified;
     }
 
+    // Constructeur sans id pour insertion
+    public User(String email, String roles, String password, String nom, String prenom,
+                String telephone, String type, LocalDateTime createdAt, boolean isActive,
+                String faceEmbedding, LocalDateTime faceUpdatedAt, LocalDateTime lastSeenAt,
+                String googleAuthenticatorSecret, boolean isTwoFactorEnabled, boolean isVerified) {
+        this.email = email != null ? email.trim().toLowerCase() : null;
+        this.roles = roles;
+        this.password = password;
+        this.nom = nom != null ? nom.trim() : null;
+        this.prenom = prenom != null ? prenom.trim() : null;
+        this.telephone = telephone;
+        this.type = type;
+        this.createdAt = createdAt;
+        this.isActive = isActive;
+        this.faceEmbedding = faceEmbedding;
+        this.faceUpdatedAt = faceUpdatedAt;
+        this.lastSeenAt = lastSeenAt;
+        this.googleAuthenticatorSecret = googleAuthenticatorSecret;
+        this.isTwoFactorEnabled = isTwoFactorEnabled;
+        this.isVerified = isVerified;
+    }
+
+    // Constructeur simple utile pour tests
+    public User(String email, String password, String nom, String prenom, String telephone, String type) {
+        this.email = email != null ? email.trim().toLowerCase() : null;
+        this.password = password;
+        this.nom = nom != null ? nom.trim() : null;
+        this.prenom = prenom != null ? prenom.trim() : null;
+        this.telephone = telephone;
+        this.type = type;
+    }
+
     public int getId() {
         return id;
     }
@@ -52,6 +86,7 @@ public class User {
     public void setId(int id) {
         this.id = id;
     }
+
 
     public String getEmail() {
         return email;
@@ -76,6 +111,7 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
+
 
     public String getNom() {
         return nom;
@@ -108,6 +144,7 @@ public class User {
     public void setType(String type) {
         this.type = type;
     }
+
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
@@ -188,5 +225,35 @@ public class User {
                 ", isVerified=" + isVerified +
                 ", isTwoFactorEnabled=" + isTwoFactorEnabled +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return id == user.id &&
+                isActive == user.isActive &&
+                isTwoFactorEnabled == user.isTwoFactorEnabled &&
+                isVerified == user.isVerified &&
+                Objects.equals(email, user.email) &&
+                Objects.equals(roles, user.roles) &&
+                Objects.equals(password, user.password) &&
+                Objects.equals(nom, user.nom) &&
+                Objects.equals(prenom, user.prenom) &&
+                Objects.equals(telephone, user.telephone) &&
+                Objects.equals(type, user.type) &&
+                Objects.equals(createdAt, user.createdAt) &&
+                Objects.equals(faceEmbedding, user.faceEmbedding) &&
+                Objects.equals(faceUpdatedAt, user.faceUpdatedAt) &&
+                Objects.equals(lastSeenAt, user.lastSeenAt) &&
+                Objects.equals(googleAuthenticatorSecret, user.googleAuthenticatorSecret);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, email, roles, password, nom, prenom, telephone, type,
+                createdAt, isActive, faceEmbedding, faceUpdatedAt, lastSeenAt,
+                googleAuthenticatorSecret, isTwoFactorEnabled, isVerified);
     }
 }

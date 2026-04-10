@@ -1,12 +1,15 @@
 package org.example.controllers;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import org.example.Main;
 import org.example.models.User;
+import org.example.services.FacebookAuthService;
 import org.example.services.SessionManager;
 import org.example.services.UserService;
 
@@ -25,6 +28,7 @@ public class LoginController {
     private Label messageLabel;
 
     private final UserService userService = UserService.getInstance();
+    private final FacebookAuthService facebookAuthService = new FacebookAuthService();
 
     @FXML
     public void initialize() {
@@ -43,7 +47,6 @@ public class LoginController {
                 ? passwordField.getText()
                 : "";
 
-        // Contrôle de saisie
         if (email.isEmpty()) {
             showError("Le champ email est obligatoire.");
             return;
@@ -79,27 +82,11 @@ public class LoginController {
 
         SessionManager.setCurrentUser(user);
 
-        // Option remember me
         if (rememberMeCheckBox != null && rememberMeCheckBox.isSelected()) {
             System.out.println("Option 'Se souvenir de moi' cochée.");
-            // Tu pourras ajouter ici la logique plus tard
         }
 
-        String type = user.getType() != null ? user.getType().trim().toUpperCase() : "";
-
-        if ("ADMIN".equals(type)) {
-            System.out.println("Ouverture dashboard ADMIN");
-            Main.showDashboardAdmin();
-        } else if ("VALORIZER".equals(type) || "VALORISATEUR".equals(type)) {
-            System.out.println("Ouverture dashboard VALORIZER");
-            Main.showDashboardValorizer();
-        } else if ("CITIZEN".equals(type) || "CITOYEN".equals(type)) {
-            System.out.println("Ouverture dashboard CITIZEN");
-            Main.showDashboardCitizen();
-        } else {
-            showError("Type utilisateur inconnu.");
-            System.out.println("Type utilisateur inconnu : " + type);
-        }
+        redirectByUserType(user);
     }
 
     @FXML
@@ -109,7 +96,28 @@ public class LoginController {
 
     @FXML
     public void handleFacebookLogin() {
-        showInfo("Login Facebook non encore implémenté en JavaFX.");
+        showInfo("Ouverture de Facebook...");
+
+        facebookAuthService.loginWithFacebook(new FacebookAuthService.AuthCallback() {
+            @Override
+            public void onSuccess(User user) {
+                Platform.runLater(() -> {
+                    if (user == null) {
+                        showError("Connexion Facebook échouée.");
+                        return;
+                    }
+
+                    SessionManager.setCurrentUser(user);
+                    showInfo("Connexion Facebook réussie.");
+                    redirectByUserType(user);
+                });
+            }
+
+            @Override
+            public void onError(String message) {
+                Platform.runLater(() -> showError(message));
+            }
+        });
     }
 
     @FXML
@@ -132,6 +140,24 @@ public class LoginController {
         Main.showRegisterPage();
     }
 
+    private void redirectByUserType(User user) {
+        String type = user.getType() != null ? user.getType().trim().toUpperCase() : "";
+
+        if ("ADMIN".equals(type)) {
+            System.out.println("Ouverture dashboard ADMIN");
+            Main.showDashboardAdmin();
+        } else if ("VALORIZER".equals(type) || "VALORISATEUR".equals(type)) {
+            System.out.println("Ouverture dashboard VALORIZER");
+            Main.showDashboardValorizer();
+        } else if ("CITIZEN".equals(type) || "CITOYEN".equals(type)) {
+            System.out.println("Ouverture dashboard CITIZEN");
+            Main.showDashboardCitizen();
+        } else {
+            showError("Type utilisateur inconnu.");
+            System.out.println("Type utilisateur inconnu : " + type);
+        }
+    }
+
     private boolean isValidEmail(String email) {
         return email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
     }
@@ -140,6 +166,8 @@ public class LoginController {
         if (messageLabel != null) {
             messageLabel.setStyle("-fx-text-fill: #dc3545;");
             messageLabel.setText(message);
+        } else {
+            showAlert(Alert.AlertType.ERROR, "Erreur", message);
         }
     }
 
@@ -148,5 +176,13 @@ public class LoginController {
             messageLabel.setStyle("-fx-text-fill: #0d6efd;");
             messageLabel.setText(message);
         }
+    }
+
+    private void showAlert(Alert.AlertType type, String title, String message) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

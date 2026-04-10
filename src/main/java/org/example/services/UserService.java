@@ -9,11 +9,13 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserService {
+public class UserService implements CRUD<User> {
 
     private static UserService instance;
+    private final Connection cnx;
 
     private UserService() {
+        cnx = DBConnection.getInstance().getConnection();
     }
 
     public static synchronized UserService getInstance() {
@@ -23,10 +25,15 @@ public class UserService {
         return instance;
     }
 
-    public boolean addUser(User user) {
+    @Override
+    public void create(User user) throws SQLException {
+        createPrepared(user);
+    }
+
+    @Override
+    public void createPrepared(User user) throws SQLException {
         if (user == null) {
-            System.out.println("❌ Utilisateur null.");
-            return false;
+            throw new SQLException("Utilisateur null.");
         }
 
         String email = user.getEmail() != null ? user.getEmail().trim().toLowerCase() : "";
@@ -37,51 +44,40 @@ public class UserService {
         String password = user.getPassword();
 
         if (email.isEmpty() || !isValidEmail(email)) {
-            System.out.println("❌ Email invalide.");
-            return false;
+            throw new SQLException("Email invalide.");
         }
 
         if (nom.isEmpty() || !isValidName(nom)) {
-            System.out.println("❌ Nom invalide.");
-            return false;
+            throw new SQLException("Nom invalide.");
         }
 
         if (prenom.isEmpty() || !isValidName(prenom)) {
-            System.out.println("❌ Prénom invalide.");
-            return false;
+            throw new SQLException("Prénom invalide.");
         }
 
         if (!telephone.isEmpty() && !isValidPhone(telephone)) {
-            System.out.println("❌ Téléphone invalide.");
-            return false;
+            throw new SQLException("Téléphone invalide.");
         }
 
         if (!isValidType(type)) {
-            System.out.println("❌ Type utilisateur invalide.");
-            return false;
+            throw new SQLException("Type utilisateur invalide.");
         }
 
         if (password == null || password.isBlank() || password.length() < 6) {
-            System.out.println("❌ Mot de passe invalide.");
-            return false;
+            throw new SQLException("Mot de passe invalide.");
         }
 
         if (getUserByEmail(email) != null) {
-            System.out.println("❌ Email déjà utilisé.");
-            return false;
+            throw new SQLException("Email déjà utilisé.");
         }
 
         String sql = "INSERT INTO user (email, roles, password, nom, prenom, telephone, type, created_at, is_active, face_embedding, face_updated_at, last_seen_at, google_authenticator_secret, is_two_factor_enabled, is_verified) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try (PreparedStatement ps = DBConnection.getInstance().getConnection().prepareStatement(sql)) {
-
+        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setString(1, email);
             ps.setString(2, user.getRoles() == null || user.getRoles().isBlank() ? "[]" : user.getRoles());
-
-            // Hash une seule fois ici
             ps.setString(3, PasswordUtil.hashPassword(password));
-
             ps.setString(4, nom);
             ps.setString(5, prenom);
             ps.setString(6, telephone.isEmpty() ? null : telephone);
@@ -97,15 +93,113 @@ public class UserService {
             ps.setBoolean(14, user.isTwoFactorEnabled());
             ps.setBoolean(15, user.isVerified());
 
-            return ps.executeUpdate() > 0;
+            ps.executeUpdate();
+        }
+    }
 
-        } catch (SQLIntegrityConstraintViolationException e) {
-            System.out.println("❌ Erreur : email déjà utilisé.");
-        } catch (SQLException e) {
-            System.out.println("❌ Erreur addUser : " + e.getMessage());
+    @Override
+    public List<User> read() throws SQLException {
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT * FROM user ORDER BY id ASC";
+
+        try (Statement st = cnx.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+
+            while (rs.next()) {
+                users.add(mapResultSetToUser(rs));
+            }
         }
 
-        return false;
+        return users;
+    }
+
+    @Override
+    public void update(User user) throws SQLException {
+        if (user == null) {
+            throw new SQLException("Utilisateur null.");
+        }
+
+        String email = user.getEmail() != null ? user.getEmail().trim().toLowerCase() : "";
+        String nom = user.getNom() != null ? user.getNom().trim() : "";
+        String prenom = user.getPrenom() != null ? user.getPrenom().trim() : "";
+        String telephone = user.getTelephone() != null ? user.getTelephone().trim() : "";
+        String type = user.getType() != null ? user.getType().trim().toUpperCase() : "";
+
+        if (user.getId() <= 0) {
+            throw new SQLException("ID utilisateur invalide.");
+        }
+
+        if (email.isEmpty() || !isValidEmail(email)) {
+            throw new SQLException("Email invalide.");
+        }
+
+        if (nom.isEmpty() || !isValidName(nom)) {
+            throw new SQLException("Nom invalide.");
+        }
+
+        if (prenom.isEmpty() || !isValidName(prenom)) {
+            throw new SQLException("Prénom invalide.");
+        }
+
+        if (!telephone.isEmpty() && !isValidPhone(telephone)) {
+            throw new SQLException("Téléphone invalide.");
+        }
+
+        if (!isValidType(type)) {
+            throw new SQLException("Type utilisateur invalide.");
+        }
+
+        if (emailExistsForAnotherUser(email, user.getId())) {
+            throw new SQLException("Email déjà utilisé par un autre utilisateur.");
+        }
+
+        String sql = "UPDATE user SET email=?, roles=?, nom=?, prenom=?, telephone=?, type=?, created_at=?, is_active=?, face_embedding=?, face_updated_at=?, last_seen_at=?, google_authenticator_secret=?, is_two_factor_enabled=?, is_verified=? WHERE id=?";
+
+        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+            ps.setString(1, email);
+            ps.setString(2, user.getRoles() == null || user.getRoles().isBlank() ? "[]" : user.getRoles());
+            ps.setString(3, nom);
+            ps.setString(4, prenom);
+            ps.setString(5, telephone.isEmpty() ? null : telephone);
+            ps.setString(6, type);
+            ps.setTimestamp(7, Timestamp.valueOf(
+                    user.getCreatedAt() != null ? user.getCreatedAt() : LocalDateTime.now()
+            ));
+            ps.setBoolean(8, user.isActive());
+            ps.setString(9, user.getFaceEmbedding());
+            ps.setTimestamp(10, user.getFaceUpdatedAt() != null ? Timestamp.valueOf(user.getFaceUpdatedAt()) : null);
+            ps.setTimestamp(11, user.getLastSeenAt() != null ? Timestamp.valueOf(user.getLastSeenAt()) : null);
+            ps.setString(12, user.getGoogleAuthenticatorSecret());
+            ps.setBoolean(13, user.isTwoFactorEnabled());
+            ps.setBoolean(14, user.isVerified());
+            ps.setInt(15, user.getId());
+
+            ps.executeUpdate();
+        }
+    }
+
+    @Override
+    public void delete(User user) throws SQLException {
+        if (user == null || user.getId() <= 0) {
+            throw new SQLException("Utilisateur ou ID invalide.");
+        }
+
+        String sql = "DELETE FROM user WHERE id = ?";
+
+        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+            ps.setInt(1, user.getId());
+            ps.executeUpdate();
+        }
+    }
+
+    public boolean addUser(User user) {
+        try {
+            createPrepared(user);
+            return true;
+        } catch (SQLException e) {
+            System.out.println("❌ Erreur addUser : " + e.getMessage());
+            return false;
+        }
     }
 
     public String registerUser(String nom, String prenom, String email, String telephone,
@@ -174,7 +268,7 @@ public class UserService {
         user.setTelephone(telephone.isEmpty() ? null : telephone);
         user.setType(type);
         user.setRoles("[]");
-        user.setPassword(password); // mot de passe brut ici, hash dans addUser()
+        user.setPassword(password);
         user.setCreatedAt(LocalDateTime.now());
         user.setActive(true);
         user.setVerified(false);
@@ -189,27 +283,18 @@ public class UserService {
     }
 
     public List<User> getAllUsers() {
-        List<User> users = new ArrayList<>();
-        String sql = "SELECT * FROM user ORDER BY id ASC";
-
-        try (Statement st = DBConnection.getInstance().getConnection().createStatement();
-             ResultSet rs = st.executeQuery(sql)) {
-
-            while (rs.next()) {
-                users.add(mapResultSetToUser(rs));
-            }
-
+        try {
+            return read();
         } catch (SQLException e) {
             System.out.println("❌ Erreur getAllUsers : " + e.getMessage());
+            return new ArrayList<>();
         }
-
-        return users;
     }
 
     public User getUserById(int id) {
         String sql = "SELECT * FROM user WHERE id = ?";
 
-        try (PreparedStatement ps = DBConnection.getInstance().getConnection().prepareStatement(sql)) {
+        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setInt(1, id);
 
             try (ResultSet rs = ps.executeQuery()) {
@@ -232,7 +317,7 @@ public class UserService {
 
         String sql = "SELECT * FROM user WHERE email = ?";
 
-        try (PreparedStatement ps = DBConnection.getInstance().getConnection().prepareStatement(sql)) {
+        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setString(1, email.trim().toLowerCase());
 
             try (ResultSet rs = ps.executeQuery()) {
@@ -253,71 +338,13 @@ public class UserService {
     }
 
     public boolean updateUser(User user) {
-        if (user == null) {
-            System.out.println("❌ Utilisateur null.");
-            return false;
-        }
-
-        String email = user.getEmail() != null ? user.getEmail().trim().toLowerCase() : "";
-        String nom = user.getNom() != null ? user.getNom().trim() : "";
-        String prenom = user.getPrenom() != null ? user.getPrenom().trim() : "";
-        String telephone = user.getTelephone() != null ? user.getTelephone().trim() : "";
-        String type = user.getType() != null ? user.getType().trim().toUpperCase() : "";
-
-        if (email.isEmpty() || !isValidEmail(email)) {
-            System.out.println("❌ Email invalide.");
-            return false;
-        }
-
-        if (nom.isEmpty() || !isValidName(nom)) {
-            System.out.println("❌ Nom invalide.");
-            return false;
-        }
-
-        if (prenom.isEmpty() || !isValidName(prenom)) {
-            System.out.println("❌ Prénom invalide.");
-            return false;
-        }
-
-        if (!telephone.isEmpty() && !isValidPhone(telephone)) {
-            System.out.println("❌ Téléphone invalide.");
-            return false;
-        }
-
-        if (!isValidType(type)) {
-            System.out.println("❌ Type utilisateur invalide.");
-            return false;
-        }
-
-        String sql = "UPDATE user SET email=?, roles=?, nom=?, prenom=?, telephone=?, type=?, created_at=?, is_active=?, face_embedding=?, face_updated_at=?, last_seen_at=?, google_authenticator_secret=?, is_two_factor_enabled=?, is_verified=? WHERE id=?";
-
-        try (PreparedStatement ps = DBConnection.getInstance().getConnection().prepareStatement(sql)) {
-
-            ps.setString(1, email);
-            ps.setString(2, user.getRoles() == null ? "[]" : user.getRoles());
-            ps.setString(3, nom);
-            ps.setString(4, prenom);
-            ps.setString(5, telephone.isEmpty() ? null : telephone);
-            ps.setString(6, type);
-            ps.setTimestamp(7, Timestamp.valueOf(
-                    user.getCreatedAt() != null ? user.getCreatedAt() : LocalDateTime.now()
-            ));
-            ps.setBoolean(8, user.isActive());
-            ps.setString(9, user.getFaceEmbedding());
-            ps.setTimestamp(10, user.getFaceUpdatedAt() != null ? Timestamp.valueOf(user.getFaceUpdatedAt()) : null);
-            ps.setTimestamp(11, user.getLastSeenAt() != null ? Timestamp.valueOf(user.getLastSeenAt()) : null);
-            ps.setString(12, user.getGoogleAuthenticatorSecret());
-            ps.setBoolean(13, user.isTwoFactorEnabled());
-            ps.setBoolean(14, user.isVerified());
-            ps.setInt(15, user.getId());
-
-            return ps.executeUpdate() > 0;
-
+        try {
+            update(user);
+            return true;
         } catch (SQLException e) {
             System.out.println("❌ Erreur updateUser : " + e.getMessage());
+            return false;
         }
-
-        return false;
     }
 
     public boolean updateProfile(User user) {
@@ -351,9 +378,14 @@ public class UserService {
             return false;
         }
 
+        if (emailExistsForAnotherUser(email, user.getId())) {
+            System.out.println("❌ Email déjà utilisé par un autre utilisateur.");
+            return false;
+        }
+
         String sql = "UPDATE user SET nom = ?, prenom = ?, email = ?, telephone = ?, password = ? WHERE id = ?";
 
-        try (PreparedStatement ps = DBConnection.getInstance().getConnection().prepareStatement(sql)) {
+        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setString(1, nom);
             ps.setString(2, prenom);
             ps.setString(3, email);
@@ -377,7 +409,7 @@ public class UserService {
 
         String sql = "SELECT id FROM user WHERE email = ? AND id <> ?";
 
-        try (PreparedStatement ps = DBConnection.getInstance().getConnection().prepareStatement(sql)) {
+        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setString(1, email.trim().toLowerCase());
             ps.setInt(2, currentUserId);
 
@@ -405,7 +437,7 @@ public class UserService {
 
         String sql = "UPDATE user SET password = ? WHERE id = ?";
 
-        try (PreparedStatement ps = DBConnection.getInstance().getConnection().prepareStatement(sql)) {
+        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setString(1, PasswordUtil.hashPassword(newPlainPassword));
             ps.setInt(2, id);
 
@@ -419,23 +451,21 @@ public class UserService {
     }
 
     public boolean deleteUser(int id) {
-        String sql = "DELETE FROM user WHERE id = ?";
-
-        try (PreparedStatement ps = DBConnection.getInstance().getConnection().prepareStatement(sql)) {
-            ps.setInt(1, id);
-            return ps.executeUpdate() > 0;
-
+        try {
+            User user = new User();
+            user.setId(id);
+            delete(user);
+            return true;
         } catch (SQLException e) {
             System.out.println("❌ Erreur deleteUser : " + e.getMessage());
+            return false;
         }
-
-        return false;
     }
 
     public boolean toggleActive(int id) {
         String sql = "UPDATE user SET is_active = NOT is_active WHERE id = ?";
 
-        try (PreparedStatement ps = DBConnection.getInstance().getConnection().prepareStatement(sql)) {
+        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setInt(1, id);
             return ps.executeUpdate() > 0;
 
@@ -476,7 +506,7 @@ public class UserService {
 
         String sql = "UPDATE user SET is_active = ? WHERE id = ?";
 
-        try (PreparedStatement ps = DBConnection.getInstance().getConnection().prepareStatement(sql)) {
+        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setBoolean(1, active);
             ps.setInt(2, targetUserId);
 
@@ -492,7 +522,7 @@ public class UserService {
     public boolean updateLastSeen(int id) {
         String sql = "UPDATE user SET last_seen_at = ? WHERE id = ?";
 
-        try (PreparedStatement ps = DBConnection.getInstance().getConnection().prepareStatement(sql)) {
+        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
             ps.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
             ps.setInt(2, id);
 
@@ -532,6 +562,8 @@ public class UserService {
         if (!user.isVerified()) {
             System.out.println("⚠️ Compte non vérifié.");
         }
+
+        updateLastSeen(user.getId());
 
         System.out.println("✅ Connexion réussie.");
         return user;
