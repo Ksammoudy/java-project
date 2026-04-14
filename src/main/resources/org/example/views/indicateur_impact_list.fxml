@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.controllers.IndicateurImpactController"
+            stylesheets="@../styles/style.css">
+
+    <!-- SIDEBAR -->
+    <left>
+        <VBox styleClass="sidebar" prefWidth="280" style="-fx-background-color: #1a3a2a;">
+            <VBox styleClass="sidebar-header" spacing="10" alignment="CENTER" style="-fx-padding: 30 0 30 0;">
+                <Text text="🌱 WasteWise" style="-fx-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;"/>
+            </VBox>
+
+            <VBox styleClass="sidebar-menu" spacing="5" style="-fx-padding: 20 15 0 15;">
+                <Text style="-fx-fill: rgba(255,255,255,0.4); -fx-font-size: 11px; -fx-font-weight: bold;">MAIN</Text>
+                <Button text="📊 Dashboard" styleClass="sidebar-btn" onAction="#goToDashboard"/>
+                <Button text="📍 Zones Polluées" styleClass="sidebar-btn" onAction="#goToZones"/>
+                <Button text="📈 Indicateurs d'Impact" styleClass="sidebar-btn active"/>
+            </VBox>
+        </VBox>
+    </left>
+
+    <!-- MAIN CONTENT -->
+    <center>
+        <VBox styleClass="main-content" spacing="20" style="-fx-padding: 20;">
+            <!-- Top Header -->
+            <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 0 0 10 0;">
+                <Label text="Dashboard / Indicateurs d'Impact" style="-fx-font-size: 14px; -fx-text-fill: #6c757d;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="🔔" style="-fx-background-color: transparent;"/>
+                <Button text="👤 Admin" style="-fx-background-color: transparent; -fx-font-weight: bold;"/>
+            </HBox>
+
+            <!-- Hero Banner -->
+            <VBox styleClass="hero" spacing="10" style="-fx-background-color: linear-gradient(to right, #2f6b4f, #8bd22f); -fx-background-radius: 20; -fx-padding: 40;">
+                <Label text="Indicateurs d'Impact" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                <Label text="Suivez l'impact environnemental de vos actions" style="-fx-text-fill: rgba(255,255,255,0.85);"/>
+            </VBox>
+
+            <!-- Stats Cards -->
+            <HBox spacing="20">
+                <VBox styleClass="stat-card" spacing="10" HBox.hgrow="ALWAYS" style="-fx-background-color: white; -fx-background-radius: 18; -fx-padding: 25;">
+                    <Text text="📊" style="-fx-font-size: 28px;"/>
+                    <Text fx:id="totalIndicateursText" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-fill: #1a3a2a;">0</Text>
+                    <Text text="Total Indicateurs" style="-fx-fill: #6c757d;"/>
+                </VBox>
+                <VBox styleClass="stat-card" spacing="10" HBox.hgrow="ALWAYS" style="-fx-background-color: white; -fx-background-radius: 18; -fx-padding: 25;">
+                    <Text text="🗑️" style="-fx-font-size: 28px;"/>
+                    <Text fx:id="totalDechetsText" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-fill: #1a3a2a;">0 kg</Text>
+                    <Text text="Déchets collectés" style="-fx-fill: #6c757d;"/>
+                </VBox>
+                <VBox styleClass="stat-card" spacing="10" HBox.hgrow="ALWAYS" style="-fx-background-color: white; -fx-background-radius: 18; -fx-padding: 25;">
+                    <Text text="🌿" style="-fx-font-size: 28px;"/>
+                    <Text fx:id="totalCo2Text" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-fill: #1a3a2a;">0 kg</Text>
+                    <Text text="CO₂ évité" style="-fx-fill: #6c757d;"/>
+                </VBox>
+            </HBox>
+
+            <!-- Table -->
+            <VBox styleClass="big-card" spacing="15" style="-fx-background-color: white; -fx-background-radius: 18; -fx-padding: 30;">
+                <HBox alignment="CENTER_LEFT">
+                    <Text text="Indicateurs d'Impact" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button text="➕ Ajouter" styleClass="btn-green" onAction="#addIndicateur"/>
+                </HBox>
+
+                <TableView fx:id="indicateurTable" prefHeight="400">
+                    <columns>
+                        <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
+                        <TableColumn fx:id="colTotalKg" text="Déchets (kg)" prefWidth="150"/>
+                        <TableColumn fx:id="colCo2" text="CO₂ évité (kg)" prefWidth="150"/>
+                        <TableColumn fx:id="colDate" text="Date" prefWidth="200"/>
+                        <TableColumn fx:id="colActions" text="Actions" prefWidth="100"/>
+                    </columns>
+                </TableView>
+            </VBox>
+        </VBox>
+    </center>
+</BorderPane>

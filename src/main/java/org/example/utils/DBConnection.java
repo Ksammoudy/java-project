@@ -6,21 +6,13 @@ import java.sql.SQLException;
 
 public class DBConnection {
 
-    private static DBConnection instance;
-    private Connection connection;
-
-    private static final String URL = "jdbc:mysql://localhost:3306/wastewise_tn";
+    private static final String URL = "jdbc:mysql://localhost:3306/pidev";
     private static final String USER = "root";
     private static final String PASSWORD = "";
 
-    private DBConnection() {
-        try {
-            connection = DriverManager.getConnection(URL, USER, PASSWORD);
-            System.out.println("Connexion MySQL réussie !");
-        } catch (SQLException e) {
-            System.out.println("Erreur connexion DB: " + e.getMessage());
-        }
-    }
+    private static DBConnection instance;
+
+    private DBConnection() {}
 
     public static DBConnection getInstance() {
         if (instance == null) {
@@ -29,7 +21,13 @@ public class DBConnection {
         return instance;
     }
 
+    // Crée une NOUVELLE connexion à chaque appel
     public Connection getConnection() {
-        return connection;
+        try {
+            return DriverManager.getConnection(URL, USER, PASSWORD);
+        } catch (SQLException e) {
+            System.out.println("Erreur connexion DB: " + e.getMessage());
+            return null;
+        }
     }
 }

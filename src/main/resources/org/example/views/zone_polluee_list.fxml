@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.controllers.ZonePollueeController"
+            stylesheets="@../styles/style.css">
+
+    <!-- SIDEBAR -->
+    <left>
+        <VBox styleClass="sidebar" prefWidth="280" style="-fx-background-color: #2f6b4f;">
+            <VBox styleClass="sidebar-header" spacing="10" alignment="CENTER" style="-fx-padding: 30 0 30 0;">
+                <Text text="🌱 WasteWise" style="-fx-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;"/>
+            </VBox>
+
+            <VBox styleClass="sidebar-menu" spacing="5" style="-fx-padding: 20 15 0 15;">
+                <Text style="-fx-fill: rgba(255,255,255,0.4); -fx-font-size: 11px; -fx-font-weight: bold;">MAIN</Text>
+                <Button text="📊 Dashboard" styleClass="sidebar-btn" onAction="#goToDashboard"/>
+                <Button text="📍 Zones Polluées" styleClass="sidebar-btn active"/>
+                <Button text="📈 Indicateurs" styleClass="sidebar-btn" onAction="#goToIndicateurs"/>
+                <Button text="🗺️ Carte" styleClass="sidebar-btn" onAction="#goToMap"/>
+            </VBox>
+        </VBox>
+    </left>
+
+    <!-- MAIN CONTENT -->
+    <center>
+        <VBox styleClass="main-content" spacing="20" style="-fx-padding: 20;">
+            <!-- Top Header -->
+            <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 0 0 10 0;">
+                <Label text="Dashboard / Zones Polluées" style="-fx-font-size: 14px; -fx-text-fill: #6c757d;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="🔔" style="-fx-background-color: transparent;"/>
+                <Button text="👤 Admin" style="-fx-background-color: transparent; -fx-font-weight: bold;"/>
+            </HBox>
+
+            <!-- Hero Banner -->
+            <VBox styleClass="hero" spacing="10" style="-fx-background-color: linear-gradient(to right, #2f6b4f, #8bd22f); -fx-background-radius: 20; -fx-padding: 40;">
+                <Label text="Dashboard Administrateur" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                <Label text="Module 6 - Gestion de l'Impact et des Zones Polluées" style="-fx-text-fill: rgba(255,255,255,0.85);"/>
+            </VBox>
+
+            <!-- Stats Cards -->
+            <HBox spacing="20">
+                <VBox styleClass="stat-card" spacing="10" HBox.hgrow="ALWAYS" style="-fx-background-color: white; -fx-background-radius: 18; -fx-padding: 25;">
+                    <Text text="📍" style="-fx-font-size: 28px;"/>
+                    <Text fx:id="totalZonesText" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-fill: #1a3a2a;">0</Text>
+                    <Text text="Zones Polluées" style="-fx-fill: #6c757d;"/>
+                </VBox>
+                <VBox styleClass="stat-card" spacing="10" HBox.hgrow="ALWAYS" style="-fx-background-color: white; -fx-background-radius: 18; -fx-padding: 25;">
+                    <Text text="⚠️" style="-fx-font-size: 28px;"/>
+                    <Text fx:id="hautRisqueText" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-fill: #dc3545;">0</Text>
+                    <Text text="Haut Risque" style="-fx-fill: #6c757d;"/>
+                </VBox>
+                <VBox styleClass="stat-card" spacing="10" HBox.hgrow="ALWAYS" style="-fx-background-color: white; -fx-background-radius: 18; -fx-padding: 25;">
+                    <Text text="📅" style="-fx-font-size: 28px;"/>
+                    <Text fx:id="nouvellesZonesText" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-fill: #28a745;">0</Text>
+                    <Text text="Nouvelles Zones (7j)" style="-fx-fill: #6c757d;"/>
+                </VBox>
+            </HBox>
+
+            <!-- Search and Filters -->
+            <HBox spacing="10">
+                <TextField fx:id="searchField" promptText="🔍 Rechercher par nom ou GPS..." style="-fx-background-radius: 20; -fx-padding: 10 15; -fx-background-color: white; -fx-border-color: #ddd;" HBox.hgrow="ALWAYS"/>
+                <ComboBox fx:id="filterCombo" prefWidth="200" style="-fx-background-radius: 20;"/>
+                <Button text="Filtrer" styleClass="btn-green" onAction="#loadZones"/>
+            </HBox>
+
+            <!-- Table -->
+            <VBox styleClass="big-card" spacing="15" style="-fx-background-color: white; -fx-background-radius: 18; -fx-padding: 30;">
+                <HBox alignment="CENTER_LEFT">
+                    <Text text="Zones Polluées" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button text="➕ Nouvelle Zone" styleClass="btn-green" onAction="#addZone"/>
+                </HBox>
+
+                <TableView fx:id="zoneTable" prefHeight="400">
+                    <columns>
+                        <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
+                        <TableColumn fx:id="colNom" text="Zone" prefWidth="200"/>
+                        <TableColumn fx:id="colGps" text="Coordonnées" prefWidth="200"/>
+                        <TableColumn fx:id="colNiveau" text="Niveau" prefWidth="80"/>
+                        <TableColumn fx:id="colDate" text="Date" prefWidth="150"/>
+                        <TableColumn fx:id="colIndicateur" text="Indicateur" prefWidth="100"/>
+                        <TableColumn fx:id="colActions" text="Actions" prefWidth="150"/>
+                    </columns>
+                </TableView>
+            </VBox>
+        </VBox>
+    </center>
+</BorderPane>

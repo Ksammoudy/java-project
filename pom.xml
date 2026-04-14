@@ -46,6 +46,7 @@
             <version>0.4</version>
         </dependency>
 
+
         <!-- Envoi email -->
         <dependency>
             <groupId>com.sun.mail</groupId>
