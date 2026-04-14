@@ -598,3 +598,269 @@
     -fx-font-weight: 800;
     -fx-text-fill: #0f172a;
 }
+/* ========================
+   DESIGN UNIFIÉ WASTEWISE
+   ======================== */
+
+/* Sidebar */
+.sidebar {
+    -fx-background-color: #1a3a2a;
+}
+
+.sidebar-header {
+    -fx-background-color: rgba(0,0,0,0.1);
+    -fx-padding: 25 20 25 20;
+}
+
+.sidebar-header Text {
+    -fx-fill: white;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+.sidebar-menu {
+    -fx-padding: 20 15 0 15;
+}
+
+.menu-label {
+    -fx-fill: rgba(255,255,255,0.4);
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 10 15;
+}
+
+.sidebar-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: rgba(255,255,255,0.8);
+    -fx-font-size: 14px;
+    -fx-font-weight: 500;
+    -fx-padding: 12 15 12 15;
+    -fx-background-radius: 12;
+    -fx-cursor: hand;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.sidebar-btn:hover {
+    -fx-background-color: rgba(139,210,47,0.15);
+    -fx-text-fill: #8bd22f;
+}
+
+.sidebar-btn.active {
+    -fx-background-color: #8bd22f;
+    -fx-text-fill: #1a3a2a;
+}
+
+/* Top Header */
+.top-header {
+    -fx-background-color: white;
+    -fx-border-color: #e5e5e5;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 15 25;
+}
+
+/* Hero Banner */
+.hero {
+    -fx-background-color: linear-gradient(to right, #2f6b4f, #8bd22f);
+    -fx-background-radius: 20;
+    -fx-padding: 35 40;
+}
+
+.hero-title {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-fill: white;
+}
+
+.hero-subtitle {
+    -fx-font-size: 14px;
+    -fx-fill: rgba(255,255,255,0.85);
+}
+
+/* Stats Cards */
+.stat-card {
+    -fx-background-color: white;
+    -fx-background-radius: 18;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 2);
+    -fx-padding: 20;
+}
+
+.stat-card:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 15, 0, 0, 5);
+    -fx-translate-y: -3;
+}
+
+.stat-icon {
+    -fx-font-size: 28px;
+}
+
+.stat-value {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-fill: #1a3a2a;
+}
+
+.stat-label {
+    -fx-fill: #6c757d;
+    -fx-font-size: 13px;
+}
+
+/* Big Card */
+.big-card {
+    -fx-background-color: white;
+    -fx-background-radius: 18;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 2);
+    -fx-padding: 25;
+}
+
+.card-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-fill: #1a3a2a;
+}
+
+/* Tableau */
+.table-view {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #f8f9fa;
+    -fx-background-radius: 12 12 0 0;
+}
+
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-border-color: #dee2e6;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 12 0;
+}
+
+.table-view .column-header .label {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #495057;
+}
+
+.table-view .table-cell {
+    -fx-padding: 12 10;
+    -fx-border-color: #e9ecef;
+    -fx-border-width: 0 0 1 0;
+}
+
+.table-row-cell:hover {
+    -fx-background-color: #f8f9fa;
+}
+
+/* Badges */
+.badge-success {
+    -fx-background-color: #28a745;
+    -fx-text-fill: white;
+    -fx-padding: 4 10;
+    -fx-background-radius: 20;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.badge-warning {
+    -fx-background-color: #ffc107;
+    -fx-text-fill: #212529;
+    -fx-padding: 4 10;
+    -fx-background-radius: 20;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.badge-danger {
+    -fx-background-color: #dc3545;
+    -fx-text-fill: white;
+    -fx-padding: 4 10;
+    -fx-background-radius: 20;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+/* Boutons */
+.btn-green {
+    -fx-background-color: #8bd22f;
+    -fx-text-fill: #1a3a2a;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20;
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+}
+
+.btn-green:hover {
+    -fx-background-color: #76c023;
+}
+
+.btn-outline {
+    -fx-background-color: transparent;
+    -fx-text-fill: #6c757d;
+    -fx-border-color: #dee2e6;
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
+    -fx-padding: 10 20;
+    -fx-cursor: hand;
+}
+
+.btn-outline:hover {
+    -fx-border-color: #8bd22f;
+    -fx-text-fill: #1a3a2a;
+}
+
+/* Search & Filter */
+.search-field {
+    -fx-background-radius: 25;
+    -fx-padding: 10 15;
+    -fx-background-color: white;
+    -fx-border-color: #dee2e6;
+    -fx-border-radius: 25;
+}
+
+.search-field:focused {
+    -fx-border-color: #8bd22f;
+}
+
+.filter-combo {
+    -fx-background-radius: 25;
+    -fx-padding: 10 15;
+    -fx-background-color: white;
+    -fx-border-color: #dee2e6;
+    -fx-border-radius: 25;
+}
+
+/* Formulaire Dialog */
+.form-dialog {
+    -fx-background-color: white;
+    -fx-background-radius: 15;
+}
+
+.form-title {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-fill: #1a3a2a;
+}
+
+.form-label {
+    -fx-font-weight: bold;
+    -fx-fill: #333;
+}
+
+.form-field {
+    -fx-background-radius: 8;
+    -fx-padding: 10 12;
+    -fx-border-color: #dee2e6;
+    -fx-border-radius: 8;
+    -fx-background-color: white;
+}
+
+.form-field:focused {
+    -fx-border-color: #8bd22f;
+    -fx-border-width: 2;
+}
+
+.form-hint {
+    -fx-fill: #6c757d;
+    -fx-font-size: 11px;
+}

@@ -1,6 +1,7 @@
 package org.example.services;
 
 import org.example.models.IndicateurImpact;
+import org.example.models.ZonePolluee;
 import org.example.utils.DBConnection;
 
 import java.sql.*;
@@ -25,7 +26,6 @@ public class IndicateurImpactDAO {
             ResultSet rs = pstmt.getGeneratedKeys();
             if (rs.next()) {
                 indicateur.setId(rs.getInt(1));
-                System.out.println("✅ Indicateur ajouté avec succès (ID: " + indicateur.getId() + ") !");
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -91,6 +91,58 @@ public class IndicateurImpactDAO {
         }
     }
 
+    // ========== GESTION DES ZONES LIÉES ==========
+
+    // Récupérer toutes les zones liées à un indicateur
+    public List<ZonePolluee> getZonesByIndicateurId(int indicateurId) {
+        List<ZonePolluee> zones = new ArrayList<>();
+        String sql = "SELECT * FROM zone_polluee WHERE indicateur_id = ?";
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, indicateurId);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                zones.add(extractZoneFromResultSet(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return zones;
+    }
+
+    // Supprimer un indicateur ET ses zones liées
+    public void deleteIndicateurWithZones(int indicateurId) {
+        // 1. Supprimer les zones liées
+        String deleteZonesSql = "DELETE FROM zone_polluee WHERE indicateur_id = ?";
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(deleteZonesSql)) {
+            pstmt.setInt(1, indicateurId);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        // 2. Supprimer l'indicateur
+        deleteIndicateur(indicateurId);
+    }
+
+    // Compter le nombre de zones liées à un indicateur
+    public int countZonesByIndicateurId(int indicateurId) {
+        String sql = "SELECT COUNT(*) FROM zone_polluee WHERE indicateur_id = ?";
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, indicateurId);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    // Extraction d'un indicateur depuis ResultSet
     private IndicateurImpact extractIndicateurFromResultSet(ResultSet rs) throws SQLException {
         IndicateurImpact indicateur = new IndicateurImpact();
         indicateur.setId(rs.getInt("id"));
@@ -98,6 +150,17 @@ public class IndicateurImpactDAO {
         indicateur.setCo2Evite(rs.getDouble("co2_evite"));
         indicateur.setDateCalcul(rs.getTimestamp("date_calcul").toLocalDateTime());
         return indicateur;
+    }
+
+    // Extraction d'une zone depuis ResultSet
+    private ZonePolluee extractZoneFromResultSet(ResultSet rs) throws SQLException {
+        ZonePolluee zone = new ZonePolluee();
+        zone.setId(rs.getInt("id"));
+        zone.setNomZone(rs.getString("nom_zone"));
+        zone.setCoordonneesGps(rs.getString("coordonnees_gps"));
+        zone.setNiveauPollution(rs.getInt("niveau_pollution"));
+        zone.setDateIdentification(rs.getTimestamp("date_identification").toLocalDateTime());
+        return zone;
     }
 
     // Contrôle de saisie

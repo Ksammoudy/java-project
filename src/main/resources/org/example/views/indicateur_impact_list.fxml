@@ -8,7 +8,7 @@
 <BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.controllers.IndicateurImpactController"
             stylesheets="@../styles/style.css">
 
-    <!-- SIDEBAR -->
+    <!-- SIDEBAR (MÊME COULEUR QUE ZONES POLLUÉES) -->
     <left>
         <VBox styleClass="sidebar" prefWidth="280" style="-fx-background-color: #1a3a2a;">
             <VBox styleClass="sidebar-header" spacing="10" alignment="CENTER" style="-fx-padding: 30 0 30 0;">
@@ -35,13 +35,13 @@
                 <Button text="👤 Admin" style="-fx-background-color: transparent; -fx-font-weight: bold;"/>
             </HBox>
 
-            <!-- Hero Banner -->
+            <!-- Hero Banner (MÊME GRADIENT) -->
             <VBox styleClass="hero" spacing="10" style="-fx-background-color: linear-gradient(to right, #2f6b4f, #8bd22f); -fx-background-radius: 20; -fx-padding: 40;">
                 <Label text="Indicateurs d'Impact" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: white;"/>
                 <Label text="Suivez l'impact environnemental de vos actions" style="-fx-text-fill: rgba(255,255,255,0.85);"/>
             </VBox>
 
-            <!-- Stats Cards -->
+            <!-- Stats Cards (MÊMES COULEURS) -->
             <HBox spacing="20">
                 <VBox styleClass="stat-card" spacing="10" HBox.hgrow="ALWAYS" style="-fx-background-color: white; -fx-background-radius: 18; -fx-padding: 25;">
                     <Text text="📊" style="-fx-font-size: 28px;"/>
