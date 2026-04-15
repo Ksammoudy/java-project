@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.example.controllers.DeclarationDechetListController"
+            styleClass="workspace-root">
+    <left>
+        <VBox prefWidth="276.0" spacing="10.0" styleClass="workspace-sidebar">
+            <padding>
+                <Insets top="24.0" right="16.0" bottom="16.0" left="16.0"/>
+            </padding>
+            <VBox spacing="4.0" styleClass="brand-shell">
+                <Label text="WasteWise" styleClass="brand-logo-text"/>
+            </VBox>
+            <Label text="Menu Principal" styleClass="sidebar-section"/>
+            <Button text="Tableau de bord" onAction="#openAdminDashboard" maxWidth="Infinity" styleClass="sidebar-nav muted"/>
+            <Label text="Gestion dechets" styleClass="sidebar-section"/>
+            <Button text="Types de dechets" onAction="#openTypeDechetWorkshop" maxWidth="Infinity" styleClass="sidebar-nav muted"/>
+            <Button text="Declarations" maxWidth="Infinity" styleClass="sidebar-nav active"/>
+            <Label text="Administration" styleClass="sidebar-section"/>
+            <Button text="Utilisateurs" onAction="#openUsers" maxWidth="Infinity" styleClass="sidebar-nav muted"/>
+            <Region VBox.vgrow="ALWAYS"/>
+            <VBox spacing="2.0" styleClass="sidebar-footer">
+                <Label text="Utilisateur Demo" styleClass="user-meta-name"/>
+                <Label text="Admin" styleClass="user-meta-role"/>
+            </VBox>
+        </VBox>
+    </left>
+    <center>
+        <VBox styleClass="workspace-main">
+            <HBox spacing="12.0" alignment="CENTER_LEFT" styleClass="workspace-topbar">
+                <Button text="Menu" styleClass="crumb-button"/>
+                <Label text="Home >" styleClass="crumb-text"/>
+                <Label text="Admin >" styleClass="crumb-text"/>
+                <Label text="Declarations" styleClass="crumb-current"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <VBox alignment="CENTER_RIGHT" spacing="3.0">
+                    <Label text="Utilisateur Demo" styleClass="workspace-title"/>
+                    <Label text="Admin" styleClass="workspace-subtitle-strong"/>
+                </VBox>
+            </HBox>
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="content-scroll">
+                <content>
+                    <VBox spacing="18.0" styleClass="workspace-content">
+                        <HBox alignment="CENTER_LEFT" styleClass="hero-panel">
+                            <VBox spacing="10.0">
+                                <Label text="Gestion des declarations" styleClass="hero-title"/>
+                                <Label text="Consultez et suivez les declarations recues." styleClass="hero-subtitle"/>
+                            </VBox>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label fx:id="syncLabel" text="Derniere sync: 28/02/2026 16:14:54" styleClass="hero-subtitle"/>
+                        </HBox>
+
+                        <HBox fx:id="flashMessageBox" spacing="10.0" alignment="CENTER_LEFT" styleClass="success-banner" managed="false" visible="false">
+                            <Label fx:id="flashMessageLabel" text="Action effectuee." styleClass="success-banner-text"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Button text="X" onAction="#closeFlash" styleClass="ghost-btn"/>
+                        </HBox>
+
+                        <HBox spacing="18.0">
+                            <VBox HBox.hgrow="ALWAYS" spacing="10.0" styleClass="stat-card">
+                                <Label text="Total" styleClass="stat-title"/>
+                                <Label fx:id="totalLabel" text="19" styleClass="stat-value-large"/>
+                            </VBox>
+                            <VBox HBox.hgrow="ALWAYS" spacing="10.0" styleClass="stat-card">
+                                <Label text="Approuvees" styleClass="stat-title"/>
+                                <Label fx:id="approvedCountLabel" text="12" styleClass="stat-value-large"/>
+                            </VBox>
+                            <VBox HBox.hgrow="ALWAYS" spacing="10.0" styleClass="stat-card">
+                                <Label text="En attente" styleClass="stat-title"/>
+                                <Label fx:id="pendingCountLabel" text="7" styleClass="stat-value-large"/>
+                            </VBox>
+                            <VBox HBox.hgrow="ALWAYS" spacing="10.0" styleClass="stat-card">
+                                <Label text="EcoPoints" styleClass="stat-title"/>
+                                <Label fx:id="ecoPointsLabel" text="6092" styleClass="stat-value-large"/>
+                            </VBox>
+                        </HBox>
+
+                        <HBox spacing="18.0">
+                            <VBox HBox.hgrow="ALWAYS" spacing="14.0" styleClass="panel-card">
+                                <HBox alignment="CENTER_LEFT">
+                                    <Label text="Declarations par type" styleClass="panel-heading"/>
+                                    <Region HBox.hgrow="ALWAYS"/>
+                                    <Label text="/admin/declarations/stats" styleClass="page-subtitle"/>
+                                </HBox>
+                                <BarChart fx:id="typeChart" legendVisible="false" prefHeight="280.0">
+                                    <xAxis>
+                                        <CategoryAxis/>
+                                    </xAxis>
+                                    <yAxis>
+                                        <NumberAxis/>
+                                    </yAxis>
+                                </BarChart>
+                            </VBox>
+                            <VBox prefWidth="360.0" spacing="14.0" styleClass="insight-card">
+                                <Label text="Intelligence" styleClass="panel-heading"/>
+                                <HBox>
+                                    <Label text="Type le plus declare:" styleClass="metric-label"/>
+                                    <Region HBox.hgrow="ALWAYS"/>
+                                    <Label fx:id="topTypeLabel" text="Plastique (14)" styleClass="metric-value"/>
+                                </HBox>
+                                <HBox>
+                                    <Label text="Valorisateur actif:" styleClass="metric-label"/>
+                                    <Region HBox.hgrow="ALWAYS"/>
+                                    <Label text="Demo Valorisateur" styleClass="metric-value"/>
+                                </HBox>
+                                <HBox>
+                                    <Label text="Declarations suspectes:" styleClass="metric-label"/>
+                                    <Region HBox.hgrow="ALWAYS"/>
+                                    <Label fx:id="suspectCountLabel" text="3" styleClass="metric-value"/>
+                                </HBox>
+                            </VBox>
+                        </HBox>
+
+                        <VBox spacing="14.0" styleClass="filter-card">
+                            <HBox alignment="CENTER_LEFT">
+                                <Label text="Filtres avances" styleClass="panel-heading"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Button text="Reset" onAction="#resetFilters" styleClass="outline-btn"/>
+                                <Button text="Rafraichir" onAction="#refreshDeclarations" styleClass="outline-btn"/>
+                            </HBox>
+                            <HBox spacing="12.0">
+                                <TextField fx:id="searchField" promptText="Recherche citoyen..." HBox.hgrow="ALWAYS" styleClass="input-field"/>
+                                <ComboBox fx:id="statusFilter" promptText="Tous statuts" prefWidth="180.0"/>
+                                <ComboBox fx:id="typeFilter" promptText="Tous types" prefWidth="180.0"/>
+                                <TextField fx:id="quantityMinField" promptText="Q min" prefWidth="110.0" styleClass="input-field"/>
+                                <TextField fx:id="quantityMaxField" promptText="Q max" prefWidth="110.0" styleClass="input-field"/>
+                                <ComboBox fx:id="sortFilter" promptText="Date desc" prefWidth="180.0"/>
+                            </HBox>
+                        </VBox>
+
+                        <VBox spacing="14.0" styleClass="table-card">
+                            <HBox alignment="CENTER_LEFT">
+                                <Label text="Liste dynamique" styleClass="panel-heading"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Label text="Risque visuel dynamique" styleClass="page-subtitle"/>
+                            </HBox>
+                            <TableView fx:id="declarationTable" prefHeight="460.0">
+                                <columns>
+                                    <TableColumn fx:id="idColumn" text="ID" prefWidth="64.0"/>
+                                    <TableColumn fx:id="photoColumn" text="Photo" prefWidth="90.0"/>
+                                    <TableColumn fx:id="citoyenColumn" text="Citoyen" prefWidth="220.0"/>
+                                    <TableColumn fx:id="typeColumn" text="Type" prefWidth="210.0"/>
+                                    <TableColumn fx:id="quantiteColumn" text="Quantite" prefWidth="120.0"/>
+                                    <TableColumn fx:id="dateColumn" text="Date" prefWidth="120.0"/>
+                                    <TableColumn fx:id="statutColumn" text="Statut" prefWidth="140.0"/>
+                                    <TableColumn fx:id="riskColumn" text="Risque" prefWidth="150.0"/>
+                                    <TableColumn fx:id="actionsColumn" text="Actions" prefWidth="240.0"/>
+                                </columns>
+                            </TableView>
+                        </VBox>
+                    </VBox>
+                </content>
+            </ScrollPane>
+        </VBox>
+    </center>
+</BorderPane>
