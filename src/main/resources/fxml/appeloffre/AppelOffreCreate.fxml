@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane prefHeight="860.0"
+            prefWidth="1400.0"
+            style="-fx-background-color: linear-gradient(to right, #D8F0E5, #C9ECE8);"
+            xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="controllers.appeloffre.AppelOffreCreateController">
+
+    <top>
+        <HBox alignment="CENTER_LEFT"
+              spacing="18.0"
+              style="-fx-background-color: linear-gradient(to right, #0E223D, #1B2F4D); -fx-padding: 12 20 12 20;">
+            <StackPane minHeight="24.0" minWidth="24.0" prefHeight="24.0" prefWidth="24.0"
+                       style="-fx-background-color: #22C55E; -fx-background-radius: 999;">
+                <Label text="W" style="-fx-text-fill: #0E223D; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+            </StackPane>
+            <Label text="WasteWise TN" style="-fx-text-fill: #FFFFFF; -fx-font-size: 24px; -fx-font-weight: bold;"/>
+
+            <Region HBox.hgrow="ALWAYS"/>
+            <HBox spacing="12.0">
+                <Button mnemonicParsing="false" onAction="#onOpenDashboard" text="Accueil"
+                        style="-fx-background-color: transparent; -fx-text-fill: #FFFFFF; -fx-font-size: 14px;"/>
+                <Button mnemonicParsing="false" onAction="#onOpenCreate" text="Appels d'offre"
+                        style="-fx-background-color: transparent; -fx-text-fill: #22C55E; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+                <Button mnemonicParsing="false" onAction="#onOpenList" text="Liste"
+                        style="-fx-background-color: transparent; -fx-text-fill: #FFFFFF; -fx-font-size: 14px;"/>
+            </HBox>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label text="Utilisateur connecte" style="-fx-text-fill: #DCE6F2; -fx-font-size: 13px;"/>
+        </HBox>
+    </top>
+
+    <center>
+        <StackPane BorderPane.alignment="CENTER">
+            <padding>
+                <Insets top="26.0" right="24.0" bottom="26.0" left="24.0"/>
+            </padding>
+
+            <VBox spacing="14.0" maxWidth="1080.0"
+                  style="-fx-background-color: #F3F7F4; -fx-background-radius: 20; -fx-padding: 18 18 18 18; -fx-effect: dropshadow(gaussian, rgba(12,31,53,0.14), 22, 0, 0, 7);">
+
+                <VBox spacing="4.0">
+                    <Label text="Appels d'offre > Creation"
+                           style="-fx-text-fill: #4C6A5B; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <Label text="Creer un appel d'offre"
+                           style="-fx-text-fill: #0D2B40; -fx-font-size: 34px; -fx-font-weight: bold;"/>
+                    <Label text="Publiez un besoin de collecte ou valorisation pour lancer des reponses B2B."
+                           style="-fx-text-fill: #5E7C6D; -fx-font-size: 14px;"/>
+                </VBox>
+
+                <VBox spacing="12.0"
+                      style="-fx-background-color: #FFFFFF; -fx-border-color: #D6E3DB; -fx-border-radius: 14; -fx-background-radius: 14; -fx-padding: 16 16 16 16;">
+                    <GridPane hgap="14.0" vgap="10.0">
+                        <columnConstraints>
+                            <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                            <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                        </columnConstraints>
+
+                        <VBox spacing="5.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                            <Label text="Titre de l'appel"
+                                   style="-fx-text-fill: #496858; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                            <TextField fx:id="txtTitre"
+                                       promptText="Ex: Collecte et valorisation de dechets plastiques"
+                                       prefHeight="44.0"
+                                       style="-fx-background-color: #F7FAF8; -fx-border-color: #C2D6CA; -fx-border-radius: 10; -fx-background-radius: 10; -fx-font-size: 15px;"/>
+                            <Label fx:id="lblTitreError" managed="false" text="" visible="false"
+                                   style="-fx-text-fill: #B91C1C; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                        </VBox>
+
+                        <VBox spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                            <Label text="Quantite demandee"
+                                   style="-fx-text-fill: #496858; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                            <TextField fx:id="txtQuantiteDemandee"
+                                       promptText="Ex: 1200"
+                                       prefHeight="44.0"
+                                       style="-fx-background-color: #F7FAF8; -fx-border-color: #C2D6CA; -fx-border-radius: 10; -fx-background-radius: 10; -fx-font-size: 15px;"/>
+                            <Label text="Unite: kilogramme (kg)"
+                                   style="-fx-text-fill: #7A9184; -fx-font-size: 11px;"/>
+                            <Label fx:id="lblQuantiteError" managed="false" text="" visible="false"
+                                   style="-fx-text-fill: #B91C1C; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                        </VBox>
+
+                        <VBox spacing="5.0" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.columnSpan="2">
+                            <Label text="Description du besoin"
+                                   style="-fx-text-fill: #496858; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                            <TextArea fx:id="txtDescription"
+                                      promptText="Detaillez le type de dechets, la frequence, la localisation et les contraintes."
+                                      prefRowCount="4"
+                                      wrapText="true"
+                                      style="-fx-background-color: #F7FAF8; -fx-border-color: #C2D6CA; -fx-border-radius: 10; -fx-background-radius: 10; -fx-font-size: 14px;"/>
+                            <Label text="Plus la description est precise, plus les reponses seront pertinentes."
+                                   style="-fx-text-fill: #7A9184; -fx-font-size: 11px;"/>
+                            <Label fx:id="lblDescriptionError" managed="false" text="" visible="false"
+                                   style="-fx-text-fill: #B91C1C; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                        </VBox>
+
+                        <VBox spacing="5.0" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                            <Label text="Date limite"
+                                   style="-fx-text-fill: #496858; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                            <DatePicker fx:id="dpDateLimite"
+                                        prefHeight="44.0"
+                                        style="-fx-background-color: #F7FAF8; -fx-border-color: #C2D6CA; -fx-border-radius: 10; -fx-background-radius: 10; -fx-font-size: 14px;"/>
+                            <Label text="La date limite doit etre strictement future."
+                                   style="-fx-text-fill: #7A9184; -fx-font-size: 11px;"/>
+                            <Label fx:id="lblDateError" managed="false" text="" visible="false"
+                                   style="-fx-text-fill: #B91C1C; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                        </VBox>
+
+                        <VBox spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                            <Label text="Responsable valorisateur"
+                                   style="-fx-text-fill: #496858; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                            <TextField fx:id="txtValorisateurId"
+                                       promptText="ID numerique du valorisateur (Ex: 1)"
+                                       prefHeight="44.0"
+                                       style="-fx-background-color: #F7FAF8; -fx-border-color: #C2D6CA; -fx-border-radius: 10; -fx-background-radius: 10; -fx-font-size: 15px;"/>
+                            <Label text="Champ numerique obligatoire."
+                                   style="-fx-text-fill: #7A9184; -fx-font-size: 11px;"/>
+                            <Label fx:id="lblValorisateurError" managed="false" text="" visible="false"
+                                   style="-fx-text-fill: #B91C1C; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                        </VBox>
+                    </GridPane>
+
+                    <HBox spacing="10.0" alignment="CENTER_LEFT">
+                        <Button mnemonicParsing="false" onAction="#onEnregistrer" text="Enregistrer"
+                                prefHeight="44.0"
+                                style="-fx-background-color: #17945D; -fx-text-fill: #FFFFFF; -fx-font-size: 15px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 8 18 8 18;"/>
+                        <Button mnemonicParsing="false" onAction="#onAnnuler" text="Annuler"
+                                prefHeight="44.0"
+                                style="-fx-background-color: #E4EBE6; -fx-text-fill: #46695B; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 8 18 8 18;"/>
+                    </HBox>
+                </VBox>
+
+                <Label fx:id="lblMessage"
+                       text="Saisissez les informations de votre appel d'offre."
+                       style="-fx-background-color: #E9F7EE; -fx-text-fill: #1D5B41; -fx-font-size: 13px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 10 12 10 12;"/>
+            </VBox>
+        </StackPane>
+    </center>
+</BorderPane>

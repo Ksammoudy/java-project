@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane prefHeight="760.0"
+            prefWidth="1360.0"
+            style="-fx-background-color: #EEF2EF;"
+            xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="main.controllers.DashboardController">
+
+    <top>
+        <HBox alignment="CENTER_LEFT"
+              spacing="14.0"
+              style="-fx-background-color: linear-gradient(to right, #0E223D, #1B2F4D); -fx-padding: 12 18 12 18;"
+              BorderPane.alignment="CENTER">
+            <StackPane minHeight="24.0"
+                       minWidth="24.0"
+                       prefHeight="24.0"
+                       prefWidth="24.0"
+                       style="-fx-background-color: #22C55E; -fx-background-radius: 999;">
+                <Label text="W"
+                       style="-fx-text-fill: #0E223D; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+            </StackPane>
+
+            <Label text="WasteWise TN"
+                   style="-fx-text-fill: #FFFFFF; -fx-font-size: 20px; -fx-font-weight: bold;"/>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <HBox alignment="CENTER" spacing="12.0">
+                <Button mnemonicParsing="false"
+                        onAction="#onOpenDashboard"
+                        text="Accueil"
+                        style="-fx-background-color: transparent; -fx-text-fill: #22C55E; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+                <Button mnemonicParsing="false"
+                        onAction="#onOpenAppelOffre"
+                        text="Appels d'offre"
+                        style="-fx-background-color: transparent; -fx-text-fill: #FFFFFF; -fx-font-size: 14px;"/>
+                <Button mnemonicParsing="false"
+                        onAction="#onOpenReponseOffre"
+                        text="Reponses"
+                        style="-fx-background-color: transparent; -fx-text-fill: #FFFFFF; -fx-font-size: 14px;"/>
+                <Button mnemonicParsing="false"
+                        text="Back Office"
+                        style="-fx-background-color: transparent; -fx-text-fill: #FFFFFF; -fx-font-size: 14px;"/>
+                <Button mnemonicParsing="false"
+                        text="Home"
+                        style="-fx-background-color: transparent; -fx-text-fill: #FFFFFF; -fx-font-size: 14px;"/>
+            </HBox>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <Label text="Utilisateur connecte"
+                   style="-fx-text-fill: #E7EDF5; -fx-font-size: 13px;"/>
+        </HBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToHeight="true"
+                    fitToWidth="true"
+                    hbarPolicy="NEVER"
+                    style="-fx-background: transparent; -fx-background-color: transparent;"
+                    BorderPane.alignment="CENTER">
+            <content>
+                <VBox spacing="18.0" style="-fx-padding: 18 24 24 24;">
+                    <VBox spacing="8.0"
+                          style="-fx-background-color: #F5F7F6; -fx-border-color: #DDE5DF; -fx-border-width: 1; -fx-padding: 12 16 12 16;">
+                        <Label text="Dashboard Des Offres"
+                               style="-fx-text-fill: #0A2A3F; -fx-font-size: 42px; -fx-font-weight: bold;"/>
+                    </VBox>
+
+                    <VBox spacing="10.0"
+                          style="-fx-background-color: linear-gradient(to right, #2F855A, #84CC16); -fx-background-radius: 20; -fx-padding: 24 24 24 24;">
+                        <Label text="Bienvenue dans votre dashboard"
+                               style="-fx-text-fill: #F6FFF8; -fx-font-size: 30px; -fx-font-weight: 300;"/>
+                        <Label text="Gerez vos appels d'offre et vos reponses en quelques clics."
+                               style="-fx-text-fill: #EAFFF1; -fx-font-size: 16px;"/>
+                    </VBox>
+
+                    <GridPane hgap="14.0" vgap="14.0">
+                        <VBox spacing="14.0"
+                              style="-fx-background-color: #F8FAF9; -fx-background-radius: 16; -fx-border-color: #DDE4DE; -fx-border-radius: 16; -fx-padding: 14 16 14 16;"
+                              GridPane.columnIndex="0"
+                              GridPane.rowIndex="0">
+                            <HBox alignment="CENTER_LEFT">
+                                <Label text="Reponses totales"
+                                       style="-fx-text-fill: #5E7A6A; -fx-font-size: 14px;"/>
+                                <Pane HBox.hgrow="ALWAYS"/>
+                                <StackPane minHeight="30.0"
+                                           minWidth="30.0"
+                                           style="-fx-background-color: #E6EDE8; -fx-background-radius: 10;">
+                                    <Label text="oo" style="-fx-text-fill: #3D6D55; -fx-font-size: 11px;"/>
+                                </StackPane>
+                            </HBox>
+                            <Label text="6" style="-fx-text-fill: #1B6B4B; -fx-font-size: 42px; -fx-font-weight: bold;"/>
+                        </VBox>
+
+                        <VBox spacing="14.0"
+                              style="-fx-background-color: #F8FAF9; -fx-background-radius: 16; -fx-border-color: #DDE4DE; -fx-border-radius: 16; -fx-padding: 14 16 14 16;"
+                              GridPane.columnIndex="1"
+                              GridPane.rowIndex="0">
+                            <HBox alignment="CENTER_LEFT">
+                                <Label text="Validees"
+                                       style="-fx-text-fill: #5E7A6A; -fx-font-size: 14px;"/>
+                                <Pane HBox.hgrow="ALWAYS"/>
+                                <StackPane minHeight="30.0"
+                                           minWidth="30.0"
+                                           style="-fx-background-color: #E6EDE8; -fx-background-radius: 10;">
+                                    <Label text="+" style="-fx-text-fill: #3D6D55; -fx-font-size: 16px; -fx-font-weight: bold;"/>
+                                </StackPane>
+                            </HBox>
+                            <Label text="4" style="-fx-text-fill: #1B6B4B; -fx-font-size: 42px; -fx-font-weight: bold;"/>
+                        </VBox>
+
+                        <VBox spacing="14.0"
+                              style="-fx-background-color: #F8FAF9; -fx-background-radius: 16; -fx-border-color: #DDE4DE; -fx-border-radius: 16; -fx-padding: 14 16 14 16;"
+                              GridPane.columnIndex="2"
+                              GridPane.rowIndex="0">
+                            <HBox alignment="CENTER_LEFT">
+                                <Label text="En attente"
+                                       style="-fx-text-fill: #5E7A6A; -fx-font-size: 14px;"/>
+                                <Pane HBox.hgrow="ALWAYS"/>
+                                <StackPane minHeight="30.0"
+                                           minWidth="30.0"
+                                           style="-fx-background-color: #E6EDE8; -fx-background-radius: 10;">
+                                    <Label text="o" style="-fx-text-fill: #3D6D55; -fx-font-size: 14px;"/>
+                                </StackPane>
+                            </HBox>
+                            <Label text="2" style="-fx-text-fill: #1B6B4B; -fx-font-size: 42px; -fx-font-weight: bold;"/>
+                        </VBox>
+
+                        <VBox spacing="14.0"
+                              style="-fx-background-color: #F8FAF9; -fx-background-radius: 16; -fx-border-color: #DDE4DE; -fx-border-radius: 16; -fx-padding: 14 16 14 16;"
+                              GridPane.columnIndex="3"
+                              GridPane.rowIndex="0">
+                            <HBox alignment="CENTER_LEFT">
+                                <Label text="Eco points"
+                                       style="-fx-text-fill: #5E7A6A; -fx-font-size: 14px;"/>
+                                <Pane HBox.hgrow="ALWAYS"/>
+                                <StackPane minHeight="30.0"
+                                           minWidth="30.0"
+                                           style="-fx-background-color: #E6EDE8; -fx-background-radius: 10;">
+                                    <Label text="*" style="-fx-text-fill: #3D6D55; -fx-font-size: 16px; -fx-font-weight: bold;"/>
+                                </StackPane>
+                            </HBox>
+                            <Label text="82690"
+                                   style="-fx-text-fill: #1B6B4B; -fx-font-size: 42px; -fx-font-weight: bold;"/>
+                        </VBox>
+                    </GridPane>
+
+                    <HBox spacing="14.0">
+                        <VBox spacing="12.0"
+                              style="-fx-background-color: #F8FAF9; -fx-background-radius: 16; -fx-border-color: #DDE4DE; -fx-border-radius: 16; -fx-padding: 18 18 18 18;"
+                              HBox.hgrow="ALWAYS">
+                            <Label text="Espace Valorisateur"
+                                   style="-fx-text-fill: #0D2B40; -fx-font-size: 22px; -fx-font-weight: bold;"/>
+                            <Label text="Publiez un appel d'offre pour demander la collecte ou la valorisation."
+                                   style="-fx-text-fill: #5F7869; -fx-font-size: 14px;"/>
+                            <Button mnemonicParsing="false"
+                                    onAction="#onOpenAppelOffre"
+                                    text="Ajouter un appel d'offre"
+                                    style="-fx-background-color: #84CC16; -fx-text-fill: #0D2B40; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 9 16 9 16;"/>
+                        </VBox>
+
+                        <VBox spacing="12.0"
+                              style="-fx-background-color: #F8FAF9; -fx-background-radius: 16; -fx-border-color: #DDE4DE; -fx-border-radius: 16; -fx-padding: 18 18 18 18;"
+                              HBox.hgrow="ALWAYS">
+                            <Label text="Espace Citoyen"
+                                   style="-fx-text-fill: #0D2B40; -fx-font-size: 22px; -fx-font-weight: bold;"/>
+                            <Label text="Proposez une reponse a un appel d'offre deja publie."
+                                   style="-fx-text-fill: #5F7869; -fx-font-size: 14px;"/>
+                            <Button mnemonicParsing="false"
+                                    onAction="#onOpenReponseOffre"
+                                    text="Ajouter une reponse"
+                                    style="-fx-background-color: #84CC16; -fx-text-fill: #0D2B40; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 9 16 9 16;"/>
+                        </VBox>
+                    </HBox>
+
+                    <VBox spacing="12.0"
+                          style="-fx-background-color: #F8FAF9; -fx-background-radius: 16; -fx-border-color: #DDE4DE; -fx-border-radius: 16; -fx-padding: 18 18 18 18;">
+                        <Label text="Dernieres reponses"
+                               style="-fx-text-fill: #0D2B40; -fx-font-size: 24px; -fx-font-weight: 500;"/>
+                        <Separator/>
+                        <TableView prefHeight="230.0" style="-fx-background-radius: 10;">
+                            <columns>
+                                <TableColumn prefWidth="170.0" text="Date"/>
+                                <TableColumn prefWidth="430.0" text="Offre"/>
+                                <TableColumn prefWidth="200.0" text="Quantite"/>
+                                <TableColumn prefWidth="200.0" text="Statut"/>
+                            </columns>
+                        </TableView>
+                    </VBox>
+                </VBox>
+            </content>
+        </ScrollPane>
+    </center>
+
+</BorderPane>
