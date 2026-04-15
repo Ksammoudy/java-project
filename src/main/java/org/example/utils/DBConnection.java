@@ -9,20 +9,11 @@ public class DBConnection {
     private static DBConnection instance;
     private Connection connection;
 
-    private static final String URL = "jdbc:mysql://localhost:3306/wastewise_tn";
-    private static final String USER = "root";
-    private static final String PASSWORD = "";
-
     private DBConnection() {
-        try {
-            connection = DriverManager.getConnection(URL, USER, PASSWORD);
-            System.out.println("Connexion MySQL réussie !");
-        } catch (SQLException e) {
-            System.out.println("Erreur connexion DB: " + e.getMessage());
-        }
+        connect();
     }
 
-    public static DBConnection getInstance() {
+    public static synchronized DBConnection getInstance() {
         if (instance == null) {
             instance = new DBConnection();
         }
@@ -30,6 +21,38 @@ public class DBConnection {
     }
 
     public Connection getConnection() {
+        try {
+            if (connection == null || connection.isClosed()) {
+                connect();
+            }
+        } catch (SQLException e) {
+            throw new IllegalStateException("Connexion JDBC indisponible.", e);
+        }
+
+        if (connection == null) {
+            throw new IllegalStateException("Connexion JDBC indisponible.");
+        }
+
         return connection;
+    }
+
+    public boolean testConnection() {
+        try {
+            return getConnection() != null && getConnection().isValid(2);
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
+    private void connect() {
+        DatabaseConfig config = DatabaseConfig.load();
+
+        try {
+            connection = DriverManager.getConnection(config.url(), config.username(), config.password());
+            System.out.println("Connexion MySQL reussie vers " + config.databaseName());
+        } catch (SQLException e) {
+            connection = null;
+            System.out.println("Erreur connexion DB: " + e.getMessage());
+        }
     }
 }
