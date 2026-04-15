@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.example.Controllers.UserController">
+
+    <top>
+        <HBox spacing="10" style="-fx-padding:10;">
+            <Button text="Events" onAction="#showEvents"/>
+        </HBox>
+    </top>
+
+    <center>
+        <TableView fx:id="tableEvents">
+
+            <columns>
+                <TableColumn fx:id="colId" text="ID"/>
+                <TableColumn fx:id="colTitre" text="Titre"/>
+                <TableColumn fx:id="colLieu" text="Lieu"/>
+                <TableColumn fx:id="colDate" text="Date"/>
+            </columns>
+
+        </TableView>
+    </center>
+
+</BorderPane>

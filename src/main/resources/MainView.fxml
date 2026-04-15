@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.example.Controllers.MainUIController">
+
+    <!-- LEFT MENU -->
+    <left>
+        <VBox spacing="20"
+              style="-fx-padding: 20; -fx-background-color: #1e293b;">
+
+            <Label text="WASTE WISE TN "
+                   style="-fx-text-fill: white; -fx-font-size: 18px;"/>
+
+            <Button text="📅 Events" onAction="#openEvents"/>
+            <Button text="👥 Participation" onAction="#openParticipation"/>
+            <Button text="🧑 Organisateur" onAction="#openOrganisateur"/>
+
+        </VBox>
+    </left>
+
+    <!-- CONTENT -->
+    <center>
+        <AnchorPane fx:id="contentArea"
+                    style="-fx-background-color: #f1f5f9;"/>
+    </center>
+
+</BorderPane>

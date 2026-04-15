@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.example.Controllers.EditParticipationController"
+      spacing="10">
+
+    <TextField fx:id="txtEvent" promptText="Event ID"/>
+    <TextField fx:id="txtCitoyen" promptText="Citoyen ID"/>
+    <DatePicker fx:id="datePicker"/>
+
+    <Button text="Save" onAction="#saveParticipation"/>
+
+</VBox>

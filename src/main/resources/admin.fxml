@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.example.Controllers.AdminControllers"   stylesheets="@style.css">
+
+    <!-- 🔵 Sidebar -->
+    <left>
+        <VBox spacing="15"
+              style="-fx-padding: 20; -fx-background-color: #2c3e50;">
+
+            <Label text="WASTE WISE TN"
+                   style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;" />
+
+            <Button fx:id="btnEvent"
+                    text="📅 Evenement"
+                    onAction="#showEvenement"
+                    style="-fx-background-color: #3498db; -fx-text-fill: white;" />
+
+            <Button fx:id="btnParticipation"
+                    text="👥 Participation"
+                    onAction="#showParticipation"
+                    style="-fx-background-color: #1abc9c; -fx-text-fill: white;" />
+
+        </VBox>
+    </left>
+
+    <!-- 🟡 Top Bar -->
+    <top>
+        <HBox style="-fx-padding: 10; -fx-background-color: #34495e;">
+            <Label text="Dashboard Admin"
+                   style="-fx-text-fill: white; -fx-font-size: 16px;" />
+        </HBox>
+    </top>
+
+    <!-- 🟡 Content -->
+    <center>
+        <AnchorPane fx:id="contentArea"
+                    style="-fx-background-color: #ecf0f1;" />
+    </center>
+
+</BorderPane>
