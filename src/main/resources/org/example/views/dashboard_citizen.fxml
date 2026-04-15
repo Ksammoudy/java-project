@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.example.controllers.DashboardCitizenController"
+            styleClass="workspace-root">
+    <left>
+        <VBox prefWidth="276.0" spacing="10.0" styleClass="workspace-sidebar">
+            <padding>
+                <Insets top="24.0" right="16.0" bottom="16.0" left="16.0"/>
+            </padding>
+            <VBox spacing="4.0" styleClass="brand-shell">
+                <Label text="WasteWise" styleClass="brand-logo-text"/>
+            </VBox>
+            <Label text="Menu Principal" styleClass="sidebar-section"/>
+            <Button fx:id="navHome" text="Accueil" onAction="#handleDashboard" maxWidth="Infinity" styleClass="sidebar-nav muted"/>
+            <Button fx:id="navDeclare" text="Declarer un dechet" onAction="#handleDeclareWaste" maxWidth="Infinity" styleClass="sidebar-nav muted"/>
+            <Button fx:id="navMyDeclarations" text="Mes declarations" onAction="#handleMyDeclarations" maxWidth="Infinity" styleClass="sidebar-nav muted"/>
+            <Button fx:id="navStatistics" text="Statistiques" onAction="#handleStatistics" maxWidth="Infinity" styleClass="sidebar-nav muted"/>
+            <Button fx:id="navNews" text="Nouveautes" onAction="#handleNews" maxWidth="Infinity" styleClass="sidebar-nav muted"/>
+            <Button fx:id="navAir" text="Air Quality" onAction="#handleAirQuality" maxWidth="Infinity" styleClass="sidebar-nav muted"/>
+            <Button fx:id="navWithdraw" text="Withdraw" onAction="#handleWithdraw" maxWidth="Infinity" styleClass="sidebar-nav muted"/>
+            <Button fx:id="navSettings" text="Parametres" onAction="#handleProfile" maxWidth="Infinity" styleClass="sidebar-nav muted"/>
+            <Region VBox.vgrow="ALWAYS"/>
+            <VBox spacing="2.0" styleClass="sidebar-footer">
+                <Label fx:id="citizenNameLabel" text="Utilisateur Demo" styleClass="user-meta-name"/>
+                <Label text="Citoyen" styleClass="user-meta-role"/>
+            </VBox>
+        </VBox>
+    </left>
+    <center>
+        <VBox styleClass="workspace-main">
+            <HBox spacing="12.0" alignment="CENTER_LEFT" styleClass="workspace-topbar">
+                <Button text="Menu" styleClass="crumb-button"/>
+                <Label text="Home >" styleClass="crumb-text"/>
+                <Label text="Citoyen &gt;" styleClass="crumb-text"/>
+                <Label text="Dashboard" styleClass="crumb-current"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <VBox alignment="CENTER_RIGHT" spacing="3.0">
+                    <Label fx:id="headerEmailLabel" text="Utilisateur Demo" styleClass="workspace-title"/>
+                    <Label text="Citoyen" styleClass="workspace-subtitle-strong"/>
+                </VBox>
+            </HBox>
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="content-scroll">
+                <content>
+                    <VBox spacing="18.0" styleClass="workspace-content">
+                        <HBox fx:id="flashMessageBox" spacing="10.0" alignment="CENTER_LEFT" styleClass="success-banner" managed="false" visible="false">
+                            <Label fx:id="flashMessageLabel" text="" styleClass="success-banner-text"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Button text="X" onAction="#closeFlash" styleClass="ghost-btn"/>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" styleClass="hero-panel">
+                            <VBox spacing="12.0">
+                                <Label text="Dashboard Citoyen" styleClass="hero-title"/>
+                                <Label text="Suivez votre impact ecologique avec des courbes dynamiques et vos indicateurs personnels." styleClass="hero-subtitle"/>
+                                <HBox spacing="12.0">
+                                    <Label fx:id="declarationsPillLabel" text="Declarations: 14" styleClass="hero-pill"/>
+                                    <Label fx:id="approvedPillLabel" text="Validees: 13" styleClass="hero-pill"/>
+                                    <Label fx:id="pointsPillLabel" text="EcoPoints: 8042" styleClass="hero-pill"/>
+                                </HBox>
+                            </VBox>
+                        </HBox>
+
+                        <HBox spacing="18.0">
+                            <VBox HBox.hgrow="ALWAYS" spacing="8.0" styleClass="strip-card weather-card">
+                                <Label text="Meteo actuelle - Tunis" styleClass="weather-title"/>
+                                <Label text="20C" styleClass="weather-value"/>
+                            </VBox>
+                            <VBox alignment="CENTER_RIGHT" spacing="8.0" styleClass="strip-card weather-card" prefWidth="320.0">
+                                <Label text="Vent: 16.7 km/h" styleClass="weather-meta"/>
+                                <Label text="Code meteo: 2" styleClass="weather-meta"/>
+                                <Label text="Maj: 2026-03-04T12:45" styleClass="weather-meta"/>
+                            </VBox>
+                        </HBox>
+
+                        <HBox spacing="18.0">
+                            <VBox HBox.hgrow="ALWAYS" spacing="8.0" styleClass="stat-card">
+                                <Label text="Declarations totales" styleClass="stat-title"/>
+                                <Label fx:id="totalDeclarationsLabel" text="14" styleClass="stat-value-large"/>
+                            </VBox>
+                            <VBox HBox.hgrow="ALWAYS" spacing="8.0" styleClass="stat-card">
+                                <Label text="Validees" styleClass="stat-title"/>
+                                <Label fx:id="validatedLabel" text="13" styleClass="stat-value-large"/>
+                            </VBox>
+                            <VBox HBox.hgrow="ALWAYS" spacing="8.0" styleClass="stat-card">
+                                <Label text="En attente" styleClass="stat-title"/>
+                                <Label fx:id="pendingLabel" text="1" styleClass="stat-value-large"/>
+                            </VBox>
+                            <VBox HBox.hgrow="ALWAYS" spacing="8.0" styleClass="stat-card">
+                                <Label text="Points gagnes" styleClass="stat-title"/>
+                                <Label fx:id="earnedPointsLabel" text="8042" styleClass="stat-value-large"/>
+                            </VBox>
+                        </HBox>
+
+                        <HBox spacing="18.0">
+                            <VBox HBox.hgrow="ALWAYS" spacing="12.0" styleClass="panel-card">
+                                <Label text="Courbe des declarations (6 derniers mois)" styleClass="panel-heading"/>
+                                <LineChart fx:id="declarationTrendChart" legendVisible="true" prefHeight="320.0">
+                                    <xAxis>
+                                        <CategoryAxis/>
+                                    </xAxis>
+                                    <yAxis>
+                                        <NumberAxis/>
+                                    </yAxis>
+                                </LineChart>
+                            </VBox>
+                            <VBox prefWidth="420.0" spacing="12.0" styleClass="panel-card">
+                                <Label text="Repartition des statuts" styleClass="panel-heading"/>
+                                <PieChart fx:id="statusChart" prefHeight="320.0"/>
+                            </VBox>
+                        </HBox>
+                    </VBox>
+                </content>
+            </ScrollPane>
+        </VBox>
+    </center>
+</BorderPane>

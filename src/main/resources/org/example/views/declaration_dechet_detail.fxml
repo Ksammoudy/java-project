@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.example.controllers.DeclarationDechetDetailController"
+            styleClass="workspace-root">
+    <center>
+        <VBox styleClass="workspace-main">
+            <HBox spacing="12.0" alignment="CENTER_LEFT" styleClass="workspace-topbar">
+                <Button text="Menu" styleClass="crumb-button"/>
+                <Label text="Home >" styleClass="crumb-text"/>
+                <Label text="Admin >" styleClass="crumb-text"/>
+                <Label text="Declarations >" styleClass="crumb-text"/>
+                <Label text="Detail" styleClass="crumb-current"/>
+            </HBox>
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="content-scroll">
+                <content>
+                    <VBox spacing="18.0" styleClass="workspace-content">
+                        <VBox spacing="10.0" styleClass="hero-panel">
+                            <Label text="Detail declaration" styleClass="hero-title"/>
+                            <Label text="Vue admin rapprochee de la fiche detail Symfony." styleClass="hero-subtitle"/>
+                        </VBox>
+
+                        <HBox spacing="18.0">
+                            <VBox HBox.hgrow="ALWAYS" spacing="8.0" styleClass="metric-card">
+                                <Label text="Declaration" styleClass="metric-label"/>
+                                <Label fx:id="declarationIdLabel" text="-" styleClass="metric-value"/>
+                            </VBox>
+                            <VBox HBox.hgrow="ALWAYS" spacing="8.0" styleClass="metric-card">
+                                <Label text="Type" styleClass="metric-label"/>
+                                <Label fx:id="typeLabel" text="-" styleClass="metric-value"/>
+                            </VBox>
+                            <VBox HBox.hgrow="ALWAYS" spacing="8.0" styleClass="metric-card">
+                                <Label text="Statut" styleClass="metric-label"/>
+                                <Label fx:id="statusLabel" text="-" styleClass="metric-value"/>
+                            </VBox>
+                        </HBox>
+
+                        <HBox spacing="18.0">
+                            <VBox HBox.hgrow="ALWAYS" spacing="8.0" styleClass="panel-card">
+                                <Label text="Resume declaration" styleClass="panel-heading"/>
+                                <HBox spacing="10.0">
+                                    <Label text="Quantite:" styleClass="metric-label"/>
+                                    <Label fx:id="quantityLabel" text="-" styleClass="body-text"/>
+                                </HBox>
+                                <HBox spacing="10.0">
+                                    <Label text="EcoPoints:" styleClass="metric-label"/>
+                                    <Label fx:id="pointsLabel" text="-" styleClass="body-text"/>
+                                </HBox>
+                                <HBox spacing="10.0">
+                                    <Label text="Date:" styleClass="metric-label"/>
+                                    <Label fx:id="dateLabel" text="-" styleClass="body-text"/>
+                                </HBox>
+                                <HBox spacing="10.0">
+                                    <Label text="Score IA:" styleClass="metric-label"/>
+                                    <Label fx:id="scoreLabel" text="-" styleClass="body-text"/>
+                                </HBox>
+                                <HBox spacing="10.0">
+                                    <Label text="Coordonnees:" styleClass="metric-label"/>
+                                    <Label fx:id="coordinatesLabel" text="-" styleClass="body-text"/>
+                                </HBox>
+                            </VBox>
+                            <VBox prefWidth="360.0" spacing="10.0" styleClass="insight-card">
+                                <Label text="Profils associes" styleClass="panel-heading"/>
+                                <HBox spacing="10.0">
+                                    <Label text="Citoyen:" styleClass="metric-label"/>
+                                    <Label fx:id="citizenLabel" text="-" wrapText="true" styleClass="body-text"/>
+                                </HBox>
+                                <HBox spacing="10.0">
+                                    <Label text="Valorisateur:" styleClass="metric-label"/>
+                                    <Label fx:id="valorisateurLabel" text="-" wrapText="true" styleClass="body-text"/>
+                                </HBox>
+                            </VBox>
+                        </HBox>
+
+                        <VBox spacing="8.0" styleClass="panel-card">
+                            <Label text="Description" styleClass="panel-heading"/>
+                            <Label fx:id="descriptionLabel" text="-" wrapText="true" styleClass="body-text"/>
+                        </VBox>
+
+                        <HBox spacing="12.0">
+                            <Button text="Retour" onAction="#handleBack" styleClass="outline-btn"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                        </HBox>
+                    </VBox>
+                </content>
+            </ScrollPane>
+        </VBox>
+    </center>
+</BorderPane>
