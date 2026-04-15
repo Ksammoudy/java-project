@@ -5,7 +5,6 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Priority?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
@@ -14,7 +13,8 @@
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="org.example.controllers.DashboardAdminController"
             prefWidth="1200.0" prefHeight="750.0"
-            styleClass="dashboard-root">
+            styleClass="dashboard-root"
+            stylesheets="@../styles/style.css">
 
     <left>
         <VBox prefWidth="260.0" spacing="12.0" styleClass="sidebar">
@@ -27,30 +27,36 @@
                     <Label text="♻" style="-fx-text-fill: white; -fx-font-size: 20px;"/>
                 </StackPane>
 
-                <VBox spacing="2">
+                <VBox spacing="2.0">
                     <Label text="WasteWise" styleClass="brand-title"/>
                     <Label text="Admin panel" styleClass="brand-subtitle"/>
                 </VBox>
             </HBox>
 
             <VBox spacing="8.0">
-                <Button text="📊 Dashboard" onAction="#handleDashboard" maxWidth="Infinity" styleClass="sidebar-btn active"/>
-                <Button text="👥 Gestion des utilisateurs" onAction="#handleUsers" maxWidth="Infinity" styleClass="sidebar-btn"/>
+                <Button text="📊 Dashboard"
+                        onAction="#handleDashboard"
+                        maxWidth="Infinity"
+                        styleClass="sidebar-btn active"/>
+
+                <Button text="👥 Gestion des utilisateurs"
+                        onAction="#handleUsers"
+                        maxWidth="Infinity"
+                        styleClass="sidebar-btn"/>
             </VBox>
 
             <Region VBox.vgrow="ALWAYS"/>
 
-            <Button text="🚪 Déconnexion" onAction="#handleLogout" maxWidth="Infinity" styleClass="sidebar-btn logout-btn"/>
+            <Button text="🚪 Déconnexion"
+                    onAction="#handleLogout"
+                    maxWidth="Infinity"
+                    styleClass="sidebar-btn logout-btn"/>
         </VBox>
     </left>
 
     <center>
         <VBox spacing="20.0" styleClass="main-area">
-            <padding>
-                <Insets top="0" right="0" bottom="0" left="0"/>
-            </padding>
 
-            <!-- Header -->
             <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="top-header">
                 <VBox spacing="3.0">
                     <Label text="Admin" styleClass="page-title"/>
@@ -60,8 +66,10 @@
                 <Region HBox.hgrow="ALWAYS"/>
 
                 <VBox spacing="3.0" alignment="CENTER_RIGHT">
-                    <Label fx:id="adminEmailLabel" text="admin@email.com" styleClass="admin-email"/>
-                    <Label text="Admin" styleClass="page-subtitle"/>
+                    <Label fx:id="adminEmailHeaderLabel"
+                           text="admin@email.com"
+                           styleClass="admin-email"/>
+                    <Label text="Administrateur" styleClass="page-subtitle"/>
                 </VBox>
             </HBox>
 
@@ -70,27 +78,33 @@
                     <Insets top="24" right="26" bottom="26" left="26"/>
                 </padding>
 
-                <!-- Hero -->
                 <HBox alignment="CENTER_LEFT" spacing="20.0" styleClass="hero-box">
                     <VBox spacing="6.0">
-                        <Label fx:id="welcomeLabel" text="Bienvenue Admin 👋" styleClass="hero-title"/>
-                        <Label text="Gestion des utilisateurs (module User)" styleClass="hero-subtitle"/>
+                        <Label fx:id="welcomeLabel"
+                               text="Bienvenue Admin 👋"
+                               styleClass="hero-title"/>
+                        <Label text="Gestion des utilisateurs (module User)"
+                               styleClass="hero-subtitle"/>
                     </VBox>
 
                     <Region HBox.hgrow="ALWAYS"/>
 
                     <HBox spacing="10.0">
-                        <Button text="👥 Utilisateurs" onAction="#handleUsers" styleClass="hero-btn"/>
+                        <Button text="👥 Utilisateurs"
+                                onAction="#handleUsers"
+                                styleClass="hero-btn"/>
                     </HBox>
                 </HBox>
 
-                <!-- Stats -->
                 <HBox spacing="16.0">
                     <VBox spacing="8.0" HBox.hgrow="ALWAYS" styleClass="stat-card">
                         <Label text="Utilisateurs" styleClass="stat-label"/>
                         <Label fx:id="totalUsersLabel" text="—" styleClass="stat-value"/>
                         <Label text="Comptes au total" styleClass="stat-small"/>
-                        <Button text="Gérer" onAction="#handleUsers" maxWidth="Infinity" styleClass="stat-btn"/>
+                        <Button text="Gérer"
+                                onAction="#handleUsers"
+                                maxWidth="Infinity"
+                                styleClass="stat-btn"/>
                     </VBox>
 
                     <VBox spacing="8.0" HBox.hgrow="ALWAYS" styleClass="stat-card">
@@ -101,19 +115,16 @@
 
                     <VBox spacing="8.0" HBox.hgrow="ALWAYS" styleClass="stat-card">
                         <Label text="Compte" styleClass="stat-label"/>
-                        <Label fx:id="adminEmailLabel2" text="Administrateur" visible="false" managed="false"/>
-                        <Label fx:id="adminEmailLabel" text="—" styleClass="stat-email"/>
+                        <Label fx:id="adminEmailCardLabel" text="—" styleClass="stat-email"/>
                         <Label text="Administrateur connecté" styleClass="stat-small"/>
                     </VBox>
                 </HBox>
 
-                <!-- Bottom -->
                 <HBox spacing="16.0">
                     <VBox spacing="12.0" HBox.hgrow="ALWAYS" styleClass="big-card">
                         <HBox spacing="10.0">
                             <Label text="📌 Vue rapide" styleClass="card-title"/>
                             <Region HBox.hgrow="ALWAYS"/>
-                            <Label fx:id="todayDateLabel2" text="" visible="false" managed="false"/>
                         </HBox>
 
                         <Label text="Ici tu peux afficher des statistiques liées aux utilisateurs : actifs, inactifs, derniers inscrits, rôles, etc."
@@ -128,7 +139,8 @@
 
                             <VBox spacing="4.0" styleClass="small-box">
                                 <Label text="💡 Idée" styleClass="small-box-title"/>
-                                <Label text="Répartition par rôle : Admin / Valorisateur / Citoyen" styleClass="small-box-text"/>
+                                <Label text="Répartition par rôle : Admin / Valorisateur / Citoyen"
+                                       styleClass="small-box-text"/>
                             </VBox>
                         </VBox>
                     </VBox>
@@ -136,8 +148,15 @@
                     <VBox spacing="12.0" prefWidth="320.0" styleClass="big-card">
                         <Label text="⚡ Raccourcis" styleClass="card-title"/>
 
-                        <Button text="👥 Gérer les utilisateurs" onAction="#handleUsers" maxWidth="Infinity" styleClass="shortcut-btn"/>
-                        <Button text="🚪 Déconnexion" onAction="#handleLogout" maxWidth="Infinity" styleClass="shortcut-btn logout-shortcut"/>
+                        <Button text="👥 Gérer les utilisateurs"
+                                onAction="#handleUsers"
+                                maxWidth="Infinity"
+                                styleClass="shortcut-btn"/>
+
+                        <Button text="🚪 Déconnexion"
+                                onAction="#handleLogout"
+                                maxWidth="Infinity"
+                                styleClass="shortcut-btn logout-shortcut"/>
 
                         <Label text="Astuce : garde ce bloc pour les actions les plus fréquentes."
                                wrapText="true"

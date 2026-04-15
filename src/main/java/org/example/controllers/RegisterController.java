@@ -48,24 +48,53 @@ public class RegisterController {
     private final UserService userService = UserService.getInstance();
 
     @FXML
+    public void initialize() {
+        if (messageLabel != null) {
+            messageLabel.setText("");
+        }
+
+        if (citoyenRadio != null) {
+            citoyenRadio.setSelected(true);
+        }
+    }
+
+    @FXML
     public void handleRegister() {
-        // Récupération et nettoyage des champs
-        String nom = nomField.getText() != null ? nomField.getText().trim() : "";
-        String prenom = prenomField.getText() != null ? prenomField.getText().trim() : "";
-        String email = emailField.getText() != null ? emailField.getText().trim() : "";
-        String telephone = telephoneField.getText() != null ? telephoneField.getText().trim() : "";
-        String password = passwordField.getText() != null ? passwordField.getText() : "";
-        String confirmPassword = confirmPasswordField.getText() != null ? confirmPasswordField.getText() : "";
-        String faceEmbedding = faceEmbeddingArea.getText() != null ? faceEmbeddingArea.getText().trim() : "";
+        String nom = nomField != null && nomField.getText() != null
+                ? nomField.getText().trim()
+                : "";
+
+        String prenom = prenomField != null && prenomField.getText() != null
+                ? prenomField.getText().trim()
+                : "";
+
+        String email = emailField != null && emailField.getText() != null
+                ? emailField.getText().trim().toLowerCase()
+                : "";
+
+        String telephone = telephoneField != null && telephoneField.getText() != null
+                ? telephoneField.getText().trim()
+                : "";
+
+        String password = passwordField != null && passwordField.getText() != null
+                ? passwordField.getText()
+                : "";
+
+        String confirmPassword = confirmPasswordField != null && confirmPasswordField.getText() != null
+                ? confirmPasswordField.getText()
+                : "";
+
+        String faceEmbedding = faceEmbeddingArea != null && faceEmbeddingArea.getText() != null
+                ? faceEmbeddingArea.getText().trim()
+                : "";
 
         String type = null;
-        if (citoyenRadio.isSelected()) {
+        if (citoyenRadio != null && citoyenRadio.isSelected()) {
             type = "CITIZEN";
-        } else if (valorizerRadio.isSelected()) {
+        } else if (valorizerRadio != null && valorizerRadio.isSelected()) {
             type = "VALORIZER";
         }
 
-        // Contrôle de saisie
         if (nom.isEmpty()) {
             showError("Le champ nom est obligatoire.");
             return;
@@ -121,12 +150,11 @@ public class RegisterController {
             return;
         }
 
-        if (!agreeTermsCheckBox.isSelected()) {
+        if (agreeTermsCheckBox == null || !agreeTermsCheckBox.isSelected()) {
             showError("Vous devez accepter les conditions d'utilisation.");
             return;
         }
 
-        // Appel du service
         String result = userService.registerUser(
                 nom,
                 prenom,
@@ -135,7 +163,7 @@ public class RegisterController {
                 type,
                 password,
                 confirmPassword,
-                agreeTermsCheckBox.isSelected(),
+                true,
                 faceEmbedding
         );
 
@@ -157,27 +185,29 @@ public class RegisterController {
     }
 
     private void showError(String message) {
-        messageLabel.setStyle("-fx-text-fill: red;");
-        messageLabel.setText(message);
+        if (messageLabel != null) {
+            messageLabel.setStyle("-fx-text-fill: red;");
+            messageLabel.setText(message);
+        }
     }
 
     private void showSuccess(String message) {
-        messageLabel.setStyle("-fx-text-fill: green;");
-        messageLabel.setText(message);
+        if (messageLabel != null) {
+            messageLabel.setStyle("-fx-text-fill: green;");
+            messageLabel.setText(message);
+        }
     }
 
     private void clearFields() {
-        nomField.clear();
-        prenomField.clear();
-        emailField.clear();
-        telephoneField.clear();
-        passwordField.clear();
-        confirmPasswordField.clear();
-        faceEmbeddingArea.clear();
-        agreeTermsCheckBox.setSelected(false);
-
-        citoyenRadio.setSelected(true);
-        valorizerRadio.setSelected(false);
-        messageLabel.setText("");
+        if (nomField != null) nomField.clear();
+        if (prenomField != null) prenomField.clear();
+        if (emailField != null) emailField.clear();
+        if (telephoneField != null) telephoneField.clear();
+        if (passwordField != null) passwordField.clear();
+        if (confirmPasswordField != null) confirmPasswordField.clear();
+        if (faceEmbeddingArea != null) faceEmbeddingArea.clear();
+        if (agreeTermsCheckBox != null) agreeTermsCheckBox.setSelected(false);
+        if (citoyenRadio != null) citoyenRadio.setSelected(true);
+        if (valorizerRadio != null) valorizerRadio.setSelected(false);
     }
 }

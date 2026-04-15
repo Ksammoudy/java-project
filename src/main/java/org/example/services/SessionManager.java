@@ -21,6 +21,12 @@ public class SessionManager {
         currentUser = null;
     }
 
+    // ✅ AJOUT ICI
+    public static void logout() {
+        clearSession();
+        System.out.println("Utilisateur déconnecté.");
+    }
+
     public static boolean isLoggedIn() {
         return currentUser != null;
     }

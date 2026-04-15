@@ -18,9 +18,10 @@ public class FacebookAuthService {
 
     private final UserService userService = UserService.getInstance();
 
-    private final String clientId = System.getenv("OAUTH_FACEBOOK_ID");
-    private final String clientSecret = System.getenv("OAUTH_FACEBOOK_SECRET");
-    private final String redirectUri = System.getenv("OAUTH_FACEBOOK_REDIRECT_URI");
+    // Version de test locale
+    private final String clientId = "1337612458412063";
+    private final String clientSecret = "14f5369e553c329cc2bd761f9bd85c2a";
+    private final String redirectUri = "http://localhost:8080/callback";
 
     public interface AuthCallback {
         void onSuccess(User user);
@@ -28,11 +29,6 @@ public class FacebookAuthService {
     }
 
     public void loginWithFacebook(AuthCallback callback) {
-        if (isBlank(clientId) || isBlank(clientSecret) || isBlank(redirectUri)) {
-            callback.onError("Variables Facebook OAuth manquantes.");
-            return;
-        }
-
         try {
             URI redirect = URI.create(redirectUri);
             int port = redirect.getPort() == -1 ? 80 : redirect.getPort();
@@ -45,26 +41,21 @@ public class FacebookAuthService {
                 String code = extractQueryParam(query, "code");
                 String error = extractQueryParam(query, "error");
 
-                String responseText;
-
                 if (!isBlank(error)) {
-                    responseText = "Connexion Facebook annulée.";
-                    sendHtml(exchange, responseText);
+                    sendHtml(exchange, "Connexion Facebook annulée.");
                     server.stop(0);
                     callback.onError("Connexion Facebook annulée.");
                     return;
                 }
 
                 if (isBlank(code)) {
-                    responseText = "Code OAuth manquant.";
-                    sendHtml(exchange, responseText);
+                    sendHtml(exchange, "Code OAuth manquant.");
                     server.stop(0);
                     callback.onError("Code Facebook manquant.");
                     return;
                 }
 
-                responseText = "Connexion réussie. Vous pouvez fermer cette fenêtre.";
-                sendHtml(exchange, responseText);
+                sendHtml(exchange, "Connexion réussie. Vous pouvez fermer cette fenêtre.");
                 server.stop(0);
 
                 CompletableFuture.runAsync(() -> handleCode(code, callback));
@@ -105,8 +96,10 @@ public class FacebookAuthService {
                     .build();
 
             HttpResponse<String> tokenResponse = client.send(tokenRequest, HttpResponse.BodyHandlers.ofString());
+            System.out.println("TOKEN RESPONSE = " + tokenResponse.body());
 
             String accessToken = extractJsonValue(tokenResponse.body(), "access_token");
+
             if (isBlank(accessToken)) {
                 callback.onError("Impossible de récupérer le token Facebook.");
                 return;
@@ -120,16 +113,25 @@ public class FacebookAuthService {
                     .build();
 
             HttpResponse<String> profileResponse = client.send(profileRequest, HttpResponse.BodyHandlers.ofString());
+            System.out.println("PROFILE RESPONSE = " + profileResponse.body());
 
             String email = extractJsonValue(profileResponse.body(), "email");
             String name = extractJsonValue(profileResponse.body(), "name");
 
+            System.out.println("EMAIL DECODED = " + email);
+            System.out.println("NAME = " + name);
+
             if (isBlank(email)) {
-                callback.onError("Facebook ne fournit pas l'email.");
-                return;
+                email = "fb_" + UUID.randomUUID() + "@facebook.local";
             }
 
             User user = loginOrCreateFacebookUser(email, name);
+
+            if (user == null) {
+                callback.onError("Impossible de connecter ou créer l’utilisateur Facebook.");
+                return;
+            }
+
             callback.onSuccess(user);
 
         } catch (Exception e) {
@@ -151,8 +153,12 @@ public class FacebookAuthService {
 
             if (!isBlank(fullName)) {
                 String[] parts = fullName.trim().split("\\s+");
-                if (parts.length > 0) prenom = parts[0];
-                if (parts.length > 1) nom = parts[1];
+                if (parts.length > 0) {
+                    prenom = parts[0];
+                }
+                if (parts.length > 1) {
+                    nom = parts[parts.length - 1];
+                }
             }
 
             user.setPrenom(prenom);
@@ -169,7 +175,12 @@ public class FacebookAuthService {
             user.setLastSeenAt(null);
             user.setGoogleAuthenticatorSecret(null);
 
-            userService.addUser(user);
+            boolean added = userService.addUser(user);
+
+            if (!added) {
+                return null;
+            }
+
             return userService.getUserByEmail(email);
         }
 
@@ -196,13 +207,16 @@ public class FacebookAuthService {
         byte[] bytes = ("<html><body><h3>" + message + "</h3></body></html>").getBytes();
         exchange.getResponseHeaders().add("Content-Type", "text/html; charset=UTF-8");
         exchange.sendResponseHeaders(200, bytes.length);
+
         try (OutputStream os = exchange.getResponseBody()) {
             os.write(bytes);
         }
     }
 
     private String extractQueryParam(String query, String key) {
-        if (query == null || query.isBlank()) return null;
+        if (query == null || query.isBlank()) {
+            return null;
+        }
 
         for (String param : query.split("&")) {
             String[] pair = param.split("=", 2);
@@ -214,14 +228,53 @@ public class FacebookAuthService {
     }
 
     private String extractJsonValue(String json, String key) {
-        if (json == null) return null;
+        if (json == null) {
+            return null;
+        }
+
         String pattern = "\"" + key + "\":\"";
         int start = json.indexOf(pattern);
-        if (start == -1) return null;
+
+        if (start == -1) {
+            return null;
+        }
+
         start += pattern.length();
         int end = json.indexOf("\"", start);
-        if (end == -1) return null;
-        return json.substring(start, end);
+
+        if (end == -1) {
+            return null;
+        }
+
+        String value = json.substring(start, end);
+        return decodeUnicodeEscapes(value);
+    }
+
+    private String decodeUnicodeEscapes(String value) {
+        if (value == null || value.isEmpty()) {
+            return value;
+        }
+
+        StringBuilder result = new StringBuilder();
+
+        for (int i = 0; i < value.length(); i++) {
+            char c = value.charAt(i);
+
+            if (c == '\\' && i + 5 < value.length() && value.charAt(i + 1) == 'u') {
+                String hex = value.substring(i + 2, i + 6);
+                try {
+                    int code = Integer.parseInt(hex, 16);
+                    result.append((char) code);
+                    i += 5;
+                } catch (NumberFormatException e) {
+                    result.append(c);
+                }
+            } else {
+                result.append(c);
+            }
+        }
+
+        return result.toString();
     }
 
     private String urlEncode(String value) {

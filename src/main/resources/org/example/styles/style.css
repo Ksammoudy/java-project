@@ -4,7 +4,7 @@
 }
 
 .left-pane {
-    -fx-background-color: linear-gradient(to bottom right, #dff6e3, #c7f0d2);
+    -fx-background-color: linear-gradient(to bottom right, #2f6b4f, #8bd22f);
 }
 
 .right-pane {
@@ -317,15 +317,17 @@
     -fx-border-color: #e5e7eb;
 }
 .citizen-root {
-    -fx-background-color: #f6f8fb;
+    -fx-background-color: #f0fdf4;
 }
 
+/* SIDEBAR */
 .citizen-sidebar {
-    -fx-background-color: #0f172a;
+    -fx-background-color: linear-gradient(to bottom, #052e16, #14532d);
 }
 
+/* BRAND */
 .citizen-brand-box {
-    -fx-background-color: rgba(255,255,255,0.06);
+    -fx-background-color: rgba(255,255,255,0.08);
     -fx-padding: 12px;
     -fx-background-radius: 14px;
 }
@@ -346,12 +348,13 @@
 }
 
 .citizen-brand-subtitle {
-    -fx-text-fill: #94a3b8;
+    -fx-text-fill: rgba(255,255,255,0.7);
     -fx-font-size: 12px;
 }
 
+/* USER BOX */
 .citizen-user-box {
-    -fx-background-color: rgba(255,255,255,0.05);
+    -fx-background-color: rgba(255,255,255,0.07);
     -fx-padding: 14px;
     -fx-background-radius: 14px;
 }
@@ -362,27 +365,29 @@
     -fx-font-weight: 700;
 }
 
+/* BADGES */
 .citizen-pill-info {
-    -fx-background-color: #0ea5e9;
+    -fx-background-color: #16a34a;
     -fx-text-fill: white;
-    -fx-padding: 4px 8px;
+    -fx-padding: 4px 10px;
     -fx-background-radius: 20px;
     -fx-font-size: 11px;
     -fx-font-weight: 700;
 }
 
 .citizen-pill-warn {
-    -fx-background-color: #f59e0b;
+    -fx-background-color: #22c55e;
     -fx-text-fill: white;
-    -fx-padding: 4px 8px;
+    -fx-padding: 4px 10px;
     -fx-background-radius: 20px;
     -fx-font-size: 11px;
     -fx-font-weight: 700;
 }
 
+/* NAVIGATION */
 .citizen-nav-btn {
     -fx-background-color: transparent;
-    -fx-text-fill: #e2e8f0;
+    -fx-text-fill: #dcfce7;
     -fx-alignment: CENTER-LEFT;
     -fx-padding: 12px 14px;
     -fx-background-radius: 12px;
@@ -392,7 +397,7 @@
 }
 
 .citizen-nav-btn:hover {
-    -fx-background-color: rgba(255,255,255,0.08);
+    -fx-background-color: rgba(34,197,94,0.25);
 }
 
 .citizen-nav-btn.active {
@@ -404,33 +409,37 @@
     -fx-text-fill: #fca5a5;
 }
 
+/* FOOTER */
 .citizen-footer {
-    -fx-text-fill: #64748b;
+    -fx-text-fill: #86efac;
     -fx-font-size: 11px;
 }
 
+/* MAIN */
 .citizen-main {
-    -fx-background-color: #f6f8fb;
+    -fx-background-color: #f0fdf4;
 }
 
+/* TITRES */
 .citizen-h1 {
     -fx-font-size: 28px;
     -fx-font-weight: 800;
-    -fx-text-fill: #0f172a;
+    -fx-text-fill: #14532d;
 }
 
 .citizen-sub {
     -fx-font-size: 13px;
-    -fx-text-fill: #475569;
+    -fx-text-fill: #4d7c0f;
 }
 
+/* TOP BUTTONS */
 .citizen-top-btn {
     -fx-background-color: white;
-    -fx-text-fill: #0f172a;
+    -fx-text-fill: #14532d;
     -fx-font-weight: 700;
     -fx-padding: 10px 14px;
     -fx-background-radius: 10px;
-    -fx-border-color: #dbe3ee;
+    -fx-border-color: #bbf7d0;
     -fx-border-radius: 10px;
     -fx-cursor: hand;
 }
@@ -441,56 +450,61 @@
     -fx-border-color: #16a34a;
 }
 
+/* CARDS */
 .citizen-stat-card,
 .citizen-card2 {
     -fx-background-color: white;
     -fx-background-radius: 18px;
-    -fx-border-color: #e2e8f0;
+    -fx-border-color: #bbf7d0;
     -fx-border-radius: 18px;
     -fx-padding: 20px;
 }
 
+/* TEXT */
 .citizen-stat-label {
     -fx-font-size: 12px;
-    -fx-text-fill: #64748b;
+    -fx-text-fill: #4d7c0f;
 }
 
 .citizen-stat-value {
     -fx-font-size: 26px;
     -fx-font-weight: 800;
-    -fx-text-fill: #0f172a;
+    -fx-text-fill: #14532d;
 }
 
 .citizen-stat-hint {
     -fx-font-size: 12px;
-    -fx-text-fill: #64748b;
+    -fx-text-fill: #6b7280;
 }
 
+/* TITLES */
 .citizen-card-title {
     -fx-font-size: 18px;
     -fx-font-weight: 800;
-    -fx-text-fill: #0f172a;
+    -fx-text-fill: #14532d;
 }
 
+/* ACTION BUTTONS */
 .citizen-action-btn {
-    -fx-background-color: #f8fafc;
-    -fx-text-fill: #0f172a;
+    -fx-background-color: #f0fdf4;
+    -fx-text-fill: #14532d;
     -fx-font-weight: 700;
     -fx-padding: 12px 14px;
     -fx-background-radius: 12px;
-    -fx-border-color: #e2e8f0;
+    -fx-border-color: #bbf7d0;
     -fx-border-radius: 12px;
     -fx-alignment: CENTER-LEFT;
     -fx-cursor: hand;
 }
 
 .citizen-action-btn:hover {
-    -fx-background-color: #eef2f7;
+    -fx-background-color: #dcfce7;
 }
 
+/* NOTES */
 .citizen-note {
     -fx-font-size: 13px;
-    -fx-text-fill: #64748b;
+    -fx-text-fill: #4b5563;
 }
 .user-dashboard-root {
     -fx-background-color: #f8fafc;
@@ -597,4 +611,69 @@
     -fx-font-size: 18px;
     -fx-font-weight: 800;
     -fx-text-fill: #0f172a;
+}
+.modern-table {
+    -fx-background-color: white;
+    -fx-border-color: #e5e7eb;
+    -fx-border-radius: 14px;
+    -fx-background-radius: 14px;
+    -fx-padding: 6px;
+}
+
+.modern-table .column-header-background {
+    -fx-background-color: #f8fafc;
+    -fx-background-radius: 12px 12px 0 0;
+}
+
+.modern-table .column-header {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent #e5e7eb transparent;
+}
+
+.modern-table .column-header .label {
+    -fx-text-fill: #111827;
+    -fx-font-size: 13px;
+    -fx-font-weight: 700;
+}
+
+.modern-table .table-row-cell {
+    -fx-background-color: white;
+    -fx-border-color: transparent transparent #f1f5f9 transparent;
+    -fx-padding: 4px;
+}
+
+.modern-table .table-row-cell:hover {
+    -fx-background-color: #f8fafc;
+}
+
+.modern-table .table-row-cell:selected {
+    -fx-background-color: #e8f5ee;
+}
+
+.modern-table .table-cell {
+    -fx-text-fill: #374151;
+    -fx-font-size: 13px;
+    -fx-alignment: CENTER-LEFT;
+    -fx-border-color: transparent;
+}
+.root-container {
+    -fx-background-color: #f0fdf4;
+}
+
+.message-success {
+    -fx-text-fill: #15803d;
+    -fx-font-weight: 700;
+}
+
+.message-error {
+    -fx-text-fill: #dc2626;
+    -fx-font-weight: 700;
+}
+.btn-danger {
+    -fx-background-color: #dc3545;
+    -fx-text-fill: white;
+}
+
+.btn-danger:hover {
+    -fx-background-color: #bb2d3b;
 }

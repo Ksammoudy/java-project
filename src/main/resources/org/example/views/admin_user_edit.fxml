@@ -26,9 +26,9 @@
     <HBox alignment="CENTER_LEFT" spacing="10.0">
         <VBox spacing="4.0">
             <Label fx:id="formTitleLabel"
-                   text="Formulaire utilisateur"
+                   text="Modifier utilisateur"
                    styleClass="page-title"/>
-            <Label text="Créer ou modifier un compte utilisateur"
+            <Label text="Mettre à jour les informations du compte"
                    styleClass="page-subtitle"/>
         </VBox>
 
@@ -88,9 +88,9 @@
         </HBox>
 
         <VBox spacing="6.0">
-            <Label text="Mot de passe" styleClass="field-label"/>
+            <Label text="Nouveau mot de passe (optionnel)" styleClass="field-label"/>
             <PasswordField fx:id="passwordField"
-                           promptText="Mot de passe"
+                           promptText="Laisser vide pour ne pas changer"
                            styleClass="input-field"/>
         </VBox>
 
@@ -105,7 +105,7 @@
                styleClass="message-label"/>
 
         <HBox spacing="10.0">
-            <Button text="✔ Enregistrer"
+            <Button text="✔ Enregistrer les modifications"
                     onAction="#handleSaveUser"
                     styleClass="btn-success"/>
 

@@ -9,13 +9,16 @@ import org.example.services.SessionManager;
 public class DashboardValorizerController {
 
     @FXML
+    private Label headerEmailLabel;
+
+    @FXML
+    private Label welcomeLabel;
+
+    @FXML
     private Label emailLabel;
 
     @FXML
     private Label typeLabel;
-
-    @FXML
-    private Label statusLabel;
 
     @FXML
     private Label nomLabel;
@@ -27,27 +30,58 @@ public class DashboardValorizerController {
     private Label telephoneLabel;
 
     @FXML
-    private Label welcomeLabel;
+    private Label statusLabel;
+
+    @FXML
+    private Label statusBadgeLabel;
 
     @FXML
     public void initialize() {
         User user = SessionManager.getCurrentUser();
 
-        if (user == null) {
-            Main.showLoginPage();
-            return;
+        if (user != null) {
+            String email = user.getEmail() != null ? user.getEmail() : "valorizer@email.com";
+            String nom = user.getNom() != null ? user.getNom() : "—";
+            String prenom = user.getPrenom() != null ? user.getPrenom() : "—";
+            String telephone = user.getTelephone() != null ? user.getTelephone() : "—";
+            String statut = user.isActive() ? "Actif" : "Inactif";
+
+            if (headerEmailLabel != null) {
+                headerEmailLabel.setText(email);
+            }
+
+            if (welcomeLabel != null) {
+                welcomeLabel.setText("Bienvenue " + prenom + " 👋");
+            }
+
+            if (emailLabel != null) {
+                emailLabel.setText(email);
+            }
+
+            if (typeLabel != null) {
+                typeLabel.setText("VALORIZER");
+            }
+
+            if (nomLabel != null) {
+                nomLabel.setText(nom);
+            }
+
+            if (prenomLabel != null) {
+                prenomLabel.setText(prenom);
+            }
+
+            if (telephoneLabel != null) {
+                telephoneLabel.setText(telephone);
+            }
+
+            if (statusLabel != null) {
+                statusLabel.setText(statut);
+            }
+
+            if (statusBadgeLabel != null) {
+                statusBadgeLabel.setText(statut);
+            }
         }
-
-        emailLabel.setText(user.getEmail() != null ? user.getEmail() : "—");
-        typeLabel.setText(user.getType() != null ? user.getType() : "VALORIZER");
-        statusLabel.setText(user.isActive() ? "Actif" : "Désactivé");
-
-        nomLabel.setText(user.getNom() != null ? user.getNom() : "—");
-        prenomLabel.setText(user.getPrenom() != null ? user.getPrenom() : "—");
-        telephoneLabel.setText(user.getTelephone() != null ? user.getTelephone() : "—");
-
-        String prenom = user.getPrenom() != null ? user.getPrenom() : "";
-        welcomeLabel.setText("Bienvenue " + prenom + " 👋");
     }
 
     @FXML
@@ -67,7 +101,7 @@ public class DashboardValorizerController {
 
     @FXML
     public void handleLogout() {
-        SessionManager.clearSession();
+        SessionManager.logout();
         Main.showLoginPage();
     }
 }

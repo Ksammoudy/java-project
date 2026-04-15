@@ -13,7 +13,10 @@ import java.time.format.DateTimeFormatter;
 public class DashboardAdminController {
 
     @FXML
-    private Label adminEmailLabel;
+    private Label adminEmailHeaderLabel;
+
+    @FXML
+    private Label adminEmailCardLabel;
 
     @FXML
     private Label totalUsersLabel;
@@ -30,28 +33,37 @@ public class DashboardAdminController {
     public void initialize() {
         User user = SessionManager.getCurrentUser();
 
-        if (user == null || user.getType() == null || !user.getType().equalsIgnoreCase("ADMIN")) {
-            Main.showLoginPage();
-            return;
-        }
+        if (user != null) {
+            String email = user.getEmail() != null ? user.getEmail() : "admin@email.com";
+            String prenom = user.getPrenom() != null && !user.getPrenom().isEmpty()
+                    ? user.getPrenom()
+                    : "Admin";
 
-        String email = user.getEmail() != null ? user.getEmail() : "—";
+            if (adminEmailHeaderLabel != null) {
+                adminEmailHeaderLabel.setText(email);
+            }
 
-        if (adminEmailLabel != null) {
-            adminEmailLabel.setText(email);
-        }
+            if (adminEmailCardLabel != null) {
+                adminEmailCardLabel.setText(email);
+            }
 
-        if (welcomeLabel != null) {
-            String prenom = user.getPrenom() != null ? user.getPrenom() : "Admin";
-            welcomeLabel.setText("Bienvenue " + prenom + " 👋");
+            if (welcomeLabel != null) {
+                welcomeLabel.setText("Bienvenue " + prenom + " 👋");
+            }
         }
 
         if (todayDateLabel != null) {
-            todayDateLabel.setText(LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            todayDateLabel.setText(LocalDate.now().format(formatter));
         }
 
         if (totalUsersLabel != null) {
-            totalUsersLabel.setText(String.valueOf(userService.getAllUsers().size()));
+            try {
+                totalUsersLabel.setText(String.valueOf(userService.getAllUsers().size()));
+            } catch (Exception e) {
+                totalUsersLabel.setText("0");
+                e.printStackTrace();
+            }
         }
     }
 
@@ -67,7 +79,7 @@ public class DashboardAdminController {
 
     @FXML
     public void handleLogout() {
-        SessionManager.clearSession();
+        SessionManager.logout();
         Main.showLoginPage();
     }
 }

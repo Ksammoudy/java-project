@@ -67,18 +67,12 @@ public class LoginController {
             return;
         }
 
-        System.out.println("Tentative login avec : " + email);
-
         User user = userService.login(email, password);
 
         if (user == null) {
             showError("Email ou mot de passe incorrect.");
-            System.out.println("Login échoué.");
             return;
         }
-
-        System.out.println("Login réussi pour : " + user.getEmail());
-        System.out.println("Type utilisateur : " + user.getType());
 
         SessionManager.setCurrentUser(user);
 
@@ -86,12 +80,13 @@ public class LoginController {
             System.out.println("Option 'Se souvenir de moi' cochée.");
         }
 
+        showSuccess("Connexion réussie.");
         redirectByUserType(user);
     }
 
     @FXML
     public void handleGoogleLogin() {
-        showInfo("Login Google non encore implémenté en JavaFX.");
+        showInfo("Connexion Google non encore implémentée en JavaFX.");
     }
 
     @FXML
@@ -108,7 +103,7 @@ public class LoginController {
                     }
 
                     SessionManager.setCurrentUser(user);
-                    showInfo("Connexion Facebook réussie.");
+                    showSuccess("Connexion Facebook réussie.");
                     redirectByUserType(user);
                 });
             }
@@ -122,7 +117,7 @@ public class LoginController {
 
     @FXML
     public void handleGithubLogin() {
-        showInfo("Login GitHub non encore implémenté en JavaFX.");
+        showInfo("Connexion GitHub non encore implémentée en JavaFX.");
     }
 
     @FXML
@@ -141,30 +136,41 @@ public class LoginController {
     }
 
     private void redirectByUserType(User user) {
+        if (user == null) {
+            showError("Utilisateur introuvable.");
+            return;
+        }
+
         String type = user.getType() != null ? user.getType().trim().toUpperCase() : "";
 
-        if ("ADMIN".equals(type)) {
-            System.out.println("Ouverture dashboard ADMIN");
-            Main.showDashboardAdmin();
-        } else if ("VALORIZER".equals(type) || "VALORISATEUR".equals(type)) {
-            System.out.println("Ouverture dashboard VALORIZER");
-            Main.showDashboardValorizer();
-        } else if ("CITIZEN".equals(type) || "CITOYEN".equals(type)) {
-            System.out.println("Ouverture dashboard CITIZEN");
-            Main.showDashboardCitizen();
-        } else {
-            showError("Type utilisateur inconnu.");
-            System.out.println("Type utilisateur inconnu : " + type);
+        switch (type) {
+            case "ADMIN":
+                Main.showDashboardAdmin();
+                break;
+
+            case "VALORIZER":
+            case "VALORISATEUR":
+                Main.showDashboardValorizer();
+                break;
+
+            case "CITIZEN":
+            case "CITOYEN":
+                Main.showDashboardCitizen();
+                break;
+
+            default:
+                showError("Type utilisateur inconnu.");
+                break;
         }
     }
 
     private boolean isValidEmail(String email) {
-        return email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
+        return email != null && email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
     }
 
     private void showError(String message) {
         if (messageLabel != null) {
-            messageLabel.setStyle("-fx-text-fill: #dc3545;");
+            messageLabel.setStyle("-fx-text-fill: red;");
             messageLabel.setText(message);
         } else {
             showAlert(Alert.AlertType.ERROR, "Erreur", message);
@@ -173,8 +179,19 @@ public class LoginController {
 
     private void showInfo(String message) {
         if (messageLabel != null) {
-            messageLabel.setStyle("-fx-text-fill: #0d6efd;");
+            messageLabel.setStyle("-fx-text-fill: blue;");
             messageLabel.setText(message);
+        } else {
+            showAlert(Alert.AlertType.INFORMATION, "Information", message);
+        }
+    }
+
+    private void showSuccess(String message) {
+        if (messageLabel != null) {
+            messageLabel.setStyle("-fx-text-fill: green;");
+            messageLabel.setText(message);
+        } else {
+            showAlert(Alert.AlertType.INFORMATION, "Succès", message);
         }
     }
 

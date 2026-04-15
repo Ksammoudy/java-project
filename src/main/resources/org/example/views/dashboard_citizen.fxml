@@ -11,7 +11,7 @@
 
 <BorderPane xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="org.example.controllers.DashboardValorizerController"
+            fx:controller="org.example.controllers.DashboardCitizenController"
             prefWidth="1200.0" prefHeight="750.0"
             styleClass="citizen-root"
             stylesheets="@../styles/style.css">
@@ -29,22 +29,22 @@
 
                 <VBox spacing="2.0">
                     <Label text="WasteWise" styleClass="citizen-brand-title"/>
-                    <Label text="Valorizer panel" styleClass="citizen-brand-subtitle"/>
+                    <Label text="Citizen panel" styleClass="citizen-brand-subtitle"/>
                 </VBox>
             </HBox>
 
             <VBox spacing="8.0" styleClass="citizen-user-box">
                 <Label fx:id="headerEmailLabel"
-                       text="valorizer@email.com"
+                       text="citizen@email.com"
                        styleClass="citizen-user-email"/>
                 <HBox spacing="8.0">
-                    <Label text="Valorisateur" styleClass="citizen-pill-info"/>
+                    <Label text="Citoyen" styleClass="citizen-pill-info"/>
                     <Label fx:id="statusBadgeLabel" text="Actif" styleClass="citizen-pill-warn"/>
                 </HBox>
             </VBox>
 
             <VBox spacing="8.0">
-                <Button text="🏭 Dashboard"
+                <Button text="🏠 Dashboard"
                         onAction="#handleDashboard"
                         maxWidth="Infinity"
                         styleClass="citizen-nav-btn active"/>
@@ -67,7 +67,7 @@
 
             <Region VBox.vgrow="ALWAYS"/>
 
-            <Label text="WasteWise TN • espace valorisateur"
+            <Label text="WasteWise TN • espace citoyen"
                    wrapText="true"
                    styleClass="citizen-footer"/>
         </VBox>
@@ -81,8 +81,8 @@
 
             <HBox alignment="CENTER_LEFT" spacing="12.0">
                 <VBox spacing="4.0">
-                    <Label text="Valorisateur" styleClass="citizen-h1"/>
-                    <Label text="WasteWise TN • Espace valorisateur" styleClass="citizen-sub"/>
+                    <Label text="Citoyen" styleClass="citizen-h1"/>
+                    <Label text="WasteWise TN • Espace citoyen" styleClass="citizen-sub"/>
                 </VBox>
 
                 <Region HBox.hgrow="ALWAYS"/>
@@ -100,7 +100,7 @@
                 <Label fx:id="welcomeLabel"
                        text="Bienvenue 👋"
                        styleClass="citizen-card-title"/>
-                <Label text="Gestion du compte utilisateur valorisateur."
+                <Label text="Gestion du compte utilisateur citoyen."
                        wrapText="true"
                        styleClass="citizen-note"/>
             </VBox>
@@ -114,7 +114,7 @@
 
                 <VBox spacing="8.0" HBox.hgrow="ALWAYS" styleClass="citizen-stat-card">
                     <Label text="Type" styleClass="citizen-stat-label"/>
-                    <Label fx:id="typeLabel" text="VALORIZER" styleClass="citizen-stat-value"/>
+                    <Label fx:id="typeLabel" text="CITIZEN" styleClass="citizen-stat-value"/>
                     <Label text="Profil actuel" styleClass="citizen-stat-hint"/>
                 </VBox>
 
@@ -129,7 +129,7 @@
                 <VBox spacing="12.0" HBox.hgrow="ALWAYS" styleClass="citizen-card2">
                     <Label text="📌 Informations du profil" styleClass="citizen-card-title"/>
 
-                    <Label text="Voici les informations principales de votre compte valorisateur."
+                    <Label text="Voici les informations principales de votre compte citoyen."
                            wrapText="true"
                            styleClass="citizen-note"/>
 

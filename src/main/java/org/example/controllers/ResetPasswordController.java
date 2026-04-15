@@ -13,7 +13,7 @@ public class ResetPasswordController {
     private TextField tokenField;
 
     @FXML
-    private PasswordField newPasswordField;
+    private PasswordField passwordField;
 
     @FXML
     private PasswordField confirmPasswordField;
@@ -32,20 +32,17 @@ public class ResetPasswordController {
 
     @FXML
     public void handleResetPassword() {
-
         String token = tokenField != null && tokenField.getText() != null
                 ? tokenField.getText().trim()
                 : "";
 
-        String newPassword = newPasswordField != null && newPasswordField.getText() != null
-                ? newPasswordField.getText().trim()
+        String newPassword = passwordField != null && passwordField.getText() != null
+                ? passwordField.getText().trim()
                 : "";
 
         String confirmPassword = confirmPasswordField != null && confirmPasswordField.getText() != null
                 ? confirmPasswordField.getText().trim()
                 : "";
-
-        // 🔴 CONTROLE DE SAISIE
 
         if (token.isEmpty()) {
             showError("Veuillez saisir le code de réinitialisation.");
@@ -67,7 +64,6 @@ public class ResetPasswordController {
             return;
         }
 
-        // 🔹 Appel service
         String result = resetPasswordService.resetPassword(token, newPassword, confirmPassword);
 
         if ("SUCCESS".equals(result)) {
@@ -84,14 +80,14 @@ public class ResetPasswordController {
 
     private void showError(String message) {
         if (messageLabel != null) {
-            messageLabel.setStyle("-fx-text-fill: red;");
+            messageLabel.getStyleClass().setAll("message-label", "message-error");
             messageLabel.setText(message);
         }
     }
 
     private void showSuccess(String message) {
         if (messageLabel != null) {
-            messageLabel.setStyle("-fx-text-fill: green;");
+            messageLabel.getStyleClass().setAll("message-label", "message-success");
             messageLabel.setText(message);
         }
     }

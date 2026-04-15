@@ -68,21 +68,45 @@ public class ProfileController {
     }
 
     private void loadUserData() {
-        if (nomLabel != null) nomLabel.setText(valueOrDash(currentUser.getNom()));
-        if (prenomLabel != null) prenomLabel.setText(valueOrDash(currentUser.getPrenom()));
-        if (emailLabel != null) emailLabel.setText(valueOrDash(currentUser.getEmail()));
-        if (telephoneLabel != null) telephoneLabel.setText(valueOrDash(currentUser.getTelephone()));
-        if (roleLabel != null) roleLabel.setText(formatType(currentUser.getType()));
+        if (nomLabel != null) {
+            nomLabel.setText(valueOrDash(currentUser.getNom()));
+        }
+        if (prenomLabel != null) {
+            prenomLabel.setText(valueOrDash(currentUser.getPrenom()));
+        }
+        if (emailLabel != null) {
+            emailLabel.setText(valueOrDash(currentUser.getEmail()));
+        }
+        if (telephoneLabel != null) {
+            telephoneLabel.setText(valueOrDash(currentUser.getTelephone()));
+        }
+        if (roleLabel != null) {
+            roleLabel.setText(formatType(currentUser.getType()));
+        }
 
-        if (nomField != null) nomField.setText(nullToEmpty(currentUser.getNom()));
-        if (prenomField != null) prenomField.setText(nullToEmpty(currentUser.getPrenom()));
-        if (emailField != null) emailField.setText(nullToEmpty(currentUser.getEmail()));
-        if (telephoneField != null) telephoneField.setText(nullToEmpty(currentUser.getTelephone()));
+        if (nomField != null) {
+            nomField.setText(nullToEmpty(currentUser.getNom()));
+        }
+        if (prenomField != null) {
+            prenomField.setText(nullToEmpty(currentUser.getPrenom()));
+        }
+        if (emailField != null) {
+            emailField.setText(nullToEmpty(currentUser.getEmail()));
+        }
+        if (telephoneField != null) {
+            telephoneField.setText(nullToEmpty(currentUser.getTelephone()));
+        }
+
+        if (messageLabel != null) {
+            messageLabel.setText("");
+        }
     }
 
     @FXML
     private void handleSaveProfile() {
-        if (currentUser == null) return;
+        if (currentUser == null) {
+            return;
+        }
 
         String nom = nomField != null ? nomField.getText().trim() : "";
         String prenom = prenomField != null ? prenomField.getText().trim() : "";
@@ -91,8 +115,6 @@ public class ProfileController {
         String currentPassword = currentPasswordField != null ? currentPasswordField.getText().trim() : "";
         String newPassword = newPasswordField != null ? newPasswordField.getText().trim() : "";
         String confirmPassword = confirmPasswordField != null ? confirmPasswordField.getText().trim() : "";
-
-        // 🔴 CONTROLE DE SAISIE
 
         if (nom.isEmpty()) {
             setMessage("Le nom est obligatoire.", false);
@@ -109,7 +131,7 @@ public class ProfileController {
             return;
         }
 
-        if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+        if (!isValidEmail(email)) {
             setMessage("Email invalide.", false);
             return;
         }
@@ -124,8 +146,9 @@ public class ProfileController {
             return;
         }
 
-        // 🔐 Gestion mot de passe
-        if (!newPassword.isEmpty()) {
+        boolean passwordUpdated = true;
+
+        if (!newPassword.isEmpty() || !confirmPassword.isEmpty() || !currentPassword.isEmpty()) {
 
             if (currentPassword.isEmpty()) {
                 setMessage("Veuillez saisir votre mot de passe actuel.", false);
@@ -134,6 +157,11 @@ public class ProfileController {
 
             if (!PasswordUtil.checkPassword(currentPassword, currentUser.getPassword())) {
                 setMessage("Mot de passe actuel incorrect.", false);
+                return;
+            }
+
+            if (newPassword.isEmpty()) {
+                setMessage("Veuillez saisir un nouveau mot de passe.", false);
                 return;
             }
 
@@ -147,24 +175,33 @@ public class ProfileController {
                 return;
             }
 
+            passwordUpdated = userService.updatePassword(currentUser.getId(), newPassword);
+
+            if (!passwordUpdated) {
+                setMessage("Erreur lors de la mise à jour du mot de passe.", false);
+                return;
+            }
+
             currentUser.setPassword(PasswordUtil.hashPassword(newPassword));
         }
 
-        // 🔹 Mise à jour
         currentUser.setNom(nom);
         currentUser.setPrenom(prenom);
         currentUser.setEmail(email);
         currentUser.setTelephone(telephone.isEmpty() ? null : telephone);
 
-        boolean updated = userService.updateProfile(currentUser);
+        boolean profileUpdated = userService.updateProfile(currentUser);
 
-        if (updated) {
+        if (profileUpdated && passwordUpdated) {
             SessionManager.setCurrentUser(currentUser);
+            clearPasswordFields();
+            loadUserData();
             setMessage("Profil mis à jour avec succès.", true);
         } else {
             setMessage("Erreur lors de la mise à jour du profil.", false);
         }
     }
+
     @FXML
     private void handleEditProfilePage() {
         Main.showProfileEditPage();
@@ -177,7 +214,9 @@ public class ProfileController {
 
     @FXML
     private void handleBackToDashboard() {
-        if (currentUser == null) return;
+        if (currentUser == null) {
+            return;
+        }
 
         String type = currentUser.getType() == null ? "" : currentUser.getType().toUpperCase();
 
@@ -190,6 +229,18 @@ public class ProfileController {
         }
     }
 
+    private void clearPasswordFields() {
+        if (currentPasswordField != null) {
+            currentPasswordField.clear();
+        }
+        if (newPasswordField != null) {
+            newPasswordField.clear();
+        }
+        if (confirmPasswordField != null) {
+            confirmPasswordField.clear();
+        }
+    }
+
     private void setMessage(String text, boolean success) {
         if (messageLabel != null) {
             messageLabel.setText(text);
@@ -197,6 +248,10 @@ public class ProfileController {
                     ? "-fx-text-fill: green; -fx-font-weight: bold;"
                     : "-fx-text-fill: red; -fx-font-weight: bold;");
         }
+    }
+
+    private boolean isValidEmail(String email) {
+        return email != null && email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
     }
 
     private String valueOrDash(String value) {
@@ -208,12 +263,18 @@ public class ProfileController {
     }
 
     private String formatType(String type) {
-        if (type == null || type.isBlank()) return "Citoyen";
+        if (type == null || type.isBlank()) {
+            return "Citoyen";
+        }
 
         type = type.toUpperCase();
 
-        if (type.contains("ADMIN")) return "Administrateur";
-        if (type.contains("VALORIZER") || type.contains("VALORISATEUR")) return "Valorisateur";
+        if (type.contains("ADMIN")) {
+            return "Administrateur";
+        }
+        if (type.contains("VALORIZER") || type.contains("VALORISATEUR")) {
+            return "Valorisateur";
+        }
         return "Citoyen";
     }
 
