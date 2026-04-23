@@ -52,9 +52,14 @@ public class ZonePollueeController {
         colGps.setCellValueFactory(new PropertyValueFactory<>("coordonneesGps"));
         colNiveau.setCellValueFactory(new PropertyValueFactory<>("niveauPollution"));
         colDate.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDateIdentification().format(dateFormatter)));
+
+        // Colonne Indicateur - Affichage "ID: X - XX kg"
         colIndicateur.setCellValueFactory(cellData -> {
             IndicateurImpact ind = cellData.getValue().getIndicateur();
-            return new SimpleStringProperty(ind != null ? "ID=" + ind.getId() : "Aucun");
+            if (ind != null) {
+                return new SimpleStringProperty("ID: " + ind.getId() + " - " + String.format("%.0f", ind.getTotalKgRecoltes()) + " kg");
+            }
+            return new SimpleStringProperty("Aucun");
         });
 
         colActions.setCellFactory(param -> new TableCell<>() {
@@ -249,29 +254,45 @@ public class ZonePollueeController {
         TextField nomField = new TextField();
         nomField.setPromptText("Ex: Plage de Hammamet");
         nomField.getStyleClass().add("form-field");
-        grid.add(nomLabel, 0, 1);
-        grid.add(nomField, 1, 1);
+        Label errorNomLabel = new Label();
+        errorNomLabel.setStyle("-fx-text-fill: #dc3545; -fx-font-size: 11px;");
+        errorNomLabel.setVisible(false);
+
+        GridPane.setConstraints(nomLabel, 0, 1);
+        GridPane.setConstraints(nomField, 1, 1);
+        GridPane.setConstraints(errorNomLabel, 1, 2);
+        grid.getChildren().addAll(nomLabel, nomField, errorNomLabel);
 
         Label gpsLabel = new Label("Coordonnées GPS");
         gpsLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #333;");
         TextField gpsField = new TextField();
         gpsField.setPromptText("Ex: 36.4025, 10.1817");
         gpsField.getStyleClass().add("form-field");
-        grid.add(gpsLabel, 0, 2);
-        grid.add(gpsField, 1, 2);
-
         Label gpsHint = new Label("Format: latitude, longitude");
         gpsHint.setStyle("-fx-text-fill: #6c757d; -fx-font-size: 11px;");
-        GridPane.setColumnSpan(gpsHint, 2);
-        grid.add(gpsHint, 0, 3);
+        Label errorGpsLabel = new Label();
+        errorGpsLabel.setStyle("-fx-text-fill: #dc3545; -fx-font-size: 11px;");
+        errorGpsLabel.setVisible(false);
+
+        GridPane.setConstraints(gpsLabel, 0, 3);
+        GridPane.setConstraints(gpsField, 1, 3);
+        GridPane.setConstraints(gpsHint, 1, 4);
+        GridPane.setConstraints(errorGpsLabel, 1, 5);
+        grid.getChildren().addAll(gpsLabel, gpsField, gpsHint, errorGpsLabel);
 
         Label niveauLabel = new Label("Niveau de pollution (1-10)");
         niveauLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #333;");
         TextField niveauField = new TextField();
         niveauField.setPromptText("Entrez un nombre entre 1 et 10");
         niveauField.getStyleClass().add("form-field");
-        grid.add(niveauLabel, 0, 4);
-        grid.add(niveauField, 1, 4);
+        Label errorNiveauLabel = new Label();
+        errorNiveauLabel.setStyle("-fx-text-fill: #dc3545; -fx-font-size: 11px;");
+        errorNiveauLabel.setVisible(false);
+
+        GridPane.setConstraints(niveauLabel, 0, 6);
+        GridPane.setConstraints(niveauField, 1, 6);
+        GridPane.setConstraints(errorNiveauLabel, 1, 7);
+        grid.getChildren().addAll(niveauLabel, niveauField, errorNiveauLabel);
 
         Label indicateurLabel = new Label("Indicateur associé");
         indicateurLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #333;");
@@ -294,8 +315,14 @@ public class ZonePollueeController {
                 setText(empty || ind == null ? null : ind.getId() + " - " + ind.getTotalKgRecoltes() + " kg");
             }
         });
-        grid.add(indicateurLabel, 0, 5);
-        grid.add(indicateurCombo, 1, 5);
+        Label errorIndicateurLabel = new Label();
+        errorIndicateurLabel.setStyle("-fx-text-fill: #dc3545; -fx-font-size: 11px;");
+        errorIndicateurLabel.setVisible(false);
+
+        GridPane.setConstraints(indicateurLabel, 0, 8);
+        GridPane.setConstraints(indicateurCombo, 1, 8);
+        GridPane.setConstraints(errorIndicateurLabel, 1, 9);
+        grid.getChildren().addAll(indicateurLabel, indicateurCombo, errorIndicateurLabel);
 
         if (zone != null) {
             nomField.setText(zone.getNomZone());
@@ -313,95 +340,115 @@ public class ZonePollueeController {
         dialog.getDialogPane().lookupButton(saveButton).setStyle("-fx-background-color: #8bd22f; -fx-text-fill: #1a3a2a; -fx-font-weight: bold; -fx-padding: 8 20;");
         dialog.getDialogPane().lookupButton(cancelButton).setStyle("-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 20;");
 
-        dialog.setResultConverter(dialogButton -> {
-            if (dialogButton == saveButton) {
-                try {
-                    String nom = nomField.getText();
-                    String gps = gpsField.getText();
-                    String niveauStr = niveauField.getText();
-                    IndicateurImpact indicateur = indicateurCombo.getValue();
+        Button saveButtonNode = (Button) dialog.getDialogPane().lookupButton(saveButton);
+        saveButtonNode.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
+            event.consume();
+            if (validateAndSave(zone, nomField, gpsField, niveauField, indicateurCombo,
+                    errorNomLabel, errorGpsLabel, errorNiveauLabel, errorIndicateurLabel)) {
+                dialog.close();
+            }
+        });
 
-                    // ========== CONTROLE DE SAISIE ==========
+        dialog.showAndWait();
+    }
 
-                    if (nom == null || nom.trim().isEmpty()) {
-                        showAlert("Erreur de saisie", "❌ Le nom de la zone est obligatoire.", Alert.AlertType.ERROR);
-                        return null;
-                    }
+    private boolean validateAndSave(ZonePolluee zone,
+                                    TextField nomField, TextField gpsField, TextField niveauField, ComboBox<IndicateurImpact> indicateurCombo,
+                                    Label errorNomLabel, Label errorGpsLabel, Label errorNiveauLabel, Label errorIndicateurLabel) {
 
-                    if (nom.length() < 3) {
-                        showAlert("Erreur de saisie", "❌ Le nom de la zone doit contenir au moins 3 caractères.", Alert.AlertType.ERROR);
-                        return null;
-                    }
+        boolean isValid = true;
 
-                    if (nom.length() > 100) {
-                        showAlert("Erreur de saisie", "❌ Le nom ne doit pas dépasser 100 caractères.", Alert.AlertType.ERROR);
-                        return null;
-                    }
+        errorNomLabel.setVisible(false);
+        errorGpsLabel.setVisible(false);
+        errorNiveauLabel.setVisible(false);
+        errorIndicateurLabel.setVisible(false);
 
-                    if (!nom.matches("^[a-zA-ZÀ-ÿ0-9\\s\\-\\']+$")) {
-                        showAlert("Erreur de saisie", "❌ Le nom ne doit contenir que des lettres, chiffres, espaces et tirets.", Alert.AlertType.ERROR);
-                        return null;
-                    }
+        String nom = nomField.getText();
+        String gps = gpsField.getText();
+        String niveauStr = niveauField.getText();
+        IndicateurImpact indicateur = indicateurCombo.getValue();
 
-                    if (gps == null || gps.trim().isEmpty()) {
-                        showAlert("Erreur de saisie", "❌ Les coordonnées GPS sont obligatoires.", Alert.AlertType.ERROR);
-                        return null;
-                    }
+        // Validation Nom
+        if (nom == null || nom.trim().isEmpty()) {
+            errorNomLabel.setText("❌ Le nom est obligatoire");
+            errorNomLabel.setVisible(true);
+            isValid = false;
+        } else if (nom.length() < 3) {
+            errorNomLabel.setText("❌ Le nom doit contenir au moins 3 caractères");
+            errorNomLabel.setVisible(true);
+            isValid = false;
+        } else if (nom.length() > 100) {
+            errorNomLabel.setText("❌ Le nom ne doit pas dépasser 100 caractères");
+            errorNomLabel.setVisible(true);
+            isValid = false;
+        } else if (!nom.matches("^[a-zA-ZÀ-ÿ0-9\\s\\-\\']+$")) {
+            errorNomLabel.setText("❌ Caractères non autorisés (lettres, chiffres, espaces, tirets)");
+            errorNomLabel.setVisible(true);
+            isValid = false;
+        }
 
-                    if (!gps.matches("^-?\\d+(\\.\\d+)?,\\s*-?\\d+(\\.\\d+)?$")) {
-                        showAlert("Erreur de saisie", "❌ Format GPS invalide. Utilisez le format: latitude,longitude (ex: 36.8065,10.1815)", Alert.AlertType.ERROR);
-                        return null;
-                    }
+        // Validation GPS
+        if (gps == null || gps.trim().isEmpty()) {
+            errorGpsLabel.setText("❌ Les coordonnées GPS sont obligatoires");
+            errorGpsLabel.setVisible(true);
+            isValid = false;
+        } else if (!gps.matches("^-?\\d+(\\.\\d+)?,\\s*-?\\d+(\\.\\d+)?$")) {
+            errorGpsLabel.setText("❌ Format invalide. Utilisez: latitude,longitude (ex: 36.8065,10.1815)");
+            errorGpsLabel.setVisible(true);
+            isValid = false;
+        }
 
-                    if (niveauStr == null || niveauStr.trim().isEmpty()) {
-                        showAlert("Erreur de saisie", "❌ Le niveau de pollution est obligatoire.", Alert.AlertType.ERROR);
-                        return null;
-                    }
-
-                    int niveau;
-                    try {
-                        niveau = Integer.parseInt(niveauStr);
-                    } catch (NumberFormatException e) {
-                        showAlert("Erreur de saisie", "❌ Le niveau doit être un nombre entier.", Alert.AlertType.ERROR);
-                        return null;
-                    }
-
-                    if (niveau < 1 || niveau > 10) {
-                        showAlert("Erreur de saisie", "❌ Le niveau doit être compris entre 1 et 10.", Alert.AlertType.ERROR);
-                        return null;
-                    }
-
-                    if (indicateur == null) {
-                        showAlert("Erreur de saisie", "❌ Veuillez sélectionner un indicateur.", Alert.AlertType.ERROR);
-                        return null;
-                    }
-
-                    // ========== FIN CONTROLE DE SAISIE ==========
-
-                    ZonePolluee newZone = new ZonePolluee(nom.trim(), gps.trim(), niveau, LocalDateTime.now(), indicateur);
-                    if (zone != null) {
-                        newZone.setId(zone.getId());
-                    }
-                    return newZone;
-                } catch (NumberFormatException e) {
-                    showAlert("Erreur de saisie", "❌ Veuillez saisir un niveau valide.", Alert.AlertType.ERROR);
-                    return null;
+        // Validation Niveau
+        if (niveauStr == null || niveauStr.trim().isEmpty()) {
+            errorNiveauLabel.setText("❌ Le niveau est obligatoire");
+            errorNiveauLabel.setVisible(true);
+            isValid = false;
+        } else {
+            try {
+                int niveau = Integer.parseInt(niveauStr);
+                if (niveau < 1 || niveau > 10) {
+                    errorNiveauLabel.setText("❌ Le niveau doit être compris entre 1 et 10");
+                    errorNiveauLabel.setVisible(true);
+                    isValid = false;
                 }
+            } catch (NumberFormatException e) {
+                errorNiveauLabel.setText("❌ Le niveau doit être un nombre entier");
+                errorNiveauLabel.setVisible(true);
+                isValid = false;
             }
-            return null;
-        });
+        }
 
-        Optional<ZonePolluee> result = dialog.showAndWait();
-        result.ifPresent(z -> {
-            if (z.getId() == 0) {
-                dao.addZone(z);
-                showAlert("Succès", "✅ Zone ajoutée avec succès !", Alert.AlertType.INFORMATION);
-            } else {
-                dao.updateZone(z);
-                showAlert("Succès", "✅ Zone modifiée avec succès !", Alert.AlertType.INFORMATION);
+        // Validation Indicateur
+        if (indicateur == null) {
+            errorIndicateurLabel.setText("❌ Veuillez sélectionner un indicateur");
+            errorIndicateurLabel.setVisible(true);
+            isValid = false;
+        }
+
+        if (isValid) {
+            try {
+                int niveau = Integer.parseInt(niveauStr);
+                ZonePolluee newZone = new ZonePolluee(nom.trim(), gps.trim(), niveau, LocalDateTime.now(), indicateur);
+                if (zone != null) {
+                    newZone.setId(zone.getId());
+                }
+
+                if (newZone.getId() == 0) {
+                    dao.addZone(newZone);
+                    showAlert("Succès", "✅ Zone ajoutée avec succès !", Alert.AlertType.INFORMATION);
+                } else {
+                    dao.updateZone(newZone);
+                    showAlert("Succès", "✅ Zone modifiée avec succès !", Alert.AlertType.INFORMATION);
+                }
+                loadZones();
+                return true;
+            } catch (NumberFormatException e) {
+                errorNiveauLabel.setText("❌ Niveau invalide");
+                errorNiveauLabel.setVisible(true);
+                return false;
             }
-            loadZones();
-        });
+        }
+        return false;
     }
 
     private void showAlert(String title, String content, Alert.AlertType type) {

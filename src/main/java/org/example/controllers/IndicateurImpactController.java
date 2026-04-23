@@ -146,26 +146,41 @@ public class IndicateurImpactController {
         grid.setPadding(new javafx.geometry.Insets(25));
         grid.setStyle("-fx-background-color: white; -fx-background-radius: 15;");
 
+        // Titre
         Label titleLabel = new Label(indicateur == null ? "➕ Nouvel indicateur" : "✏️ Modifier l'indicateur");
         titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1a3a2a;");
         GridPane.setColumnSpan(titleLabel, 2);
         grid.add(titleLabel, 0, 0);
 
+        // Champ Total kg
         Label kgLabel = new Label("Total kg récoltés");
         kgLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #333;");
         TextField kgField = new TextField();
         kgField.setPromptText("Ex: 150");
         kgField.getStyleClass().add("form-field");
-        grid.add(kgLabel, 0, 1);
-        grid.add(kgField, 1, 1);
+        Label errorKgLabel = new Label();
+        errorKgLabel.setStyle("-fx-text-fill: #dc3545; -fx-font-size: 11px;");
+        errorKgLabel.setVisible(false);
 
+        GridPane.setConstraints(kgLabel, 0, 1);
+        GridPane.setConstraints(kgField, 1, 1);
+        GridPane.setConstraints(errorKgLabel, 1, 2);
+        grid.getChildren().addAll(kgLabel, kgField, errorKgLabel);
+
+        // Champ CO₂
         Label co2Label = new Label("CO₂ évité (kg)");
         co2Label.setStyle("-fx-font-weight: bold; -fx-text-fill: #333;");
         TextField co2Field = new TextField();
         co2Field.setPromptText("Ex: 25");
         co2Field.getStyleClass().add("form-field");
-        grid.add(co2Label, 0, 2);
-        grid.add(co2Field, 1, 2);
+        Label errorCo2Label = new Label();
+        errorCo2Label.setStyle("-fx-text-fill: #dc3545; -fx-font-size: 11px;");
+        errorCo2Label.setVisible(false);
+
+        GridPane.setConstraints(co2Label, 0, 3);
+        GridPane.setConstraints(co2Field, 1, 3);
+        GridPane.setConstraints(errorCo2Label, 1, 4);
+        grid.getChildren().addAll(co2Label, co2Field, errorCo2Label);
 
         if (indicateur != null) {
             kgField.setText(String.valueOf(indicateur.getTotalKgRecoltes()));
@@ -181,91 +196,103 @@ public class IndicateurImpactController {
         dialog.getDialogPane().lookupButton(saveButton).setStyle("-fx-background-color: #8bd22f; -fx-text-fill: #1a3a2a; -fx-font-weight: bold; -fx-padding: 8 20;");
         dialog.getDialogPane().lookupButton(cancelButton).setStyle("-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 20;");
 
-        dialog.setResultConverter(dialogButton -> {
-            if (dialogButton == saveButton) {
-                try {
-                    String kgStr = kgField.getText();
-                    String co2Str = co2Field.getText();
+        Button saveButtonNode = (Button) dialog.getDialogPane().lookupButton(saveButton);
+        saveButtonNode.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
+            event.consume();
+            if (validateAndSave(indicateur, kgField, co2Field, errorKgLabel, errorCo2Label)) {
+                dialog.close();
+            }
+        });
 
-                    // ========== CONTROLE DE SAISIE ==========
+        dialog.showAndWait();
+    }
 
-                    if (kgStr == null || kgStr.trim().isEmpty()) {
-                        showAlert("Erreur de saisie", "❌ Le total kg récoltés est obligatoire.", Alert.AlertType.ERROR);
-                        return null;
-                    }
+    private boolean validateAndSave(IndicateurImpact indicateur,
+                                    TextField kgField, TextField co2Field,
+                                    Label errorKgLabel, Label errorCo2Label) {
 
-                    double kg;
-                    try {
-                        kg = Double.parseDouble(kgStr);
-                    } catch (NumberFormatException e) {
-                        showAlert("Erreur de saisie", "❌ Le total kg doit être un nombre valide.", Alert.AlertType.ERROR);
-                        return null;
-                    }
+        boolean isValid = true;
 
-                    if (kg < 0) {
-                        showAlert("Erreur de saisie", "❌ Le total kg ne peut pas être négatif.", Alert.AlertType.ERROR);
-                        return null;
-                    }
+        errorKgLabel.setVisible(false);
+        errorCo2Label.setVisible(false);
 
-                    if (kg > 1000000) {
-                        showAlert("Erreur de saisie", "❌ Le total kg ne peut pas dépasser 1 000 000 kg.", Alert.AlertType.ERROR);
-                        return null;
-                    }
+        String kgStr = kgField.getText();
+        String co2Str = co2Field.getText();
 
-                    if (co2Str == null || co2Str.trim().isEmpty()) {
-                        showAlert("Erreur de saisie", "❌ Le CO₂ évité est obligatoire.", Alert.AlertType.ERROR);
-                        return null;
-                    }
-
-                    double co2;
-                    try {
-                        co2 = Double.parseDouble(co2Str);
-                    } catch (NumberFormatException e) {
-                        showAlert("Erreur de saisie", "❌ Le CO₂ doit être un nombre valide.", Alert.AlertType.ERROR);
-                        return null;
-                    }
-
-                    if (co2 < 0) {
-                        showAlert("Erreur de saisie", "❌ Le CO₂ évité ne peut pas être négatif.", Alert.AlertType.ERROR);
-                        return null;
-                    }
-
-                    if (co2 > 500000) {
-                        showAlert("Erreur de saisie", "❌ Le CO₂ évité ne peut pas dépasser 500 000 kg.", Alert.AlertType.ERROR);
-                        return null;
-                    }
-
-                    if (kg > 0 && co2 / kg > 1) {
-                        // Avertissement seulement, pas d'erreur bloquante
-                        System.out.println("⚠️ Attention: Ratio CO₂/kg élevé: " + (co2/kg));
-                    }
-
-                    // ========== FIN CONTROLE DE SAISIE ==========
-
-                    IndicateurImpact newIndicateur = new IndicateurImpact(kg, co2, LocalDateTime.now());
-                    if (indicateur != null) {
-                        newIndicateur.setId(indicateur.getId());
-                    }
-                    return newIndicateur;
-                } catch (NumberFormatException e) {
-                    showAlert("Erreur de saisie", "❌ Veuillez saisir des nombres valides.", Alert.AlertType.ERROR);
-                    return null;
+        // Validation Kg
+        if (kgStr == null || kgStr.trim().isEmpty()) {
+            errorKgLabel.setText("❌ Le total kg est obligatoire");
+            errorKgLabel.setVisible(true);
+            isValid = false;
+        } else {
+            try {
+                double kg = Double.parseDouble(kgStr);
+                if (kg < 0) {
+                    errorKgLabel.setText("❌ Le total kg ne peut pas être négatif");
+                    errorKgLabel.setVisible(true);
+                    isValid = false;
+                } else if (kg > 1000000) {
+                    errorKgLabel.setText("❌ Le total kg ne peut pas dépasser 1 000 000 kg");
+                    errorKgLabel.setVisible(true);
+                    isValid = false;
                 }
+            } catch (NumberFormatException e) {
+                errorKgLabel.setText("❌ Le total kg doit être un nombre valide");
+                errorKgLabel.setVisible(true);
+                isValid = false;
             }
-            return null;
-        });
+        }
 
-        Optional<IndicateurImpact> result = dialog.showAndWait();
-        result.ifPresent(ind -> {
-            if (ind.getId() == 0) {
-                dao.addIndicateur(ind);
-                showAlert("Succès", "✅ Indicateur ajouté avec succès !", Alert.AlertType.INFORMATION);
-            } else {
-                dao.updateIndicateur(ind);
-                showAlert("Succès", "✅ Indicateur modifié avec succès !", Alert.AlertType.INFORMATION);
+        // Validation CO₂
+        if (co2Str == null || co2Str.trim().isEmpty()) {
+            errorCo2Label.setText("❌ Le CO₂ évité est obligatoire");
+            errorCo2Label.setVisible(true);
+            isValid = false;
+        } else {
+            try {
+                double co2 = Double.parseDouble(co2Str);
+                if (co2 < 0) {
+                    errorCo2Label.setText("❌ Le CO₂ ne peut pas être négatif");
+                    errorCo2Label.setVisible(true);
+                    isValid = false;
+                } else if (co2 > 500000) {
+                    errorCo2Label.setText("❌ Le CO₂ ne peut pas dépasser 500 000 kg");
+                    errorCo2Label.setVisible(true);
+                    isValid = false;
+                }
+            } catch (NumberFormatException e) {
+                errorCo2Label.setText("❌ Le CO₂ doit être un nombre valide");
+                errorCo2Label.setVisible(true);
+                isValid = false;
             }
-            loadIndicateurs();
-        });
+        }
+
+        if (isValid) {
+            try {
+                double kg = Double.parseDouble(kgStr);
+                double co2 = Double.parseDouble(co2Str);
+
+                IndicateurImpact newIndicateur = new IndicateurImpact(kg, co2, LocalDateTime.now());
+                if (indicateur != null) {
+                    newIndicateur.setId(indicateur.getId());
+                }
+
+                if (newIndicateur.getId() == 0) {
+                    dao.addIndicateur(newIndicateur);
+                    showAlert("Succès", "✅ Indicateur ajouté avec succès !", Alert.AlertType.INFORMATION);
+                } else {
+                    dao.updateIndicateur(newIndicateur);
+                    showAlert("Succès", "✅ Indicateur modifié avec succès !", Alert.AlertType.INFORMATION);
+                }
+                loadIndicateurs();
+                return true;
+            } catch (NumberFormatException e) {
+                errorKgLabel.setText("❌ Valeur invalide");
+                errorKgLabel.setVisible(true);
+                return false;
+            }
+        }
+        return false;
     }
 
     private void showAlert(String title, String content, Alert.AlertType type) {
