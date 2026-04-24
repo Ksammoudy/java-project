@@ -1,8 +1,8 @@
 package controllers.reponseoffre;
 
+import entities.AppelOffre;
 import entities.ReponseOffre;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import entities.UserOption;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -12,14 +12,16 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import main.navigation.ViewNavigator;
+import services.ServiceAppelOffre;
 import services.ServiceReponseOffre;
+import services.ServiceUserDirectory;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 public class ReponseOffreEditController {
 
@@ -51,8 +53,19 @@ public class ReponseOffreEditController {
     private Label lblAppelError;
     @FXML
     private Label lblCitoyenError;
+    @FXML
+    private Label lblCtxReponseId;
+    @FXML
+    private Label lblCtxStatut;
+    @FXML
+    private Label lblCtxAppelLie;
 
     private final ServiceReponseOffre serviceReponseOffre = new ServiceReponseOffre();
+    private final ServiceAppelOffre serviceAppelOffre = new ServiceAppelOffre();
+    private final ServiceUserDirectory serviceUserDirectory = new ServiceUserDirectory();
+    private final Map<Integer, AppelOffre> appelsById = new LinkedHashMap<>();
+    private final Map<String, Integer> appelIdByLabel = new LinkedHashMap<>();
+    private final Map<String, Integer> citoyenIdByLabel = new LinkedHashMap<>();
 
     private Integer currentId;
     private Timestamp currentDateSoumis;
@@ -141,10 +154,16 @@ public class ReponseOffreEditController {
     }
 
     private void initialiserCombos() {
-        cbAppelOffre.setEditable(true);
-        cbCitoyen.setEditable(true);
-        cbAppelOffre.setPromptText("ID appel d'offre");
-        cbCitoyen.setPromptText("ID citoyen");
+        cbAppelOffre.setEditable(false);
+        cbCitoyen.setEditable(false);
+        cbAppelOffre.setPromptText("Selectionnez un appel d'offre");
+        cbCitoyen.setPromptText("Selectionnez un citoyen");
+        cbAppelOffre.valueProperty().addListener((obs, oldV, newV) -> {
+            Integer id = parseSelectionId(cbAppelOffre, appelIdByLabel);
+            if (id != null && lblCtxAppelLie != null) {
+                lblCtxAppelLie.setText(String.valueOf(id));
+            }
+        });
     }
 
     private void chargerReponse(int id) {
@@ -157,36 +176,61 @@ public class ReponseOffreEditController {
             currentDateSoumis = r.getDateSoumis() == null ? Timestamp.valueOf(LocalDateTime.now()) : r.getDateSoumis();
             currentStatut = r.getStatut();
 
+            hydrateComboValues(r);
             txtQuantiteProposee.setText(String.valueOf(r.getQuantiteProposee()));
             txtMessage.setText(r.getMessage() == null ? "" : r.getMessage());
-            cbAppelOffre.setValue(String.valueOf(r.getAppelOffreId()));
-            cbCitoyen.setValue(String.valueOf(r.getCitoyenId()));
-
-            hydrateComboValues(r);
+            updateContextCard(r);
             setInfo("Edition reponse #" + r.getId() + " - statut actuel: " + normaliserStatut(r.getStatut()));
         } catch (Exception e) {
             setError("Erreur chargement: " + e.getMessage());
         }
     }
 
+    private void updateContextCard(ReponseOffre r) {
+        if (lblCtxReponseId != null) {
+            lblCtxReponseId.setText("#" + r.getId());
+        }
+        if (lblCtxStatut != null) {
+            lblCtxStatut.setText(toDisplayStatut(normaliserStatut(r.getStatut())));
+        }
+        if (lblCtxAppelLie != null) {
+            lblCtxAppelLie.setText(String.valueOf(r.getAppelOffreId()));
+        }
+    }
+
     private void hydrateComboValues(ReponseOffre current) {
+        appelIdByLabel.clear();
+        citoyenIdByLabel.clear();
+        appelsById.clear();
+
         try {
-            List<ReponseOffre> all = serviceReponseOffre.recupererTout();
-
-            Set<String> appels = new LinkedHashSet<>();
-            Set<String> citoyens = new LinkedHashSet<>();
-            for (ReponseOffre r : all) {
-                appels.add(String.valueOf(r.getAppelOffreId()));
-                citoyens.add(String.valueOf(r.getCitoyenId()));
+            List<AppelOffre> appels = serviceAppelOffre.recupererTout();
+            for (AppelOffre a : appels) {
+                appelsById.put(a.getId(), a);
+                String label = "#" + a.getId() + " - " + a.getTitre();
+                appelIdByLabel.put(label, a.getId());
             }
-            appels.add(String.valueOf(current.getAppelOffreId()));
-            citoyens.add(String.valueOf(current.getCitoyenId()));
+        } catch (Exception e) {
+            setError("Impossible de charger les appels d'offre: " + e.getMessage());
+        }
 
-            ObservableList<String> itemsAppels = FXCollections.observableArrayList(appels);
-            ObservableList<String> itemsCitoyens = FXCollections.observableArrayList(citoyens);
-            cbAppelOffre.setItems(itemsAppels);
-            cbCitoyen.setItems(itemsCitoyens);
-        } catch (Exception ignored) {
+        try {
+            List<UserOption> citoyens = serviceUserDirectory.recupererCitoyens();
+            for (UserOption c : citoyens) {
+                citoyenIdByLabel.put(c.getLabel(), c.getId());
+            }
+        } catch (Exception e) {
+            setError("Impossible de charger les citoyens: " + e.getMessage());
+        }
+
+        cbAppelOffre.getItems().setAll(appelIdByLabel.keySet());
+        cbCitoyen.getItems().setAll(citoyenIdByLabel.keySet());
+        setSelectionById(cbAppelOffre, appelIdByLabel, current.getAppelOffreId(), "Appel");
+        setSelectionById(cbCitoyen, citoyenIdByLabel, current.getCitoyenId(), "Citoyen");
+
+        Integer appelSelected = parseSelectionId(cbAppelOffre, appelIdByLabel);
+        if (appelSelected != null && lblCtxAppelLie != null) {
+            lblCtxAppelLie.setText(String.valueOf(appelSelected));
         }
     }
 
@@ -200,15 +244,15 @@ public class ReponseOffreEditController {
             hasError = true;
         }
 
-        Integer appelId = parseIdFromCombo(cbAppelOffre);
+        Integer appelId = parseSelectionId(cbAppelOffre, appelIdByLabel);
         if (appelId == null) {
-            showFieldError(cbAppelOffre, lblAppelError, "Selectionnez ou saisissez un appel valide.");
+            showFieldError(cbAppelOffre, lblAppelError, "Selectionnez un appel valide.");
             hasError = true;
         }
 
-        Integer citoyenId = parseIdFromCombo(cbCitoyen);
+        Integer citoyenId = parseSelectionId(cbCitoyen, citoyenIdByLabel);
         if (citoyenId == null) {
-            showFieldError(cbCitoyen, lblCitoyenError, "Selectionnez ou saisissez un citoyen valide.");
+            showFieldError(cbCitoyen, lblCitoyenError, "Selectionnez un citoyen valide.");
             hasError = true;
         }
 
@@ -244,22 +288,29 @@ public class ReponseOffreEditController {
         }
     }
 
-    private Integer parseIdFromCombo(ComboBox<String> combo) {
-        String value = combo.getEditor().getText();
-        if (value == null || value.trim().isEmpty()) {
-            value = combo.getValue();
-        }
-        if (value == null || value.trim().isEmpty()) {
+    private Integer parseSelectionId(ComboBox<String> combo, Map<String, Integer> idByLabel) {
+        String value = combo.getValue();
+        if (value == null) {
             return null;
         }
-        String text = value.trim();
-        String firstToken = text.contains("-") ? text.substring(0, text.indexOf('-')).trim() : text;
-        try {
-            int id = Integer.parseInt(firstToken);
-            return id > 0 ? id : null;
-        } catch (Exception e) {
-            return null;
+        Integer mapped = idByLabel.get(value);
+        return (mapped != null && mapped > 0) ? mapped : null;
+    }
+
+    private void setSelectionById(ComboBox<String> combo, Map<String, Integer> idByLabel, int id, String fallbackPrefix) {
+        for (Map.Entry<String, Integer> entry : idByLabel.entrySet()) {
+            Integer value = entry.getValue();
+            if (value != null && value == id) {
+                combo.setValue(entry.getKey());
+                return;
+            }
         }
+        String fallback = fallbackPrefix + " #" + id;
+        idByLabel.put(fallback, id);
+        if (!combo.getItems().contains(fallback)) {
+            combo.getItems().add(fallback);
+        }
+        combo.setValue(fallback);
     }
 
     private String normaliserStatut(String s) {
@@ -274,6 +325,16 @@ public class ReponseOffreEditController {
             return "refuse";
         }
         return "en attente";
+    }
+
+    private String toDisplayStatut(String statutNormalise) {
+        if ("valide".equals(statutNormalise)) {
+            return "Validee";
+        }
+        if ("refuse".equals(statutNormalise)) {
+            return "Refusee";
+        }
+        return "En attente";
     }
 
     private void applyDefaultStyles() {

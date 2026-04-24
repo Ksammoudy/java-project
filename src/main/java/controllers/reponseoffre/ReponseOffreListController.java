@@ -56,6 +56,10 @@ public class ReponseOffreListController {
     private Label lblTotalValides;
     @FXML
     private Label lblTotalRefusees;
+    @FXML
+    private Label lblTauxValidation;
+    @FXML
+    private Label lblQuantiteTotale;
 
     @FXML
     private TableView<ReponseOffre> tableReponses;
@@ -90,7 +94,7 @@ public class ReponseOffreListController {
     }
 
     private void initialiserFiltres() {
-        cbStatut.setItems(FXCollections.observableArrayList("Tous", "En attente", "Valide", "Refuse"));
+        cbStatut.setItems(FXCollections.observableArrayList("Tous", "En attente", "Validee", "Refusee"));
         cbStatut.setValue("Tous");
 
         cbTri.setItems(FXCollections.observableArrayList("Date soumis", "Quantite", "Statut"));
@@ -129,13 +133,13 @@ public class ReponseOffreListController {
                 }
 
                 String s = normaliserStatut(item);
-                badge.setText(s);
+                badge.setText(toDisplayStatut(s));
                 if ("valide".equals(s)) {
-                    badge.setStyle("-fx-background-color: #D8F3E5; -fx-text-fill: #107C41; -fx-font-size: 12px; -fx-font-weight: bold; -fx-background-radius: 999; -fx-padding: 4 10 4 10;");
+                    badge.setStyle("-fx-background-color: #D8F3E5; -fx-text-fill: #107C41; -fx-font-size: 12px; -fx-font-weight: bold; -fx-background-radius: 999; -fx-padding: 5 11 5 11;");
                 } else if ("refuse".equals(s)) {
-                    badge.setStyle("-fx-background-color: #FBE4E4; -fx-text-fill: #C0392B; -fx-font-size: 12px; -fx-font-weight: bold; -fx-background-radius: 999; -fx-padding: 4 10 4 10;");
+                    badge.setStyle("-fx-background-color: #FBE4E4; -fx-text-fill: #C0392B; -fx-font-size: 12px; -fx-font-weight: bold; -fx-background-radius: 999; -fx-padding: 5 11 5 11;");
                 } else {
-                    badge.setStyle("-fx-background-color: #FDEFC8; -fx-text-fill: #9A6B00; -fx-font-size: 12px; -fx-font-weight: bold; -fx-background-radius: 999; -fx-padding: 4 10 4 10;");
+                    badge.setStyle("-fx-background-color: #FDEFC8; -fx-text-fill: #9A6B00; -fx-font-size: 12px; -fx-font-weight: bold; -fx-background-radius: 999; -fx-padding: 5 11 5 11;");
                 }
                 setText(null);
                 setGraphic(badge);
@@ -148,8 +152,8 @@ public class ReponseOffreListController {
             private final HBox box = new HBox(6, btnVoir, btnModifier);
 
             {
-                btnVoir.setStyle("-fx-background-color: #E0ECFF; -fx-text-fill: #1E3A8A; -fx-font-weight: bold; -fx-background-radius: 8;");
-                btnModifier.setStyle("-fx-background-color: #DBEAFE; -fx-text-fill: #1E3A8A; -fx-font-weight: bold; -fx-background-radius: 8;");
+                btnVoir.setStyle("-fx-background-color: #E8F0FF; -fx-text-fill: #1E3A8A; -fx-font-weight: bold; -fx-background-radius: 9; -fx-padding: 6 12 6 12;");
+                btnModifier.setStyle("-fx-background-color: #DBEAFE; -fx-text-fill: #1E3A8A; -fx-font-weight: bold; -fx-background-radius: 9; -fx-padding: 6 12 6 12;");
 
                 btnVoir.setOnAction(evt -> {
                     ReponseOffre r = getTableView().getItems().get(getIndex());
@@ -330,11 +334,23 @@ public class ReponseOffreListController {
         return "en attente";
     }
 
+    private String toDisplayStatut(String statutNormalise) {
+        if ("valide".equals(statutNormalise)) {
+            return "Validee";
+        }
+        if ("refuse".equals(statutNormalise)) {
+            return "Refusee";
+        }
+        return "En attente";
+    }
+
     private void updateCountAndSummary() {
         int total = data.size();
         long attente = data.stream().filter(r -> "en attente".equals(normaliserStatut(r.getStatut()))).count();
         long valides = data.stream().filter(r -> "valide".equals(normaliserStatut(r.getStatut()))).count();
         long refusees = data.stream().filter(r -> "refuse".equals(normaliserStatut(r.getStatut()))).count();
+        double quantiteTotale = data.stream().mapToDouble(ReponseOffre::getQuantiteProposee).sum();
+        double tauxValidation = total == 0 ? 0d : (valides * 100d) / total;
 
         lblCount.setText(total + " reponse(s)");
         if (lblTotalReponses != null) {
@@ -348,6 +364,12 @@ public class ReponseOffreListController {
         }
         if (lblTotalRefusees != null) {
             lblTotalRefusees.setText(String.valueOf(refusees));
+        }
+        if (lblTauxValidation != null) {
+            lblTauxValidation.setText(String.format(Locale.ROOT, "%.1f%%", tauxValidation));
+        }
+        if (lblQuantiteTotale != null) {
+            lblQuantiteTotale.setText(String.format(Locale.ROOT, "%.1f kg", quantiteTotale));
         }
     }
 

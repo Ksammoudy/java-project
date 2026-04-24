@@ -2,6 +2,7 @@ package services;
 
 import entities.AppelOffre;
 import utils.MyConnection;
+import utils.SchemaManager;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,9 +14,11 @@ import java.util.List;
 
 public class ServiceAppelOffre {
     private Connection cnx;
+    private boolean schemaChecked;
 
     public ServiceAppelOffre() {
         this.cnx = null;
+        this.schemaChecked = false;
     }
 
     private Connection getConnection() throws SQLException {
@@ -26,9 +29,23 @@ public class ServiceAppelOffre {
             if (cnx == null || cnx.isClosed()) {
                 throw new SQLException("Connexion JDBC fermee ou indisponible.");
             }
+            ensureSchemaSafely();
             return cnx;
         } catch (IllegalStateException e) {
-            throw new SQLException("Connexion JDBC indisponible.", e);
+            throw new SQLException("Connexion JDBC indisponible: " + e.getMessage(), e);
+        }
+    }
+
+    private void ensureSchemaSafely() {
+        if (schemaChecked) {
+            return;
+        }
+        try {
+            SchemaManager.ensureCoreForeignKeys();
+            schemaChecked = true;
+        } catch (Exception e) {
+            schemaChecked = true;
+            System.err.println("[WARN] SchemaManager ignore: " + e.getMessage());
         }
     }
 
@@ -80,12 +97,28 @@ public class ServiceAppelOffre {
         String sql = "DELETE FROM appel_offre WHERE id=?";
         try (PreparedStatement pst = getConnection().prepareStatement(sql)) {
             pst.setInt(1, id);
-
             int affected = pst.executeUpdate();
             if (affected == 0) {
                 throw new SQLException("Suppression echouee: aucun appel_offre trouve avec id=" + id);
             }
         }
+    }
+
+    public int compterReponsesLiees(int appelOffreId) throws SQLException {
+        if (appelOffreId <= 0) {
+            throw new IllegalArgumentException("appelOffreId invalide.");
+        }
+
+        String sql = "SELECT COUNT(*) FROM reponse_offre WHERE appel_offre_id=?";
+        try (PreparedStatement pst = getConnection().prepareStatement(sql)) {
+            pst.setInt(1, appelOffreId);
+            try (ResultSet rs = pst.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        }
+        return 0;
     }
 
     public AppelOffre recupererParId(int id) throws SQLException {
@@ -227,4 +260,5 @@ public class ServiceAppelOffre {
         a.setTitre(titre);
         a.setDescription(description);
     }
+
 }

@@ -21,6 +21,7 @@ public class MainTest {
             System.out.println("=== TEST JDBC WasteWiseJava ===");
             System.out.println("Connected: " + (cnx != null && !cnx.isClosed()));
             System.out.println("Database: " + cnx.getCatalog());
+            System.out.println("JDBC URL: " + MyConnection.getInstance().getActiveUrl());
             System.out.println("Message: JDBC connection to shared Symfony DB is OK.");
 
             ServiceAppelOffre serviceAppelOffre = new ServiceAppelOffre();

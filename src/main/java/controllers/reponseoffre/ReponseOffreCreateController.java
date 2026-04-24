@@ -2,8 +2,7 @@ package controllers.reponseoffre;
 
 import entities.AppelOffre;
 import entities.ReponseOffre;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import entities.UserOption;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
@@ -13,12 +12,15 @@ import javafx.scene.control.TextField;
 import main.navigation.ViewNavigator;
 import services.ServiceAppelOffre;
 import services.ServiceReponseOffre;
+import services.ServiceUserDirectory;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.LinkedHashSet;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 public class ReponseOffreCreateController {
 
@@ -50,9 +52,20 @@ public class ReponseOffreCreateController {
     private Label lblAppelError;
     @FXML
     private Label lblCitoyenError;
+    @FXML
+    private Label lblCtxAppel;
+    @FXML
+    private Label lblCtxQuantiteDemandee;
+    @FXML
+    private Label lblCtxDateLimite;
 
     private final ServiceReponseOffre serviceReponseOffre = new ServiceReponseOffre();
     private final ServiceAppelOffre serviceAppelOffre = new ServiceAppelOffre();
+    private final ServiceUserDirectory serviceUserDirectory = new ServiceUserDirectory();
+    private final Map<Integer, AppelOffre> appelsById = new HashMap<>();
+    private final Map<String, Integer> appelIdByLabel = new LinkedHashMap<>();
+    private final Map<String, Integer> citoyenIdByLabel = new LinkedHashMap<>();
+    private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     @FXML
     public void initialize() {
@@ -101,36 +114,42 @@ public class ReponseOffreCreateController {
     }
 
     private void initialiserCombos() {
-        cbAppelOffre.setEditable(true);
-        cbCitoyen.setEditable(true);
-        cbAppelOffre.setPromptText("Ex: 14 - Titre appel");
-        cbCitoyen.setPromptText("Ex: 3");
+        cbAppelOffre.setEditable(false);
+        cbCitoyen.setEditable(false);
+        cbAppelOffre.setPromptText("Selectionnez un appel");
+        cbCitoyen.setPromptText("Selectionnez un citoyen");
+        resetContextCard();
+        appelIdByLabel.clear();
+        citoyenIdByLabel.clear();
 
         try {
             List<AppelOffre> appels = serviceAppelOffre.recupererTout();
-            ObservableList<String> items = FXCollections.observableArrayList();
             for (AppelOffre a : appels) {
-                items.add(a.getId() + " - " + a.getTitre());
+                appelsById.put(a.getId(), a);
+                String label = "#" + a.getId() + " - " + a.getTitre();
+                appelIdByLabel.put(label, a.getId());
             }
-            cbAppelOffre.setItems(items);
-            if (!items.isEmpty()) {
-                cbAppelOffre.setValue(items.get(0));
+            cbAppelOffre.getItems().setAll(appelIdByLabel.keySet());
+            if (!cbAppelOffre.getItems().isEmpty()) {
+                cbAppelOffre.setValue(cbAppelOffre.getItems().get(0));
+                updateContextCardFromSelection();
             }
-        } catch (Exception ignored) {
+            cbAppelOffre.valueProperty().addListener((obs, oldV, newV) -> updateContextCardFromSelection());
+        } catch (Exception e) {
+            setError("Impossible de charger les appels d'offre: " + e.getMessage());
         }
 
         try {
-            List<ReponseOffre> reponses = serviceReponseOffre.recupererTout();
-            Set<String> uniqueCitoyens = new LinkedHashSet<>();
-            for (ReponseOffre r : reponses) {
-                uniqueCitoyens.add(String.valueOf(r.getCitoyenId()));
+            List<UserOption> citoyens = serviceUserDirectory.recupererCitoyens();
+            for (UserOption c : citoyens) {
+                citoyenIdByLabel.put(c.getLabel(), c.getId());
             }
-            ObservableList<String> citoyens = FXCollections.observableArrayList(uniqueCitoyens);
-            cbCitoyen.setItems(citoyens);
-            if (!citoyens.isEmpty()) {
-                cbCitoyen.setValue(citoyens.get(0));
+            cbCitoyen.getItems().setAll(citoyenIdByLabel.keySet());
+            if (!cbCitoyen.getItems().isEmpty()) {
+                cbCitoyen.setValue(cbCitoyen.getItems().get(0));
             }
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            setError("Impossible de charger les citoyens: " + e.getMessage());
         }
     }
 
@@ -144,15 +163,15 @@ public class ReponseOffreCreateController {
             hasError = true;
         }
 
-        Integer appelId = parseIdFromCombo(cbAppelOffre);
+        Integer appelId = parseSelectionId(cbAppelOffre, appelIdByLabel);
         if (appelId == null) {
-            showFieldError(cbAppelOffre, lblAppelError, "Selectionnez ou saisissez un appel valide.");
+            showFieldError(cbAppelOffre, lblAppelError, "Selectionnez un appel valide.");
             hasError = true;
         }
 
-        Integer citoyenId = parseIdFromCombo(cbCitoyen);
+        Integer citoyenId = parseSelectionId(cbCitoyen, citoyenIdByLabel);
         if (citoyenId == null) {
-            showFieldError(cbCitoyen, lblCitoyenError, "Selectionnez ou saisissez un citoyen valide.");
+            showFieldError(cbCitoyen, lblCitoyenError, "Selectionnez un citoyen valide.");
             hasError = true;
         }
 
@@ -185,21 +204,47 @@ public class ReponseOffreCreateController {
         }
     }
 
-    private Integer parseIdFromCombo(ComboBox<String> combo) {
-        String value = combo.getEditor().getText();
-        if (value == null || value.trim().isEmpty()) {
-            value = combo.getValue();
-        }
-        if (value == null || value.trim().isEmpty()) {
+    private Integer parseSelectionId(ComboBox<String> combo, Map<String, Integer> idByLabel) {
+        String value = combo.getValue();
+        if (value == null) {
             return null;
         }
-        String text = value.trim();
-        String firstToken = text.contains("-") ? text.substring(0, text.indexOf('-')).trim() : text;
-        try {
-            int id = Integer.parseInt(firstToken);
-            return id > 0 ? id : null;
-        } catch (Exception e) {
-            return null;
+        Integer mapped = idByLabel.get(value);
+        return (mapped != null && mapped > 0) ? mapped : null;
+    }
+
+    private void updateContextCardFromSelection() {
+        Integer appelId = parseSelectionId(cbAppelOffre, appelIdByLabel);
+        if (appelId == null) {
+            resetContextCard();
+            return;
+        }
+        AppelOffre a = appelsById.get(appelId);
+        if (a == null) {
+            lblCtxAppel.setText("Appel #" + appelId);
+            lblCtxQuantiteDemandee.setText("-");
+            lblCtxDateLimite.setText("-");
+            return;
+        }
+
+        lblCtxAppel.setText("Appel #" + a.getId() + " - " + a.getTitre());
+        lblCtxQuantiteDemandee.setText(String.format("%.2f kg", a.getQuantiteDemandee()));
+        if (a.getDateLimite() != null) {
+            lblCtxDateLimite.setText(dateFormatter.format(a.getDateLimite().toLocalDateTime()));
+        } else {
+            lblCtxDateLimite.setText("-");
+        }
+    }
+
+    private void resetContextCard() {
+        if (lblCtxAppel != null) {
+            lblCtxAppel.setText("Aucun appel selectionne");
+        }
+        if (lblCtxQuantiteDemandee != null) {
+            lblCtxQuantiteDemandee.setText("-");
+        }
+        if (lblCtxDateLimite != null) {
+            lblCtxDateLimite.setText("-");
         }
     }
 

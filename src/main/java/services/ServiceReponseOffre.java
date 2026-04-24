@@ -2,6 +2,7 @@ package services;
 
 import entities.ReponseOffre;
 import utils.MyConnection;
+import utils.SchemaManager;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -11,15 +12,46 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ServiceReponseOffre {
-    private final Connection cnx;
+    private Connection cnx;
+    private boolean schemaChecked;
 
     public ServiceReponseOffre() {
-        this.cnx = MyConnection.getInstance().getConnection();
+        this.cnx = null;
+        this.schemaChecked = false;
     }
+
+    private Connection getConnection() throws SQLException {
+        try {
+            if (cnx == null || cnx.isClosed()) {
+                cnx = MyConnection.getInstance().getConnection();
+            }
+            if (cnx == null || cnx.isClosed()) {
+                throw new SQLException("Connexion JDBC fermee ou indisponible.");
+            }
+            ensureSchemaSafely();
+            return cnx;
+        } catch (IllegalStateException e) {
+            throw new SQLException("Connexion JDBC indisponible: " + e.getMessage(), e);
+        }
+    }
+
+    private void ensureSchemaSafely() {
+        if (schemaChecked) {
+            return;
+        }
+        try {
+            SchemaManager.ensureCoreForeignKeys();
+            schemaChecked = true;
+        } catch (Exception e) {
+            schemaChecked = true;
+            System.err.println("[WARN] SchemaManager ignore: " + e.getMessage());
+        }
+    }
+
     public void ajouter(ReponseOffre r) throws SQLException {
         valider(r);
         String sql = "INSERT INTO reponse_offre (quantite_proposee, date_soumis, statut, message, appel_offre_id, citoyen_id) VALUES (?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement pst = cnx.prepareStatement(sql)) {
+        try (PreparedStatement pst = getConnection().prepareStatement(sql)) {
             pst.setDouble(1, r.getQuantiteProposee());
             pst.setTimestamp(2, r.getDateSoumis());
             pst.setString(3, normaliserStatut(r.getStatut()));
@@ -36,7 +68,7 @@ public class ServiceReponseOffre {
         }
         valider(r);
         String sql = "UPDATE reponse_offre SET quantite_proposee=?, date_soumis=?, statut=?, message=?, appel_offre_id=?, citoyen_id=? WHERE id=?";
-        try (PreparedStatement pst = cnx.prepareStatement(sql)) {
+        try (PreparedStatement pst = getConnection().prepareStatement(sql)) {
             pst.setDouble(1, r.getQuantiteProposee());
             pst.setTimestamp(2, r.getDateSoumis());
             pst.setString(3, normaliserStatut(r.getStatut()));
@@ -44,7 +76,10 @@ public class ServiceReponseOffre {
             pst.setInt(5, r.getAppelOffreId());
             pst.setInt(6, r.getCitoyenId());
             pst.setInt(7, r.getId());
-            pst.executeUpdate();
+            int affected = pst.executeUpdate();
+            if (affected == 0) {
+                throw new SQLException("Modification echouee: aucune reponse_offre trouvee avec id=" + r.getId());
+            }
         }
     }
 
@@ -53,9 +88,12 @@ public class ServiceReponseOffre {
             throw new IllegalArgumentException("id invalide pour la suppression.");
         }
         String sql = "DELETE FROM reponse_offre WHERE id=?";
-        try (PreparedStatement pst = cnx.prepareStatement(sql)) {
+        try (PreparedStatement pst = getConnection().prepareStatement(sql)) {
             pst.setInt(1, id);
-            pst.executeUpdate();
+            int affected = pst.executeUpdate();
+            if (affected == 0) {
+                throw new SQLException("Suppression echouee: aucune reponse_offre trouvee avec id=" + id);
+            }
         }
     }
     public ReponseOffre recupererParId(int id) throws SQLException {
@@ -63,7 +101,7 @@ public class ServiceReponseOffre {
             throw new IllegalArgumentException("id invalide.");
         }
         String sql = "SELECT id, quantite_proposee, date_soumis, statut, message, appel_offre_id, citoyen_id FROM reponse_offre WHERE id=?";
-        try (PreparedStatement pst = cnx.prepareStatement(sql)) {
+        try (PreparedStatement pst = getConnection().prepareStatement(sql)) {
             pst.setInt(1, id);
             try (ResultSet rs = pst.executeQuery()) {
                 if (rs.next()) {
@@ -77,7 +115,7 @@ public class ServiceReponseOffre {
     public List<ReponseOffre> recupererTout() throws SQLException {
         List<ReponseOffre> list = new ArrayList<>();
         String sql = "SELECT id, quantite_proposee, date_soumis, statut, message, appel_offre_id, citoyen_id FROM reponse_offre ORDER BY id DESC";
-        try (PreparedStatement pst = cnx.prepareStatement(sql);
+        try (PreparedStatement pst = getConnection().prepareStatement(sql);
              ResultSet rs = pst.executeQuery()) {
             while (rs.next()) {
                 list.add(mapRow(rs));
@@ -99,7 +137,7 @@ public class ServiceReponseOffre {
             throw new IllegalArgumentException("id invalide pour statut.");
         }
         String sql = "UPDATE reponse_offre SET statut=? WHERE id=?";
-        try (PreparedStatement pst = cnx.prepareStatement(sql)) {
+        try (PreparedStatement pst = getConnection().prepareStatement(sql)) {
             pst.setString(1, normaliserStatut(statut));
             pst.setInt(2, id);
             pst.executeUpdate();

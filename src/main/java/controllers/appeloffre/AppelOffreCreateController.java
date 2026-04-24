@@ -1,17 +1,24 @@
 package controllers.appeloffre;
 
 import entities.AppelOffre;
+import entities.UserOption;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.DatePicker;
 import main.navigation.ViewNavigator;
 import services.ServiceAppelOffre;
+import services.ServiceUserDirectory;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class AppelOffreCreateController {
 
@@ -20,6 +27,8 @@ public class AppelOffreCreateController {
     private static final String STYLE_TEXT_AREA_OK =
             "-fx-background-color: #F7FAF8; -fx-border-color: #C2D6CA; -fx-border-radius: 10; -fx-background-radius: 10; -fx-font-size: 14px;";
     private static final String STYLE_DATE_PICKER_OK =
+            "-fx-background-color: #F7FAF8; -fx-border-color: #C2D6CA; -fx-border-radius: 10; -fx-background-radius: 10; -fx-font-size: 14px;";
+    private static final String STYLE_COMBO_OK =
             "-fx-background-color: #F7FAF8; -fx-border-color: #C2D6CA; -fx-border-radius: 10; -fx-background-radius: 10; -fx-font-size: 14px;";
     private static final String STYLE_FIELD_ERROR_SUFFIX =
             " -fx-border-color: #DC2626; -fx-border-width: 1.8;";
@@ -37,7 +46,7 @@ public class AppelOffreCreateController {
     @FXML
     private DatePicker dpDateLimite;
     @FXML
-    private TextField txtValorisateurId;
+    private ComboBox<String> cbValorisateur;
     @FXML
     private Label lblMessage;
     @FXML
@@ -50,14 +59,27 @@ public class AppelOffreCreateController {
     private Label lblDateError;
     @FXML
     private Label lblValorisateurError;
+    @FXML
+    private Label lblPreviewTitre;
+    @FXML
+    private Label lblPreviewQuantite;
+    @FXML
+    private Label lblPreviewDate;
+    @FXML
+    private Label lblPreviewValorisateur;
 
     private final ServiceAppelOffre serviceAppelOffre = new ServiceAppelOffre();
+    private final ServiceUserDirectory serviceUserDirectory = new ServiceUserDirectory();
+    private final DateTimeFormatter previewDateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private final Map<String, Integer> valorisateurIdByLabel = new LinkedHashMap<>();
 
     @FXML
     public void initialize() {
         applyDefaultFieldStyles();
         resetValidationUi();
         dpDateLimite.setValue(LocalDate.now().plusDays(1));
+        initialiserValorisateurs();
+        initialiserPreview();
         setInfo("Saisissez les informations de votre appel d'offre.");
     }
 
@@ -117,9 +139,9 @@ public class AppelOffreCreateController {
             hasError = true;
         }
 
-        Integer valorisateurId = parsePositiveInt(txtValorisateurId.getText());
+        Integer valorisateurId = parseValorisateurId();
         if (valorisateurId == null) {
-            showFieldError(txtValorisateurId, lblValorisateurError, "Entrez un ID numerique > 0.");
+            showFieldError(cbValorisateur, lblValorisateurError, "Selectionnez un valorisateur.");
             hasError = true;
         }
 
@@ -156,24 +178,65 @@ public class AppelOffreCreateController {
         }
     }
 
-    private Integer parsePositiveInt(String value) {
-        try {
-            int v = Integer.parseInt(lireTexte(value));
-            if (v <= 0) {
-                return null;
-            }
-            return v;
-        } catch (NumberFormatException e) {
-            return null;
-        }
-    }
-
     private void applyDefaultFieldStyles() {
         txtTitre.setStyle(STYLE_TEXT_FIELD_OK);
         txtQuantiteDemandee.setStyle(STYLE_TEXT_FIELD_OK);
-        txtValorisateurId.setStyle(STYLE_TEXT_FIELD_OK);
+        cbValorisateur.setStyle(STYLE_COMBO_OK);
         txtDescription.setStyle(STYLE_TEXT_AREA_OK);
         dpDateLimite.setStyle(STYLE_DATE_PICKER_OK);
+    }
+
+    private void initialiserPreview() {
+        updatePreviewCard();
+        txtTitre.textProperty().addListener((obs, oldV, newV) -> updatePreviewCard());
+        txtQuantiteDemandee.textProperty().addListener((obs, oldV, newV) -> updatePreviewCard());
+        cbValorisateur.valueProperty().addListener((obs, oldV, newV) -> updatePreviewCard());
+        dpDateLimite.valueProperty().addListener((obs, oldV, newV) -> updatePreviewCard());
+    }
+
+    private void updatePreviewCard() {
+        if (lblPreviewTitre != null) {
+            String titre = lireTexte(txtTitre.getText());
+            lblPreviewTitre.setText(titre.isEmpty() ? "Titre non renseigne" : titre);
+        }
+        if (lblPreviewQuantite != null) {
+            Double q = parsePositiveDouble(txtQuantiteDemandee.getText());
+            lblPreviewQuantite.setText(q == null ? "-" : String.format("%.2f kg", q));
+        }
+        if (lblPreviewDate != null) {
+            LocalDate d = dpDateLimite.getValue();
+            lblPreviewDate.setText(d == null ? "-" : previewDateFormatter.format(d));
+        }
+        if (lblPreviewValorisateur != null) {
+            String label = cbValorisateur.getValue();
+            lblPreviewValorisateur.setText(label == null || label.isBlank() ? "-" : label);
+        }
+    }
+
+    private void initialiserValorisateurs() {
+        cbValorisateur.setEditable(false);
+        cbValorisateur.setPromptText("Selectionnez un valorisateur");
+        valorisateurIdByLabel.clear();
+        try {
+            List<UserOption> users = serviceUserDirectory.recupererValorisateurs();
+            for (UserOption u : users) {
+                valorisateurIdByLabel.put(u.getLabel(), u.getId());
+            }
+            cbValorisateur.getItems().setAll(valorisateurIdByLabel.keySet());
+            if (!cbValorisateur.getItems().isEmpty()) {
+                cbValorisateur.setValue(cbValorisateur.getItems().get(0));
+            }
+        } catch (Exception e) {
+            setError("Impossible de charger les valorisateurs: " + e.getMessage());
+        }
+    }
+
+    private Integer parseValorisateurId() {
+        String label = cbValorisateur.getValue();
+        if (label == null) {
+            return null;
+        }
+        return valorisateurIdByLabel.get(label);
     }
 
     private void resetValidationUi() {
@@ -203,6 +266,11 @@ public class AppelOffreCreateController {
 
     private void showFieldError(DatePicker field, Label errorLabel, String message) {
         field.setStyle(STYLE_DATE_PICKER_OK + STYLE_FIELD_ERROR_SUFFIX);
+        showErrorLabel(errorLabel, message);
+    }
+
+    private void showFieldError(ComboBox<String> field, Label errorLabel, String message) {
+        field.setStyle(STYLE_COMBO_OK + STYLE_FIELD_ERROR_SUFFIX);
         showErrorLabel(errorLabel, message);
     }
 

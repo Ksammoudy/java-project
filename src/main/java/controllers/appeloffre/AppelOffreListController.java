@@ -29,6 +29,11 @@ import java.util.stream.Collectors;
 
 public class AppelOffreListController {
 
+    private static final String STYLE_FILTER_OK =
+            "-fx-background-color: #F7FAF8; -fx-border-color: #C2D6CA; -fx-border-radius: 10; -fx-background-radius: 10;";
+    private static final String STYLE_FILTER_ERROR =
+            "-fx-background-color: #FFF6F6; -fx-border-color: #DC2626; -fx-border-radius: 10; -fx-background-radius: 10;";
+
     @FXML
     private TextField txtRecherche;
     @FXML
@@ -49,6 +54,10 @@ public class AppelOffreListController {
     private Label lblTotalActifs;
     @FXML
     private Label lblTotalExpires;
+    @FXML
+    private Label lblTauxActifs;
+    @FXML
+    private Label lblQuantiteTotale;
 
     @FXML
     private TableView<AppelOffre> tableAppelOffres;
@@ -76,6 +85,7 @@ public class AppelOffreListController {
         initialiserFiltres();
         initialiserColonnes();
         chargerDonnees();
+        initialiserSelectionInfo();
 
         String flash = AppelOffreFlowState.consumeFlashMessage();
         if (flash != null && !flash.isBlank()) {
@@ -92,6 +102,7 @@ public class AppelOffreListController {
 
         cbOrdre.setItems(FXCollections.observableArrayList("Decroissant", "Croissant"));
         cbOrdre.setValue("Decroissant");
+        txtQuantiteMin.setStyle(STYLE_FILTER_OK);
     }
 
     private void initialiserColonnes() {
@@ -127,8 +138,8 @@ public class AppelOffreListController {
                 boolean isActive = "Active".equalsIgnoreCase(item.trim());
                 badge.setText(isActive ? "Active" : "Expire");
                 badge.setStyle(isActive
-                        ? "-fx-background-color: #D8F3E5; -fx-text-fill: #107C41; -fx-font-size: 12px; -fx-font-weight: bold; -fx-background-radius: 999; -fx-padding: 4 10 4 10;"
-                        : "-fx-background-color: #FBE4E4; -fx-text-fill: #C0392B; -fx-font-size: 12px; -fx-font-weight: bold; -fx-background-radius: 999; -fx-padding: 4 10 4 10;");
+                        ? "-fx-background-color: #D8F3E5; -fx-text-fill: #107C41; -fx-font-size: 12px; -fx-font-weight: bold; -fx-background-radius: 999; -fx-padding: 5 11 5 11;"
+                        : "-fx-background-color: #FBE4E4; -fx-text-fill: #C0392B; -fx-font-size: 12px; -fx-font-weight: bold; -fx-background-radius: 999; -fx-padding: 5 11 5 11;");
 
                 setText(null);
                 setGraphic(badge);
@@ -141,8 +152,8 @@ public class AppelOffreListController {
             private final HBox container = new HBox(6, btnVoir, btnModifier);
 
             {
-                btnVoir.setStyle("-fx-background-color: #E0ECFF; -fx-text-fill: #1E3A8A; -fx-font-weight: bold; -fx-background-radius: 8;");
-                btnModifier.setStyle("-fx-background-color: #DBEAFE; -fx-text-fill: #1E3A8A; -fx-font-weight: bold; -fx-background-radius: 8;");
+                btnVoir.setStyle("-fx-background-color: #E8F0FF; -fx-text-fill: #1E3A8A; -fx-font-weight: bold; -fx-background-radius: 9; -fx-padding: 6 12 6 12;");
+                btnModifier.setStyle("-fx-background-color: #DBEAFE; -fx-text-fill: #1E3A8A; -fx-font-weight: bold; -fx-background-radius: 9; -fx-padding: 6 12 6 12;");
 
                 btnVoir.setOnAction(evt -> {
                     AppelOffre a = getTableView().getItems().get(getIndex());
@@ -192,7 +203,13 @@ public class AppelOffreListController {
         try {
             List<AppelOffre> source = new ArrayList<>(serviceAppelOffre.recupererTout());
             String search = safeLower(txtRecherche.getText());
-            double min = parseMin(txtQuantiteMin.getText());
+            Double min = parseMinOrNull(txtQuantiteMin.getText());
+            if (min == null) {
+                txtQuantiteMin.setStyle(STYLE_FILTER_ERROR);
+                lblInfo.setText("Quantite min invalide. Entrez un nombre >= 0.");
+                return;
+            }
+            txtQuantiteMin.setStyle(STYLE_FILTER_OK);
             String etat = cbEtat.getValue();
 
             List<AppelOffre> filtered = source.stream()
@@ -216,6 +233,7 @@ public class AppelOffreListController {
     private void onReinitialiserFiltres() {
         txtRecherche.clear();
         txtQuantiteMin.clear();
+        txtQuantiteMin.setStyle(STYLE_FILTER_OK);
         cbEtat.setValue("Tous");
         cbTri.setValue("Date limite");
         cbOrdre.setValue("Decroissant");
@@ -283,12 +301,16 @@ public class AppelOffreListController {
         return value == null ? "" : value.trim().toLowerCase(Locale.ROOT);
     }
 
-    private double parseMin(String value) {
+    private Double parseMinOrNull(String value) {
         String text = value == null ? "" : value.trim();
         if (text.isEmpty()) {
             return 0d;
         }
-        return Math.max(0d, Double.parseDouble(text));
+        try {
+            return Math.max(0d, Double.parseDouble(text));
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
     private void updateCount() {
@@ -297,6 +319,8 @@ public class AppelOffreListController {
                 .filter(a -> a != null && a.getDateLimite() != null && a.getDateLimite().after(new Timestamp(System.currentTimeMillis())))
                 .count();
         long expires = total - actifs;
+        double quantiteTotale = data.stream().mapToDouble(AppelOffre::getQuantiteDemandee).sum();
+        double tauxActifs = total == 0 ? 0d : (actifs * 100d) / total;
 
         lblCount.setText(total + " appel(s)");
         if (lblTotalAppels != null) {
@@ -308,5 +332,20 @@ public class AppelOffreListController {
         if (lblTotalExpires != null) {
             lblTotalExpires.setText(String.valueOf(expires));
         }
+        if (lblTauxActifs != null) {
+            lblTauxActifs.setText(String.format(Locale.ROOT, "%.1f%%", tauxActifs));
+        }
+        if (lblQuantiteTotale != null) {
+            lblQuantiteTotale.setText(String.format(Locale.ROOT, "%.1f kg", quantiteTotale));
+        }
+    }
+
+    private void initialiserSelectionInfo() {
+        tableAppelOffres.getSelectionModel().selectedItemProperty().addListener((obs, oldV, selected) -> {
+            if (selected == null) {
+                return;
+            }
+            lblInfo.setText("Appel #" + selected.getId() + " selectionne. Vous pouvez cliquer sur Modifier.");
+        });
     }
 }

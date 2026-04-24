@@ -24,22 +24,22 @@
 
     <top>
         <HBox alignment="CENTER_LEFT"
-              spacing="18.0"
+              spacing="16.0"
               style="-fx-background-color: linear-gradient(to right, #0E223D, #1B2F4D); -fx-padding: 12 20 12 20;">
-            <StackPane minHeight="24.0" minWidth="24.0" prefHeight="24.0" prefWidth="24.0"
+            <StackPane minHeight="26.0" minWidth="26.0" prefHeight="26.0" prefWidth="26.0"
                        style="-fx-background-color: #22C55E; -fx-background-radius: 999;">
-                <Label text="W" style="-fx-text-fill: #0E223D; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                <Label text="WW" style="-fx-text-fill: #0E223D; -fx-font-size: 9px; -fx-font-weight: bold;"/>
             </StackPane>
-            <Label text="WasteWise TN" style="-fx-text-fill: #FFFFFF; -fx-font-size: 24px; -fx-font-weight: bold;"/>
+            <Label text="WasteWise TN" style="-fx-text-fill: #FFFFFF; -fx-font-size: 23px; -fx-font-weight: bold;"/>
 
             <Region HBox.hgrow="ALWAYS"/>
-            <HBox spacing="12.0">
+            <HBox spacing="10.0">
                 <Button mnemonicParsing="false" onAction="#onOpenDashboard" text="Accueil"
-                        style="-fx-background-color: transparent; -fx-text-fill: #FFFFFF; -fx-font-size: 14px;"/>
+                        style="-fx-background-color: transparent; -fx-text-fill: #EAF2FA; -fx-font-size: 14px;"/>
                 <Button mnemonicParsing="false" onAction="#onOpenCreate" text="Appels d'offre"
-                        style="-fx-background-color: transparent; -fx-text-fill: #22C55E; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+                        style="-fx-background-color: rgba(34,197,94,0.15); -fx-text-fill: #22C55E; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 6 12 6 12;"/>
                 <Button mnemonicParsing="false" onAction="#onOpenList" text="Liste"
-                        style="-fx-background-color: transparent; -fx-text-fill: #FFFFFF; -fx-font-size: 14px;"/>
+                        style="-fx-background-color: transparent; -fx-text-fill: #EAF2FA; -fx-font-size: 14px;"/>
             </HBox>
             <Region HBox.hgrow="ALWAYS"/>
             <Label text="Utilisateur connecte" style="-fx-text-fill: #DCE6F2; -fx-font-size: 13px;"/>
@@ -52,44 +52,58 @@
                 <Insets top="20.0" right="24.0" bottom="20.0" left="24.0"/>
             </padding>
 
-            <VBox spacing="14.0" maxWidth="1080.0"
-                  style="-fx-background-color: #F3F7F4; -fx-background-radius: 20; -fx-padding: 16 16 16 16; -fx-effect: dropshadow(gaussian, rgba(12,31,53,0.14), 22, 0, 0, 7);">
+            <VBox spacing="14.0" maxWidth="1120.0"
+                  style="-fx-background-color: #F3F7F4; -fx-background-radius: 22; -fx-padding: 18 18 18 18; -fx-effect: dropshadow(gaussian, rgba(12,31,53,0.16), 26, 0, 0, 8);">
 
                 <HBox alignment="CENTER_LEFT">
                     <VBox spacing="3.0">
                         <Label text="Appels d'offre > Liste"
                                style="-fx-text-fill: #4C6A5B; -fx-font-size: 12px; -fx-font-weight: bold;"/>
                         <Label text="Liste des appels d'offre"
-                               style="-fx-text-fill: #0D2B40; -fx-font-size: 30px; -fx-font-weight: bold;"/>
+                               style="-fx-text-fill: #0D2B40; -fx-font-size: 31px; -fx-font-weight: bold;"/>
+                        <Label text="Filtrez et pilotez vos appels actifs/expirés avec un affichage metier clair."
+                               style="-fx-text-fill: #5E7C6D; -fx-font-size: 13px;"/>
                     </VBox>
                     <Region HBox.hgrow="ALWAYS"/>
                     <Label fx:id="lblCount" text="0 appel(s)"
-                           style="-fx-background-color: #EAF6EF; -fx-text-fill: #19693F; -fx-font-size: 13px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 8 12 8 12;"/>
+                           style="-fx-background-color: #EAF6EF; -fx-text-fill: #19693F; -fx-font-size: 13px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 8 12 8 12; -fx-border-color: #C9E2D5; -fx-border-radius: 10;"/>
                 </HBox>
 
                 <HBox spacing="10.0">
                     <VBox spacing="4.0" HBox.hgrow="ALWAYS"
-                          style="-fx-background-color: #FFFFFF; -fx-border-color: #D3E1DA; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 10 12 10 12;">
+                          style="-fx-background-color: #FFFFFF; -fx-border-color: #D3E1DA; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 10 12 10 12; -fx-effect: dropshadow(gaussian, rgba(13,43,64,0.08), 8, 0, 0, 2);">
                         <Label text="Total appels" style="-fx-text-fill: #637D6F; -fx-font-size: 12px;"/>
                         <Label fx:id="lblTotalAppels" text="0"
                                style="-fx-text-fill: #0D2B40; -fx-font-size: 22px; -fx-font-weight: bold;"/>
                     </VBox>
                     <VBox spacing="4.0" HBox.hgrow="ALWAYS"
-                          style="-fx-background-color: #FFFFFF; -fx-border-color: #D3E1DA; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 10 12 10 12;">
+                          style="-fx-background-color: #FFFFFF; -fx-border-color: #D3E1DA; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 10 12 10 12; -fx-effect: dropshadow(gaussian, rgba(13,43,64,0.08), 8, 0, 0, 2);">
                         <Label text="Actifs" style="-fx-text-fill: #637D6F; -fx-font-size: 12px;"/>
                         <Label fx:id="lblTotalActifs" text="0"
                                style="-fx-text-fill: #166534; -fx-font-size: 22px; -fx-font-weight: bold;"/>
                     </VBox>
                     <VBox spacing="4.0" HBox.hgrow="ALWAYS"
-                          style="-fx-background-color: #FFFFFF; -fx-border-color: #D3E1DA; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 10 12 10 12;">
+                          style="-fx-background-color: #FFFFFF; -fx-border-color: #D3E1DA; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 10 12 10 12; -fx-effect: dropshadow(gaussian, rgba(13,43,64,0.08), 8, 0, 0, 2);">
                         <Label text="Expires" style="-fx-text-fill: #637D6F; -fx-font-size: 12px;"/>
                         <Label fx:id="lblTotalExpires" text="0"
                                style="-fx-text-fill: #B91C1C; -fx-font-size: 22px; -fx-font-weight: bold;"/>
                     </VBox>
+                    <VBox spacing="4.0" HBox.hgrow="ALWAYS"
+                          style="-fx-background-color: #FFFFFF; -fx-border-color: #D3E1DA; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 10 12 10 12; -fx-effect: dropshadow(gaussian, rgba(13,43,64,0.08), 8, 0, 0, 2);">
+                        <Label text="Taux actifs" style="-fx-text-fill: #637D6F; -fx-font-size: 12px;"/>
+                        <Label fx:id="lblTauxActifs" text="0.0%"
+                               style="-fx-text-fill: #1E3A8A; -fx-font-size: 22px; -fx-font-weight: bold;"/>
+                    </VBox>
+                    <VBox spacing="4.0" HBox.hgrow="ALWAYS"
+                          style="-fx-background-color: #FFFFFF; -fx-border-color: #D3E1DA; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 10 12 10 12; -fx-effect: dropshadow(gaussian, rgba(13,43,64,0.08), 8, 0, 0, 2);">
+                        <Label text="Quantite totale" style="-fx-text-fill: #637D6F; -fx-font-size: 12px;"/>
+                        <Label fx:id="lblQuantiteTotale" text="0.0 kg"
+                               style="-fx-text-fill: #14532D; -fx-font-size: 22px; -fx-font-weight: bold;"/>
+                    </VBox>
                 </HBox>
 
                 <VBox spacing="10.0"
-                      style="-fx-background-color: #FFFFFF; -fx-border-color: #D3E1DA; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 12 12 12 12;">
+                      style="-fx-background-color: #FFFFFF; -fx-border-color: #D3E1DA; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 12 12 12 12; -fx-effect: dropshadow(gaussian, rgba(13,43,64,0.07), 7, 0, 0, 2);">
                     <Label text="Filtres et tri"
                            style="-fx-text-fill: #3F5F50; -fx-font-size: 15px; -fx-font-weight: bold;"/>
                     <Label text="Affinez votre vue avant de consulter ou modifier les offres."
@@ -127,25 +141,25 @@
                     <HBox spacing="8.0" alignment="CENTER_LEFT">
                         <Button mnemonicParsing="false" onAction="#onAppliquerFiltres" text="Appliquer"
                                 prefHeight="38.0"
-                                style="-fx-background-color: #17945D; -fx-text-fill: #FFFFFF; -fx-font-size: 13px; -fx-font-weight: bold; -fx-background-radius: 10;"/>
+                                style="-fx-background-color: linear-gradient(to right, #17945D, #1FA466); -fx-text-fill: #FFFFFF; -fx-font-size: 13px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 6 16 6 16;"/>
                         <Button mnemonicParsing="false" onAction="#onReinitialiserFiltres" text="Reinitialiser"
                                 prefHeight="38.0"
-                                style="-fx-background-color: #E4EBE6; -fx-text-fill: #46695B; -fx-font-size: 13px; -fx-font-weight: bold; -fx-background-radius: 10;"/>
+                                style="-fx-background-color: #E4EBE6; -fx-text-fill: #46695B; -fx-font-size: 13px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 6 16 6 16;"/>
                         <Region HBox.hgrow="ALWAYS"/>
-                        <Button mnemonicParsing="false" onAction="#onNouveau" text="Nouveau appel"
+                        <Button mnemonicParsing="false" onAction="#onNouveau" text="+ Nouveau appel"
                                 prefHeight="40.0"
-                                style="-fx-background-color: #14532D; -fx-text-fill: #FFFFFF; -fx-font-size: 13px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 8 16 8 16;"/>
+                                style="-fx-background-color: linear-gradient(to right, #14532D, #1A6A3A); -fx-text-fill: #FFFFFF; -fx-font-size: 13px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 8 16 8 16;"/>
                         <Button mnemonicParsing="false" onAction="#onModifierSelection" text="Modifier selection"
                                 prefHeight="40.0"
-                                style="-fx-background-color: #1E3A8A; -fx-text-fill: #FFFFFF; -fx-font-size: 13px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 8 16 8 16;"/>
+                                style="-fx-background-color: linear-gradient(to right, #1E3A8A, #2448A5); -fx-text-fill: #FFFFFF; -fx-font-size: 13px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 8 16 8 16;"/>
                     </HBox>
                 </VBox>
 
                 <VBox spacing="8.0"
-                      style="-fx-background-color: #FFFFFF; -fx-border-color: #D3E1DA; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 10 10 10 10;">
+                      style="-fx-background-color: #FFFFFF; -fx-border-color: #D3E1DA; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 10 10 10 10; -fx-effect: dropshadow(gaussian, rgba(13,43,64,0.07), 7, 0, 0, 2);">
                     <TableView fx:id="tableAppelOffres"
-                               prefHeight="470.0"
-                               style="-fx-background-color: #FFFFFF; -fx-border-color: #C7D6CF; -fx-border-radius: 10; -fx-background-radius: 10; -fx-control-inner-background: #FFFFFF; -fx-control-inner-background-alt: #F6FBF8; -fx-selection-bar: #D9F99D; -fx-selection-bar-non-focused: #ECFCCB; -fx-fixed-cell-size: 46;">
+                               prefHeight="490.0"
+                               style="-fx-background-color: #FFFFFF; -fx-border-color: #C7D6CF; -fx-border-radius: 10; -fx-background-radius: 10; -fx-control-inner-background: #FFFFFF; -fx-control-inner-background-alt: #F6FBF8; -fx-selection-bar: #D9F99D; -fx-selection-bar-non-focused: #ECFCCB; -fx-fixed-cell-size: 50;">
                         <columns>
                             <TableColumn fx:id="colId" prefWidth="70.0" text="ID"/>
                             <TableColumn fx:id="colTitre" prefWidth="170.0" text="Titre"/>

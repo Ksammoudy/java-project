@@ -23,24 +23,24 @@
 
     <top>
         <HBox alignment="CENTER_LEFT"
-              spacing="18.0"
+              spacing="16.0"
               style="-fx-background-color: linear-gradient(to right, #0E223D, #1B2F4D); -fx-padding: 12 20 12 20;">
-            <StackPane minHeight="24.0" minWidth="24.0" prefHeight="24.0" prefWidth="24.0"
+            <StackPane minHeight="26.0" minWidth="26.0" prefHeight="26.0" prefWidth="26.0"
                        style="-fx-background-color: #22C55E; -fx-background-radius: 999;">
-                <Label text="W" style="-fx-text-fill: #0E223D; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                <Label text="WW" style="-fx-text-fill: #0E223D; -fx-font-size: 9px; -fx-font-weight: bold;"/>
             </StackPane>
-            <Label text="WasteWise TN" style="-fx-text-fill: #FFFFFF; -fx-font-size: 24px; -fx-font-weight: bold;"/>
+            <Label text="WasteWise TN" style="-fx-text-fill: #FFFFFF; -fx-font-size: 23px; -fx-font-weight: bold;"/>
 
             <Region HBox.hgrow="ALWAYS"/>
-            <HBox spacing="12.0">
+            <HBox spacing="10.0">
                 <Button mnemonicParsing="false" onAction="#onOpenDashboard" text="Accueil"
-                        style="-fx-background-color: transparent; -fx-text-fill: #FFFFFF; -fx-font-size: 14px;"/>
+                        style="-fx-background-color: transparent; -fx-text-fill: #EAF2FA; -fx-font-size: 14px;"/>
                 <Button mnemonicParsing="false" onAction="#onOpenAppelOffre" text="Appels d'offre"
-                        style="-fx-background-color: transparent; -fx-text-fill: #FFFFFF; -fx-font-size: 14px;"/>
+                        style="-fx-background-color: transparent; -fx-text-fill: #EAF2FA; -fx-font-size: 14px;"/>
                 <Button mnemonicParsing="false" onAction="#onOpenReponseCreate" text="Reponses"
-                        style="-fx-background-color: transparent; -fx-text-fill: #22C55E; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+                        style="-fx-background-color: rgba(34,197,94,0.15); -fx-text-fill: #22C55E; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 6 12 6 12;"/>
                 <Button mnemonicParsing="false" onAction="#onOpenReponseList" text="Liste"
-                        style="-fx-background-color: transparent; -fx-text-fill: #FFFFFF; -fx-font-size: 14px;"/>
+                        style="-fx-background-color: transparent; -fx-text-fill: #EAF2FA; -fx-font-size: 14px;"/>
             </HBox>
             <Region HBox.hgrow="ALWAYS"/>
             <Label text="Utilisateur connecte" style="-fx-text-fill: #DCE6F2; -fx-font-size: 13px;"/>
@@ -53,24 +53,45 @@
                 <Insets top="26.0" right="24.0" bottom="26.0" left="24.0"/>
             </padding>
 
-            <VBox spacing="14.0" maxWidth="1020.0"
-                  style="-fx-background-color: #F3F7F4; -fx-background-radius: 20; -fx-padding: 18 18 18 18; -fx-effect: dropshadow(gaussian, rgba(12,31,53,0.14), 22, 0, 0, 7);">
+            <VBox spacing="14.0" maxWidth="1120.0"
+                  style="-fx-background-color: #F3F7F4; -fx-background-radius: 22; -fx-padding: 18 18 18 18; -fx-effect: dropshadow(gaussian, rgba(12,31,53,0.16), 26, 0, 0, 8);">
 
                 <VBox spacing="4.0">
                     <Label text="Reponses d'offre > Modification"
                            style="-fx-text-fill: #4C6A5B; -fx-font-size: 12px; -fx-font-weight: bold;"/>
                     <Label text="Modifier la reponse d'offre"
-                           style="-fx-text-fill: #0D2B40; -fx-font-size: 34px; -fx-font-weight: bold;"/>
-                    <Label text="Mettez a jour la quantite, le message et les liens de la reponse."
+                           style="-fx-text-fill: #0D2B40; -fx-font-size: 33px; -fx-font-weight: bold;"/>
+                    <Label text="Mettez a jour la quantite et le message avec un cadre clair et securise."
                            style="-fx-text-fill: #5E7C6D; -fx-font-size: 14px;"/>
                 </VBox>
+
+                <HBox spacing="10.0">
+                    <VBox spacing="4.0" HBox.hgrow="ALWAYS"
+                          style="-fx-background-color: #FFFFFF; -fx-border-color: #D0E0D7; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 10 12 10 12;">
+                        <Label text="ID reponse" style="-fx-text-fill: #6A8477; -fx-font-size: 12px;"/>
+                        <Label fx:id="lblCtxReponseId" text="-"
+                               style="-fx-text-fill: #0D2B40; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+                    </VBox>
+                    <VBox spacing="4.0" HBox.hgrow="ALWAYS"
+                          style="-fx-background-color: #FFFFFF; -fx-border-color: #D0E0D7; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 10 12 10 12;">
+                        <Label text="Statut actuel" style="-fx-text-fill: #6A8477; -fx-font-size: 12px;"/>
+                        <Label fx:id="lblCtxStatut" text="-"
+                               style="-fx-text-fill: #1E3A8A; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+                    </VBox>
+                    <VBox spacing="4.0" HBox.hgrow="ALWAYS"
+                          style="-fx-background-color: #FFFFFF; -fx-border-color: #D0E0D7; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 10 12 10 12;">
+                        <Label text="Appel lie" style="-fx-text-fill: #6A8477; -fx-font-size: 12px;"/>
+                        <Label fx:id="lblCtxAppelLie" text="-"
+                               style="-fx-text-fill: #14532D; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+                    </VBox>
+                </HBox>
 
                 <Label fx:id="lblMessage"
                        text="Chargement..."
                        style="-fx-background-color: #EEF7F1; -fx-text-fill: #1D5B41; -fx-font-size: 13px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 10 12 10 12;"/>
 
                 <VBox spacing="12.0"
-                      style="-fx-background-color: #FFFFFF; -fx-border-color: #D6E3DB; -fx-border-radius: 14; -fx-background-radius: 14; -fx-padding: 16 16 16 16;">
+                      style="-fx-background-color: #FFFFFF; -fx-border-color: #D6E3DB; -fx-border-radius: 14; -fx-background-radius: 14; -fx-padding: 16 16 16 16; -fx-effect: dropshadow(gaussian, rgba(13,43,64,0.07), 7, 0, 0, 2);">
                     <GridPane hgap="14.0" vgap="10.0">
                         <columnConstraints>
                             <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
@@ -83,6 +104,8 @@
                             <TextField fx:id="txtQuantiteProposee"
                                        prefHeight="44.0"
                                        style="-fx-background-color: #F7FAF8; -fx-border-color: #C2D6CA; -fx-border-radius: 10; -fx-background-radius: 10; -fx-font-size: 15px;"/>
+                            <Label text="Quantite strictement positive."
+                                   style="-fx-text-fill: #7A9184; -fx-font-size: 11px;"/>
                             <Label fx:id="lblQuantiteError" managed="false" text="" visible="false"
                                    style="-fx-text-fill: #B91C1C; -fx-font-size: 12px; -fx-font-weight: bold;"/>
                         </VBox>
@@ -94,6 +117,8 @@
                                       prefRowCount="3"
                                       wrapText="true"
                                       style="-fx-background-color: #F7FAF8; -fx-border-color: #C2D6CA; -fx-border-radius: 10; -fx-background-radius: 10; -fx-font-size: 14px;"/>
+                            <Label text="Message optionnel pour ajouter des precisions."
+                                   style="-fx-text-fill: #7A9184; -fx-font-size: 11px;"/>
                         </VBox>
 
                         <VBox spacing="5.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
@@ -120,14 +145,14 @@
                     <HBox spacing="10.0" alignment="CENTER_LEFT">
                         <Button mnemonicParsing="false" onAction="#onMettreAJour" text="Mettre a jour"
                                 prefHeight="44.0"
-                                style="-fx-background-color: #1E9B63; -fx-text-fill: #FFFFFF; -fx-font-size: 15px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 8 18 8 18;"/>
+                                style="-fx-background-color: linear-gradient(to right, #1E9B63, #26AC70); -fx-text-fill: #FFFFFF; -fx-font-size: 15px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 8 20 8 20;"/>
+                        <Button mnemonicParsing="false" onAction="#onAnnuler" text="Annuler"
+                                prefHeight="44.0"
+                                style="-fx-background-color: #E7ECE8; -fx-text-fill: #496858; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 8 18 8 18;"/>
                         <Region HBox.hgrow="ALWAYS"/>
                         <Button mnemonicParsing="false" onAction="#onSupprimer" text="Supprimer"
                                 prefHeight="44.0"
-                                style="-fx-background-color: #DC2626; -fx-text-fill: #FFFFFF; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 8 18 8 18;"/>
-                        <Button mnemonicParsing="false" onAction="#onAnnuler" text="Annuler"
-                                prefHeight="44.0"
-                                style="-fx-background-color: #E4EBE6; -fx-text-fill: #46695B; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 8 18 8 18;"/>
+                                style="-fx-background-color: linear-gradient(to right, #D93232, #C21F1F); -fx-text-fill: #FFFFFF; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 8 18 8 18;"/>
                     </HBox>
                 </VBox>
             </VBox>
