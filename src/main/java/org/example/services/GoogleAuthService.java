@@ -7,28 +7,30 @@ import org.example.models.User;
 import java.awt.Desktop;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.*;
+import java.net.InetSocketAddress;
+import java.net.URI;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-public class FacebookAuthService {
+public class GoogleAuthService {
 
     private final UserService userService = UserService.getInstance();
 
-    private final String clientId = "1337612458412063";
-    private final String clientSecret = "14f5369e553c329cc2bd761f9bd85c2a";
-    private final String redirectUri = "http://localhost:8080/callback";
+    private final String clientId = System.getenv("GOOGLE_CLIENT_ID");
+    private final String clientSecret = System.getenv("GOOGLE_CLIENT_SECRET");
+    private final String redirectUri = "http://localhost:8000/connect/google/check";
 
     public interface AuthCallback {
         void onSuccess(SocialLoginResult result);
         void onError(String message);
     }
 
-    public void loginWithFacebook(AuthCallback callback) {
+    public void loginWithGoogle(AuthCallback callback) {
         try {
             URI redirect = URI.create(redirectUri);
             int port = redirect.getPort() == -1 ? 80 : redirect.getPort();
@@ -42,20 +44,20 @@ public class FacebookAuthService {
                 String error = extractQueryParam(query, "error");
 
                 if (!isBlank(error)) {
-                    sendHtml(exchange, "Connexion Facebook annulée.");
+                    sendHtml(exchange, "Connexion Google annulée.");
                     server.stop(0);
-                    callback.onError("Connexion Facebook annulée.");
+                    callback.onError("Connexion Google annulée.");
                     return;
                 }
 
                 if (isBlank(code)) {
                     sendHtml(exchange, "Code OAuth manquant.");
                     server.stop(0);
-                    callback.onError("Code Facebook manquant.");
+                    callback.onError("Code Google manquant.");
                     return;
                 }
 
-                sendHtml(exchange, "Connexion réussie. Vous pouvez fermer cette fenêtre.");
+                sendHtml(exchange, "Connexion Google réussie. Vous pouvez fermer cette fenêtre.");
                 server.stop(0);
 
                 CompletableFuture.runAsync(() -> handleCode(code, callback));
@@ -63,11 +65,13 @@ public class FacebookAuthService {
 
             server.start();
 
-            String authUrl = "https://www.facebook.com/v19.0/dialog/oauth"
+            String authUrl = "https://accounts.google.com/o/oauth2/v2/auth"
                     + "?client_id=" + urlEncode(clientId)
                     + "&redirect_uri=" + urlEncode(redirectUri)
-                    + "&scope=" + urlEncode("email,public_profile")
-                    + "&response_type=code";
+                    + "&response_type=code"
+                    + "&scope=" + urlEncode("openid email profile")
+                    + "&access_type=offline"
+                    + "&prompt=select_account";
 
             if (Desktop.isDesktopSupported()) {
                 Desktop.getDesktop().browse(URI.create(authUrl));
@@ -76,7 +80,7 @@ public class FacebookAuthService {
             }
 
         } catch (Exception e) {
-            callback.onError("Erreur Facebook OAuth : " + e.getMessage());
+            callback.onError("Erreur Google OAuth : " + e.getMessage());
         }
     }
 
@@ -84,29 +88,29 @@ public class FacebookAuthService {
         try {
             HttpClient client = HttpClient.newHttpClient();
 
-            String tokenUrl = "https://graph.facebook.com/v19.0/oauth/access_token"
-                    + "?client_id=" + urlEncode(clientId)
-                    + "&redirect_uri=" + urlEncode(redirectUri)
+            String form = "code=" + urlEncode(code)
+                    + "&client_id=" + urlEncode(clientId)
                     + "&client_secret=" + urlEncode(clientSecret)
-                    + "&code=" + urlEncode(code);
+                    + "&redirect_uri=" + urlEncode(redirectUri)
+                    + "&grant_type=authorization_code";
 
             HttpRequest tokenRequest = HttpRequest.newBuilder()
-                    .uri(URI.create(tokenUrl))
-                    .GET()
+                    .uri(URI.create("https://oauth2.googleapis.com/token"))
+                    .header("Content-Type", "application/x-www-form-urlencoded")
+                    .POST(HttpRequest.BodyPublishers.ofString(form))
                     .build();
 
             HttpResponse<String> tokenResponse = client.send(tokenRequest, HttpResponse.BodyHandlers.ofString());
             String accessToken = extractJsonValue(tokenResponse.body(), "access_token");
 
             if (isBlank(accessToken)) {
-                callback.onError("Impossible de récupérer le token Facebook.");
+                callback.onError("Impossible de récupérer le token Google.");
                 return;
             }
 
-            String profileUrl = "https://graph.facebook.com/me?fields=id,name,email&access_token=" + urlEncode(accessToken);
-
             HttpRequest profileRequest = HttpRequest.newBuilder()
-                    .uri(URI.create(profileUrl))
+                    .uri(URI.create("https://www.googleapis.com/oauth2/v2/userinfo"))
+                    .header("Authorization", "Bearer " + accessToken)
                     .GET()
                     .build();
 
@@ -116,7 +120,8 @@ public class FacebookAuthService {
             String fullName = extractJsonValue(profileResponse.body(), "name");
 
             if (isBlank(email)) {
-                email = "fb_" + UUID.randomUUID() + "@facebook.local";
+                callback.onError("Impossible de récupérer l'email Google.");
+                return;
             }
 
             email = email.trim().toLowerCase();
@@ -124,13 +129,13 @@ public class FacebookAuthService {
 
             if (existingUser != null) {
                 userService.updateLastSeen(existingUser.getId());
-                callback.onSuccess(new SocialLoginResult(true, existingUser, email, fullName, "FACEBOOK"));
+                callback.onSuccess(new SocialLoginResult(true, existingUser, email, fullName, "GOOGLE"));
             } else {
-                callback.onSuccess(new SocialLoginResult(false, null, email, fullName, "FACEBOOK"));
+                callback.onSuccess(new SocialLoginResult(false, null, email, fullName, "GOOGLE"));
             }
 
         } catch (Exception e) {
-            callback.onError("Erreur Facebook : " + e.getMessage());
+            callback.onError("Erreur Google : " + e.getMessage());
         }
     }
 
@@ -163,7 +168,7 @@ public class FacebookAuthService {
             return null;
         }
 
-        String pattern = "\"" + key + "\":\"";
+        String pattern = "\"" + key + "\":";
         int start = json.indexOf(pattern);
 
         if (start == -1) {
@@ -171,13 +176,26 @@ public class FacebookAuthService {
         }
 
         start += pattern.length();
-        int end = json.indexOf("\"", start);
 
-        if (end == -1) {
-            return null;
+        while (start < json.length() && Character.isWhitespace(json.charAt(start))) {
+            start++;
         }
 
-        return json.substring(start, end);
+        if (start < json.length() && json.charAt(start) == '"') {
+            start++;
+            int end = json.indexOf("\"", start);
+            if (end == -1) {
+                return null;
+            }
+            return json.substring(start, end);
+        }
+
+        int end = start;
+        while (end < json.length() && json.charAt(end) != ',' && json.charAt(end) != '}') {
+            end++;
+        }
+
+        return json.substring(start, end).trim();
     }
 
     private String urlEncode(String value) {

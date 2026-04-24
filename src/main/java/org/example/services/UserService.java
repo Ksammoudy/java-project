@@ -455,6 +455,64 @@ public class UserService implements CRUD<User> {
         }
     }
 
+    public boolean updateFaceData(User user) {
+        if (user == null || user.getId() <= 0) {
+            System.out.println("❌ Utilisateur invalide pour updateFaceData.");
+            return false;
+        }
+
+        String sql = "UPDATE `user` SET face_embedding = ?, face_updated_at = ? WHERE id = ?";
+
+        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+            ps.setString(1, user.getFaceEmbedding());
+            ps.setTimestamp(2, user.getFaceUpdatedAt() != null
+                    ? Timestamp.valueOf(user.getFaceUpdatedAt())
+                    : Timestamp.valueOf(LocalDateTime.now()));
+            ps.setInt(3, user.getId());
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.out.println("❌ Erreur updateFaceData : " + e.getMessage());
+            return false;
+        }
+    }
+
+    public boolean clearFaceData(int userId) {
+        if (userId <= 0) {
+            return false;
+        }
+
+        String sql = "UPDATE `user` SET face_embedding = NULL, face_updated_at = NULL WHERE id = ?";
+
+        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.out.println("❌ Erreur clearFaceData : " + e.getMessage());
+            return false;
+        }
+    }
+
+    public boolean updateTwoFactorData(User user) {
+        if (user == null || user.getId() <= 0) {
+            System.out.println("❌ Utilisateur invalide pour updateTwoFactorData.");
+            return false;
+        }
+
+        String sql = "UPDATE `user` SET google_authenticator_secret = ?, is_two_factor_enabled = ? WHERE id = ?";
+
+        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+            ps.setString(1, user.getGoogleAuthenticatorSecret());
+            ps.setBoolean(2, user.isTwoFactorEnabled());
+            ps.setInt(3, user.getId());
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.out.println("❌ Erreur updateTwoFactorData : " + e.getMessage());
+            return false;
+        }
+    }
+
     public boolean emailExistsForAnotherUser(String email, int currentUserId) {
         if (email == null || email.isBlank()) {
             return false;
@@ -608,6 +666,7 @@ public class UserService implements CRUD<User> {
         }
 
         updateLastSeen(user.getId());
+        user.setLastSeenAt(LocalDateTime.now());
 
         System.out.println("✅ Connexion réussie.");
         return user;
@@ -651,15 +710,15 @@ public class UserService implements CRUD<User> {
     }
 
     private boolean isValidEmail(String email) {
-        return email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
+        return email != null && email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
     }
 
     private boolean isValidName(String value) {
-        return value.matches("[A-Za-zÀ-ÿ\\s-]{2,30}");
+        return value != null && value.matches("[A-Za-zÀ-ÿ\\s-]{2,30}");
     }
 
     private boolean isValidPhone(String phone) {
-        return phone.matches("\\d{8}");
+        return phone != null && phone.matches("\\d{8}");
     }
 
     private boolean isValidType(String type) {

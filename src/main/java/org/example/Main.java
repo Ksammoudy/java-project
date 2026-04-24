@@ -6,15 +6,17 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
+import org.example.controllers.TwoFactorVerifyController;
 import org.example.controllers.UserController;
 import org.example.models.User;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.function.Consumer;
 
 public class Main extends Application {
 
-    public static Stage primaryStage;
+    private static Stage primaryStage;
 
     public static void main(String[] args) {
         launch(args);
@@ -23,8 +25,14 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) {
         primaryStage = stage;
+        primaryStage.setMinWidth(900);
+        primaryStage.setMinHeight(600);
         showLoginPage();
         primaryStage.show();
+    }
+
+    public static Stage getPrimaryStage() {
+        return primaryStage;
     }
 
     // =========================
@@ -43,7 +51,29 @@ public class Main extends Application {
     }
 
     public static void showResetPasswordPage() {
-        loadPage("/org/example/views/reset_password.fxml", "Réinitialisation", 900, 600);
+        loadPage("/org/example/views/reset_password.fxml", "Réinitialisation du mot de passe", 900, 600);
+    }
+
+    public static void showTwoFactorVerifyPage(User user) {
+        loadPageWithController(
+                "/org/example/views/two_factor_verify.fxml",
+                "Vérification 2FA",
+                450,
+                320,
+                (TwoFactorVerifyController controller) -> controller.setUser(user)
+        );
+    }
+
+    public static void showTwoFactorSetupPage() {
+        loadPage("/org/example/views/two_factor_setup.fxml", "Activation Google Authenticator", 650, 620);
+    }
+
+    public static void showFaceLoginPage() {
+        loadPage("/org/example/views/face_login.fxml", "Connexion par visage", 900, 600);
+    }
+
+    public static void showFaceEnrollPage() {
+        loadPage("/org/example/views/face_enroll.fxml", "Enregistrement du visage", 900, 550);
     }
 
     // =========================
@@ -59,6 +89,37 @@ public class Main extends Application {
 
     public static void showDashboardCitizen() {
         loadPage("/org/example/views/dashboard_citizen.fxml", "Dashboard Citizen", 1200, 800);
+    }
+
+    public static void redirectByUserType(User user) {
+        if (user == null) {
+            showError("Utilisateur introuvable.");
+            showLoginPage();
+            return;
+        }
+
+        String type = user.getType() != null ? user.getType().trim().toUpperCase() : "";
+
+        switch (type) {
+            case "ADMIN":
+                showDashboardAdmin();
+                break;
+
+            case "VALORIZER":
+            case "VALORISATEUR":
+                showDashboardValorizer();
+                break;
+
+            case "CITIZEN":
+            case "CITOYEN":
+                showDashboardCitizen();
+                break;
+
+            default:
+                showError("Type utilisateur inconnu : " + type);
+                showLoginPage();
+                break;
+        }
     }
 
     // =========================
@@ -80,32 +141,13 @@ public class Main extends Application {
     }
 
     public static void showAdminUserEditPage(User user) {
-        try {
-            URL fxmlUrl = Main.class.getResource("/org/example/views/admin_user_edit.fxml");
-
-            if (fxmlUrl == null) {
-                showError("FXML introuvable : /org/example/views/admin_user_edit.fxml");
-                return;
-            }
-
-            FXMLLoader loader = new FXMLLoader(fxmlUrl);
-            Parent root = loader.load();
-
-            UserController controller = loader.getController();
-            controller.setSelectedUser(user);
-
-            Scene scene = new Scene(root, 950, 650);
-            applyGlobalCss(scene);
-
-            primaryStage.setScene(scene);
-            primaryStage.setTitle("Modifier utilisateur");
-            primaryStage.centerOnScreen();
-            primaryStage.show();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            showError("Erreur chargement page modification utilisateur : " + e.getMessage());
-        }
+        loadPageWithController(
+                "/org/example/views/admin_user_edit.fxml",
+                "Modifier utilisateur",
+                950,
+                650,
+                (UserController controller) -> controller.setSelectedUser(user)
+        );
     }
 
     // =========================
@@ -113,8 +155,9 @@ public class Main extends Application {
     // =========================
     private static void loadPage(String fxmlPath, String title, int width, int height) {
         try {
-            URL fxmlUrl = Main.class.getResource(fxmlPath);
+            checkPrimaryStage();
 
+            URL fxmlUrl = Main.class.getResource(fxmlPath);
             if (fxmlUrl == null) {
                 showError("FXML introuvable : " + fxmlPath);
                 System.out.println("FXML introuvable : " + fxmlPath);
@@ -134,7 +177,46 @@ public class Main extends Application {
 
         } catch (IOException e) {
             e.printStackTrace();
-            showError("Erreur chargement page : " + e.getMessage());
+            showError("Erreur lors du chargement de la page : " + e.getMessage());
+        }
+    }
+
+    private static <T> void loadPageWithController(
+            String fxmlPath,
+            String title,
+            int width,
+            int height,
+            Consumer<T> controllerInitializer
+    ) {
+        try {
+            checkPrimaryStage();
+
+            URL fxmlUrl = Main.class.getResource(fxmlPath);
+            if (fxmlUrl == null) {
+                showError("FXML introuvable : " + fxmlPath);
+                System.out.println("FXML introuvable : " + fxmlPath);
+                return;
+            }
+
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+            Parent root = loader.load();
+
+            T controller = loader.getController();
+            if (controller != null && controllerInitializer != null) {
+                controllerInitializer.accept(controller);
+            }
+
+            Scene scene = new Scene(root, width, height);
+            applyGlobalCss(scene);
+
+            primaryStage.setScene(scene);
+            primaryStage.setTitle(title);
+            primaryStage.centerOnScreen();
+            primaryStage.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            showError("Erreur lors du chargement de la page : " + e.getMessage());
         }
     }
 
@@ -142,18 +224,30 @@ public class Main extends Application {
     // CSS GLOBAL
     // =========================
     private static void applyGlobalCss(Scene scene) {
-        URL cssUrl = Main.class.getResource("/org/example/styles/style.css");
+        if (scene == null) {
+            return;
+        }
 
+        URL cssUrl = Main.class.getResource("/org/example/styles/style.css");
         if (cssUrl != null) {
-            scene.getStylesheets().add(cssUrl.toExternalForm());
+            String css = cssUrl.toExternalForm();
+            if (!scene.getStylesheets().contains(css)) {
+                scene.getStylesheets().add(css);
+            }
         } else {
             System.out.println("CSS introuvable : /org/example/styles/style.css");
         }
     }
 
     // =========================
-    // ALERT ERROR
+    // TOOLS
     // =========================
+    private static void checkPrimaryStage() {
+        if (primaryStage == null) {
+            throw new IllegalStateException("Le Stage principal n'est pas encore initialisé.");
+        }
+    }
+
     private static void showError(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Erreur");

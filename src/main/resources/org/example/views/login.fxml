@@ -17,15 +17,18 @@
 <BorderPane xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="org.example.controllers.LoginController"
-            prefWidth="1100.0" prefHeight="700.0"
+            prefWidth="1180.0" prefHeight="760.0"
             styleClass="root-pane"
             stylesheets="@../styles/style.css">
 
     <left>
-        <StackPane prefWidth="520.0" styleClass="left-pane">
-            <VBox alignment="CENTER" spacing="24.0" maxWidth="390.0" styleClass="left-content">
+        <StackPane prefWidth="470.0" minWidth="420.0" styleClass="left-pane">
+            <VBox alignment="CENTER_LEFT" spacing="26.0" maxWidth="360.0" styleClass="left-content">
+                <padding>
+                    <Insets top="40.0" right="35.0" bottom="40.0" left="35.0"/>
+                </padding>
 
-                <HBox alignment="CENTER" spacing="10.0" styleClass="left-badge">
+                <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="left-badge">
                     <Label text="♻" styleClass="left-badge-icon"/>
                     <Label text="Plateforme écoresponsable" styleClass="left-badge-text"/>
                 </HBox>
@@ -38,7 +41,7 @@
                        wrapText="true"
                        styleClass="left-subtitle"/>
 
-                <HBox alignment="CENTER" spacing="18.0">
+                <HBox alignment="CENTER_LEFT" spacing="14.0">
                     <VBox alignment="CENTER" spacing="6.0" styleClass="info-card">
                         <Label text="24/7" styleClass="info-value"/>
                         <Label text="Accès rapide" styleClass="info-label"/>
@@ -58,38 +61,37 @@
                 <StackPane styleClass="left-visual-box">
                     <Label text="♻" styleClass="left-big-icon"/>
                 </StackPane>
-
             </VBox>
         </StackPane>
     </left>
 
     <center>
         <StackPane styleClass="right-pane">
-            <VBox spacing="18.0" maxWidth="420.0" styleClass="auth-card">
+            <VBox spacing="20.0" maxWidth="440.0" styleClass="auth-card">
                 <padding>
-                    <Insets top="35.0" right="35.0" bottom="35.0" left="35.0"/>
+                    <Insets top="40.0" right="40.0" bottom="40.0" left="40.0"/>
                 </padding>
 
-                <VBox spacing="8.0" alignment="CENTER">
+                <VBox spacing="8.0" alignment="CENTER_LEFT">
                     <Label text="Connexion" styleClass="title-label"/>
-                    <Label text="Connecte-toi à ton compte" styleClass="subtitle-label"/>
+                    <Label text="Connecte-toi à ton compte pour continuer" styleClass="subtitle-label"/>
                 </VBox>
 
-                <VBox spacing="10.0">
+                <VBox spacing="12.0">
                     <Button text="Continuer avec Google"
                             onAction="#handleGoogleLogin"
                             maxWidth="Infinity"
-                            styleClass="btn-light"/>
+                            styleClass="btn-social btn-light"/>
 
                     <Button text="Continuer avec Facebook"
                             onAction="#handleFacebookLogin"
                             maxWidth="Infinity"
-                            styleClass="btn-primary"/>
+                            styleClass="btn-social btn-primary"/>
 
                     <Button text="Continuer avec GitHub"
                             onAction="#handleGithubLogin"
                             maxWidth="Infinity"
-                            styleClass="btn-dark"/>
+                            styleClass="btn-social btn-dark"/>
                 </VBox>
 
                 <HBox alignment="CENTER" spacing="10.0">
@@ -98,14 +100,14 @@
                     <Separator HBox.hgrow="ALWAYS"/>
                 </HBox>
 
-                <VBox spacing="6.0">
+                <VBox spacing="7.0">
                     <Label text="Email" styleClass="field-label"/>
                     <TextField fx:id="emailField"
                                promptText="ex: khalil@email.com"
                                styleClass="input-field"/>
                 </VBox>
 
-                <VBox spacing="6.0">
+                <VBox spacing="7.0">
                     <Label text="Mot de passe" styleClass="field-label"/>
                     <PasswordField fx:id="passwordField"
                                    promptText="********"
@@ -120,10 +122,10 @@
                                styleClass="link-action"/>
                 </HBox>
 
-                <Button text="Connexion"
+                <Button text="Se connecter"
                         onAction="#handleLogin"
                         maxWidth="Infinity"
-                        styleClass="btn-success"/>
+                        styleClass="btn-success login-btn"/>
 
                 <Button text="Connexion avec visage"
                         onAction="#handleFaceLogin"
