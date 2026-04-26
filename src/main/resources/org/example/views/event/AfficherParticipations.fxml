@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox spacing="20" styleClass="main-content" stylesheets="@../../style.css"
+      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.example.controllers.gestionevent.ParticipationsController">
+
+    <VBox styleClass="header-banner">
+        <Label text="Gestion des Participations" styleClass="header-title" />
+        <Label text="Suivez les inscriptions des citoyens aux différents événements écologiques." styleClass="header-subtitle" />
+    </VBox>
+
+    <HBox alignment="CENTER_LEFT" spacing="20" styleClass="list-header-container">
+        <Label text="👥 Liste des Participants" styleClass="list-title" />
+
+        <Region HBox.hgrow="ALWAYS" />
+
+        <HBox spacing="10" alignment="CENTER">
+            <TextField promptText="Rechercher un citoyen..." styleClass="search-container" />
+            <Button onAction="#handleAjouterParticipant" styleClass="nav-button-active" text="+ Ajouter Participant" />
+        </HBox>
+    </HBox>
+
+    <TableView fx:id="participationTable" VBox.vgrow="ALWAYS" styleClass="table-view">
+        <columns>
+            <TableColumn fx:id="colCitoyen" prefWidth="200.0" text="Nom du Citoyen" />
+            <TableColumn fx:id="colEvenement" prefWidth="250.0" text="Événement" />
+            <TableColumn fx:id="colDate" prefWidth="150.0" text="Date d'Inscription" />
+            <TableColumn fx:id="colActions" prefWidth="150.0" text="Actions" />
+        </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+        </columnResizePolicy>
+    </TableView>
+
+</VBox>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="500.0" prefWidth="700.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.controllers.gestionevent.DetailsEvenementController">
+    <children>
+        <VBox layoutX="50.0" layoutY="30.0" spacing="20.0" AnchorPane.leftAnchor="50.0" AnchorPane.topAnchor="30.0">
+            <children>
+                <Label text="Détails de l'Événement" textFill="#4caf50">
+                    <font>
+                        <Font name="System Bold" size="24.0" />
+                    </font>
+                </Label>
+
+                <VBox spacing="5.0">
+                    <Label text="Titre :" textFill="#777777" />
+                    <Label fx:id="lblTitre" text="Nom de l'événement" wrapText="true">
+                        <font>
+                            <Font name="System Bold" size="18.0" />
+                        </font>
+                    </Label>
+                </VBox>
+
+                <VBox spacing="5.0">
+                    <Label text="Description :" textFill="#777777" />
+                    <Label fx:id="lblDescription" text="Description détaillée ici..." wrapText="true" prefWidth="500.0">
+                        <font>
+                            <Font size="14.0" />
+                        </font>
+                    </Label>
+                </VBox>
+
+                <VBox spacing="5.0">
+                    <Label text="Date &amp; Heure :" textFill="#777777" />
+                    <Label fx:id="lblDate" text="2026-05-12">
+                        <font>
+                            <Font size="14.0" />
+                        </font>
+                    </Label>
+                </VBox>
+
+                <VBox spacing="5.0">
+                    <Label text="Organisateur :" textFill="#777777" />
+                    <Label fx:id="lblOrganisateur" text="Nom de l'organisateur">
+                        <font>
+                            <Font name="System Italic" size="14.0" />
+                        </font>
+                    </Label>
+                </VBox>
+            </children>
+        </VBox>
+
+        <Button layoutX="50.0" layoutY="430.0" mnemonicParsing="false" onAction="#handleRetour" prefHeight="35.0" prefWidth="120.0" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-cursor: hand;" text="← Retour" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="50.0" />
+    </children>
+</AnchorPane>

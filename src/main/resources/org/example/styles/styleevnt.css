@@ -1,0 +1,150 @@
+/* --- SIDEBAR & NAV (Koudek el 9dim m3a t7assinat) --- */
+.sidebar {
+    -fx-background-color: #2D5A27; /* Dark Green */
+    -fx-padding: 0;
+}
+
+.logo-text {
+    -fx-text-fill: #97D73F;
+    -fx-font-family: "System Bold";
+    -fx-font-size: 20px;
+}
+
+.nav-button, .nav-button-active {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-alignment: CENTER_LEFT;
+    -fx-font-size: 14px;
+    -fx-padding: 15 20 15 20;
+    -fx-border-width: 0;
+    -fx-cursor: hand;
+}
+
+.nav-button:hover {
+    -fx-background-color: #3e7a36;
+}
+
+.nav-button-active {
+    -fx-background-color: #97D73F;
+    -fx-text-fill: #2D5A27;
+    -fx-background-radius: 10;
+    -fx-font-weight: bold;
+    -fx-background-insets: 5 10 5 10;
+}
+
+.main-content {
+    -fx-background-color: #F4F7F6;
+}
+
+/* --- TABLEVIEW MODERN DESIGN (El Zyada el jdida) --- */
+
+.table-view {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 20;
+}
+
+/* Row Style: Rounded w Shadow kima l-image */
+.table-row-cell {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-background-insets: 5 0 5 0; /* Bo3d bin el s'tour */
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 4);
+}
+
+.table-row-cell:hover {
+    -fx-background-color: #f1f8e9; /* Loun akhdher bared barcha kif t'7ot el souri */
+}
+
+/* Header Style */
+.table-view .column-header-background {
+    -fx-background-color: transparent;
+}
+
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-size: 50;
+    -fx-padding: 0 10 0 10;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #2D5A27; /* Dark Green kima el sidebar */
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-alignment: CENTER_LEFT;
+}
+
+/* Cell Style */
+.table-cell {
+    -fx-border-color: transparent;
+    -fx-padding: 15;
+    -fx-text-fill: #555555;
+    -fx-alignment: CENTER_LEFT;
+}
+
+/* Actions Buttons Style (Icones) */
+.button-view {
+    -fx-background-color: #E3F2FD;
+    -fx-text-fill: #2196F3;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+
+.button-edit {
+    -fx-background-color: #FFF3E0;
+    -fx-text-fill: #FF9800;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+
+/* El Banner el kbir el akhdher */
+.header-banner {
+    -fx-background-color: linear-gradient(to right, #2D5A27, #97D73F);
+    -fx-background-radius: 20;
+    -fx-padding: 30;
+    -fx-margin: 10;
+}
+
+.header-title {
+    -fx-text-fill: white;
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+}
+
+.header-subtitle {
+    -fx-text-fill: #E0E0E0;
+    -fx-font-size: 14px;
+}
+
+/* El kelma "Liste des Événements" m3a el Icone */
+.list-header-container {
+    -fx-padding: 20 0 10 20;
+}
+
+.list-title {
+    -fx-text-fill: #2D5A27;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+
+/* Search Bar & Filter styling */
+.search-container {
+    -fx-background-color: white;
+    -fx-background-radius: 10;
+    -fx-border-color: #E0E0E0;
+    -fx-border-radius: 10;
+    -fx-padding: 5 10;
+}
+
+.button-delete {
+    -fx-background-color: #FFEBEE;
+    -fx-text-fill: #F44336;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+
+/* ScrollBar Design (bech mat-kounch khayba) */
+.table-view .virtual-flow .scroll-bar:vertical,
+.table-view .virtual-flow .scroll-bar:horizontal {
+    -fx-background-color: transparent;
+}

@@ -23,26 +23,26 @@ public class Main extends Application {
     // AUTH PAGES
     // =========================
     public static void showLoginPage() {
-        loadPage("/org/example/views/login.fxml", "Connexion | WasteWise TN", 1100, 700);
+        loadPage("/org/example/views/usser/login.fxml", "Connexion | WasteWise TN", 1100, 700);
     }
 
     public static void showRegisterPage() {
-        loadPage("/org/example/views/register.fxml", "Créer un compte | WasteWise TN", 1100, 750);
+        loadPage("/org/example/views/usser/register.fxml", "Créer un compte | WasteWise TN", 1100, 750);
     }
 
     public static void showForgotPasswordPage() {
-        loadPage("/org/example/views/forgot_password.fxml", "Mot de passe oublié | WasteWise TN", 900, 600);
+        loadPage("/org/example/views/usser/forgot_password.fxml", "Mot de passe oublié | WasteWise TN", 900, 600);
     }
 
     public static void showResetPasswordPage() {
-        loadPage("/org/example/views/reset_password.fxml", "Nouveau mot de passe | WasteWise TN", 900, 600);
+        loadPage("/org/example/views/usser/reset_password.fxml", "Nouveau mot de passe | WasteWise TN", 900, 600);
     }
 
     // =========================
     // DASHBOARDS
     // =========================
     public static void showDashboardAdmin() {
-        loadPage("/org/example/views/dashboard_admin.fxml", "Dashboard Admin | WasteWise TN", 1200, 750);
+        loadPage("/org/example/views/usser/dashboard_admin.fxml", "Dashboard Admin | WasteWise TN", 1200, 750);
     }
 
     public static void showDashboardCitizen() {
@@ -50,33 +50,33 @@ public class Main extends Application {
     }
 
     public static void showDashboardValorizer() {
-        loadPage("/org/example/views/dashboard_valorizer.fxml", "Dashboard Valorisateur | WasteWise TN", 1200, 750);
+        loadPage("/org/example/views/usser/dashboard_valorizer.fxml", "Dashboard Valorisateur | WasteWise TN", 1200, 750);
     }
 
     // =========================
     // PROFILE PAGES
     // =========================
     public static void showProfileViewPage() {
-        loadPage("/org/example/views/profile_view.fxml", "Mon Profil | WasteWise TN", 1200, 750);
+        loadPage("/org/example/views/usser/profile_view.fxml", "Mon Profil | WasteWise TN", 1200, 750);
     }
 
     public static void showProfileEditPage() {
-        loadPage("/org/example/views/profile_edit.fxml", "Modifier Profil | WasteWise TN", 1200, 750);
+        loadPage("/org/example/views/usser/profile_edit.fxml", "Modifier Profil | WasteWise TN", 1200, 750);
     }
 
     // =========================
     // ADMIN USER MANAGEMENT
     // =========================
     public static void showAdminUsersPage() {
-        loadPage("/org/example/views/admin_users.fxml", "Utilisateurs | WasteWise TN", 1200, 750);
+        loadPage("/org/example/views/usser/admin_users.fxml", "Utilisateurs | WasteWise TN", 1200, 750);
     }
 
     public static void showAdminUserFormPage() {
-        loadPage("/org/example/views/admin_user_form.fxml", "Formulaire utilisateur | WasteWise TN", 900, 650);
+        loadPage("/org/example/views/usser/admin_user_form.fxml", "Formulaire utilisateur | WasteWise TN", 900, 650);
     }
 
     public static void showAdminUserDeletePage() {
-        loadPage("/org/example/views/admin_user_delete.fxml", "Supprimer utilisateur | WasteWise TN", 700, 400);
+        loadPage("/org/example/views/usser/admin_user_delete.fxml", "Supprimer utilisateur | WasteWise TN", 700, 400);
     }
 
     // =========================

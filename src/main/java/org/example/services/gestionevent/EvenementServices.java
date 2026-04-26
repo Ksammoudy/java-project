@@ -18,119 +18,98 @@ public class EvenementServices implements CRUD<Evenement> {
 
     // Validation
     private void validateEvenement(Evenement e) {
-
         if (e.getTitre() == null || e.getTitre().trim().isEmpty()) {
             throw new IllegalArgumentException("Titre obligatoire");
         }
-
         if (e.getDescription() == null || e.getDescription().trim().isEmpty()) {
             throw new IllegalArgumentException("Description obligatoire");
         }
-
-        if (e.getLieu() == null || e.getLieu().trim().isEmpty()) {
-            throw new IllegalArgumentException("Lieu obligatoire");
-        }
-
         if (e.getDate() == null) {
             throw new IllegalArgumentException("Date obligatoire");
         }
-
         if (e.getIdOrganisateur() <= 0) {
             throw new IllegalArgumentException("ID Organisateur invalide");
         }
     }
 
-    // CREATE
+    // CREATE (Salla7na el Column Count hna)
     @Override
     public void create(Evenement e) throws SQLException {
-
         validateEvenement(e);
 
-        String req = "INSERT INTO evenement (title, description, lieu, dateHeure, idOrganisateur) VALUES (?, ?, ?, ?, ?)";
-        PreparedStatement ps = connection.prepareStatement(req);
+        // Zid "nom_organisateur" fil query w zid "?" 5ames
+        String req = "INSERT INTO evenement (title, description, dateHeure, idOrganisateur, nom_organisateur) VALUES (?, ?, ?, ?, ?)";
 
-        ps.setString(1, e.getTitre());
-        ps.setString(2, e.getDescription());
-        ps.setString(3, e.getLieu());
-        ps.setTimestamp(4, new Timestamp(e.getDate().getTime()));
-        ps.setInt(5, e.getIdOrganisateur());
+        try (PreparedStatement ps = connection.prepareStatement(req)) {
+            ps.setString(1, e.getTitre());
+            ps.setString(2, e.getDescription());
+            ps.setTimestamp(3, new Timestamp(e.getDate().getTime()));
+            ps.setInt(4, e.getIdOrganisateur());
+            ps.setString(5, e.getNomOrganisateur());
+            // HNA EL ZYADA EL LEZMA
 
-        ps.executeUpdate();
-        System.out.println("Evenement ajouté");
+            ps.executeUpdate();
+            System.out.println("✅ Evenement ajouté avec succès!");
+        }
     }
-
     // READ
     @Override
     public List<Evenement> read() throws SQLException {
-
         List<Evenement> list = new ArrayList<>();
         String req = "SELECT * FROM evenement";
 
-        Statement st = connection.createStatement();
-        ResultSet rs = st.executeQuery(req);
+        try (Statement st = connection.createStatement();
+             ResultSet rs = st.executeQuery(req)) {
 
-        while (rs.next()) {
-            list.add(new Evenement(
-                    rs.getInt("id"),
-                    rs.getString("title"),
-                    rs.getString("description"),
-                    rs.getString("lieu"),
-                    rs.getDate("dateHeure"),
-                    rs.getInt("idOrganisateur")
-            ));
+            while (rs.next()) {
+                list.add(new Evenement(
+                        rs.getInt("id"),
+                        rs.getString("title"),
+                        rs.getString("description"),
+                        rs.getDate("dateHeure"),
+                        rs.getInt("idOrganisateur"),
+                        rs.getString("nom_organisateur"),
+                        rs.getString("lieu")
+                        // Thabbet esm el column fil base s7i7
+                ));
+            }
         }
-
         return list;
     }
 
     // UPDATE
     @Override
     public void update(Evenement e) throws SQLException {
-
         validateEvenement(e);
 
-        String req = "UPDATE evenement SET title=?, description=?, lieu=?, dateHeure=? WHERE id=?";
-        PreparedStatement ps = connection.prepareStatement(req);
+        String req = "UPDATE evenement SET title=?, description=?, dateHeure=? WHERE id=?";
 
-        ps.setString(1, e.getTitre());
-        ps.setString(2, e.getDescription());
-        ps.setString(3, e.getLieu());
-        ps.setTimestamp(4, new Timestamp(e.getDate().getTime()));
-        ps.setInt(5, e.getId());
+        try (PreparedStatement ps = connection.prepareStatement(req)) {
+            ps.setString(1, e.getTitre());
+            ps.setString(2, e.getDescription());
+            ps.setTimestamp(3, new Timestamp(e.getDate().getTime()));
+            ps.setInt(4, e.getId());
 
-        ps.executeUpdate();
-        System.out.println("Evenement modifié");
+            ps.executeUpdate();
+            System.out.println("✅ Evenement modifié avec succès!");
+        }
     }
 
-    // DELETE (CORRIGÉ selon interface CRUD)
+    // DELETE
     @Override
     public void delete(Evenement e) throws SQLException {
-
         String req = "DELETE FROM evenement WHERE id = ?";
-        PreparedStatement ps = connection.prepareStatement(req);
 
-        ps.setInt(1, e.getId());
-
-        ps.executeUpdate();
-        System.out.println("Evenement supprimé");
+        try (PreparedStatement ps = connection.prepareStatement(req)) {
+            ps.setInt(1, e.getId());
+            ps.executeUpdate();
+            System.out.println("✅ Evenement supprimé!");
+        }
     }
 
-    // CREATE PREPARED
+    // CREATE PREPARED (Nafsu kima create)
     @Override
     public void createPrepared(Evenement e) throws SQLException {
-
-        validateEvenement(e);
-
-        String req = "INSERT INTO evenement (title, description, lieu, dateHeure, idOrganisateur) VALUES (?, ?, ?, ?, ?)";
-        PreparedStatement ps = connection.prepareStatement(req);
-
-        ps.setString(1, e.getTitre());
-        ps.setString(2, e.getDescription());
-        ps.setString(3, e.getLieu());
-        ps.setTimestamp(4, new Timestamp(e.getDate().getTime()));
-        ps.setInt(5, e.getIdOrganisateur());
-
-        ps.executeUpdate();
-        System.out.println("Evenement ajouté (PreparedStatement)");
+        create(e);
     }
 }

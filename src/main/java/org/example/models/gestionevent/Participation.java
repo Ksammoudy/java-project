@@ -8,24 +8,29 @@ public class Participation {
     private Date dateInscription;
     private int idEvenement;
     private int idCitoyen;
+    private String nomCitoyen;
+    private String nomEvenement;
+    private String email; // 👈 1. Zidna l-email hne
 
     // 1. Constructeur Vide
     public Participation() {
     }
 
-    // 2. Constructeur avec Paramètres (Tout) - Lel Affichage
-    public Participation(int id, Date dateInscription, int idEvenement, int idCitoyen) {
+    // 2. Constructeur pour l'Affichage (Read)
+    public Participation(int id, String nomCitoyen, String email, String nomEvenement, Date dateInscription) {
         this.id = id;
+        this.nomCitoyen = nomCitoyen;
+        this.email = email; // 👈
+        this.nomEvenement = nomEvenement;
         this.dateInscription = dateInscription;
-        this.idEvenement = idEvenement;
-        this.idCitoyen = idCitoyen;
     }
 
-    // 3. Constructeur sans ID - Lel Ajout (khater id auto-increment)
-    public Participation(Date dateInscription, int idEvenement, int idCitoyen) {
-        this.dateInscription = dateInscription;
+    // 3. Constructeur pour l'Ajout (Dhibet mel Formulaire)
+    public Participation(int idEvenement, String nomCitoyen, String email, Date dateInscription) {
         this.idEvenement = idEvenement;
-        this.idCitoyen = idCitoyen;
+        this.nomCitoyen = nomCitoyen;
+        this.email = email; // 👈
+        this.dateInscription = dateInscription;
     }
 
     // 4. Getters et Setters
@@ -41,32 +46,41 @@ public class Participation {
     public int getIdCitoyen() { return idCitoyen; }
     public void setIdCitoyen(int idCitoyen) { this.idCitoyen = idCitoyen; }
 
-    // 5. ToString
+    public String getNomCitoyen() { return nomCitoyen; }
+    public void setNomCitoyen(String nomCitoyen) { this.nomCitoyen = nomCitoyen; }
+
+    public String getNomEvenement() { return nomEvenement; }
+    public void setNomEvenement(String nomEvenement) { this.nomEvenement = nomEvenement; }
+
+    public String getEmail() { return email; } // 👈 Getter email
+    public void setEmail(String email) { this.email = email; } // 👈 Setter email
+
+    // 5. ToString (Zid fih el email bech t-thabbet fih)
     @Override
     public String toString() {
         return "Participation{" +
                 "id=" + id +
-                ", dateInscription=" + dateInscription +
-                ", idEvenement=" + idEvenement +
-                ", idCitoyen=" + idCitoyen +
+                ", Citoyen='" + nomCitoyen + '\'' +
+                ", Email='" + email + '\'' +
+                ", Evenement='" + nomEvenement + '\'' +
+                ", date=" + dateInscription +
                 '}';
     }
 
-    // 6. Equals
+    // 6. Equals & HashCode
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Participation that = (Participation) o;
         return id == that.id &&
-                idEvenement == that.idEvenement &&
-                idCitoyen == that.idCitoyen &&
-                Objects.equals(dateInscription, that.dateInscription);
+                Objects.equals(nomCitoyen, that.nomCitoyen) &&
+                Objects.equals(email, that.email) && // 👈
+                Objects.equals(nomEvenement, that.nomEvenement);
     }
 
-    // 7. HashCode
     @Override
     public int hashCode() {
-        return Objects.hash(id, dateInscription, idEvenement, idCitoyen);
+        return Objects.hash(id, nomCitoyen, email, nomEvenement);
     }
 }

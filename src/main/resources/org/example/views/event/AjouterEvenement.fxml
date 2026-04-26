@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox spacing="20" style="-fx-padding: 30; -fx-background-color: white;"
+      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.example.controllers.gestionevent.AjouterEvenementController">
+
+    <children>
+        <Label fx:id="labelTitrePage" text="Ajouter un nouvel Événement"
+               style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2d5a27;" />
+
+        <GridPane hgap="15" vgap="15">
+            <columnConstraints>
+                <ColumnConstraints minWidth="120" prefWidth="120" />
+                <ColumnConstraints hgrow="ALWAYS" />
+            </columnConstraints>
+
+            <children>
+                <Label text="Titre :" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                <TextField fx:id="txtTitre" promptText="Ex: Nettoyage de plage"
+                           GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                <Label text="Description :" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                <TextArea fx:id="txtDescription" promptText="Détails de l'événement..."
+                          prefHeight="100" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                <Label text="Date :" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                <DatePicker fx:id="datePicker" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                <Label text="Organisateur :" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                <TextField fx:id="txtNomOrg" promptText="Nom de la personné ou association"
+                           GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            </children>
+        </GridPane>
+
+        <HBox spacing="15" alignment="CENTER_RIGHT">
+            <children>
+                <Button text="Annuler" onAction="#handleCancel"
+                        style="-fx-background-color: #ccc; -fx-cursor: hand; -fx-padding: 10 20;" />
+
+                <Button fx:id="btnValider" text="Valider" onAction="#handleSave"
+                        style="-fx-background-color: #97D73F; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 10 20;" />
+            </children>
+        </HBox>
+    </children>
+</VBox>

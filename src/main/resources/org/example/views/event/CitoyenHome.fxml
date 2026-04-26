@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane prefHeight="700.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.controllers.gestionevent.CitoyenHomeController">
+    <left>
+        <VBox prefWidth="200.0" spacing="15.0" style="-fx-background-color: #ffffff; -fx-border-color: #E0E0E0; -fx-border-width: 0 1 0 0;">
+            <children>
+                <Label text="WasteWise Front" style="-fx-font-weight: bold; -fx-text-fill: #27ae60; -fx-font-size: 18px;">
+                    <VBox.margin><Insets bottom="30.0" left="20.0" top="20.0" /></VBox.margin>
+                </Label>
+                <Button onAction="#showEvents" maxWidth="Infinity" styleClass="nav-btn" text="🌍 Événements" />
+                <Button onAction="#showMyParticipations" maxWidth="Infinity" styleClass="nav-btn" text="📝 Mes Participations" />
+                <Button onAction="#showBadges" maxWidth="Infinity" styleClass="nav-btn" text="🏅 Mes Badges" />
+            </children>
+        </VBox>
+    </left>
+    <center>
+        <AnchorPane fx:id="contentArea" style="-fx-background-color: #F8F9FA;" />
+    </center>
+</BorderPane>

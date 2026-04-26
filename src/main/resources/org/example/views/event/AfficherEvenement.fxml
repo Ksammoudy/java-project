@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="10" prefHeight="500.0" prefWidth="800.0" style="-fx-padding: 20; -fx-background-color: white;"
+      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.example.controllers.gestionevent.AfficherEvenementsController" stylesheets="@/org/example/styles/styleevnt.css">
+
+    <children>
+        <Label text="Liste des Événements" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2d5a27;"/>
+
+        <TableView fx:id="eventTable" prefHeight="400.0" VBox.vgrow="ALWAYS">
+            <columns>
+                <TableColumn fx:id="colTitre" text="Titre" prefWidth="150"/>
+                <TableColumn fx:id="colDescription" text="Description" prefWidth="200"/>
+                <TableColumn fx:id="colDate" text="Date &amp; Heure" prefWidth="150"/>
+                <TableColumn fx:id="colOrganisateur" text="Organisateur" prefWidth="150"/>
+                <TableColumn fx:id="colActions" text="Actions" prefWidth="120"/>
+            </columns>
+        </TableView>
+
+        <HBox alignment="CENTER_RIGHT">
+            <children>
+                <Button text="+ Créer un événement" onAction="#handleAjouter"
+                        style="-fx-background-color: #97D73F; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20;"/>
+            </children>
+        </HBox>
+    </children>
+</VBox>
+

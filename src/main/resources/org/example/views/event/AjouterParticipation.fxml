@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox spacing="20" styleClass="main-content" stylesheets="@../../styles/styleevnt.css"
+      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.example.controllers.gestionevent.AjouterParticipationController">
+
+    <VBox styleClass="header-banner" style="-fx-background-color: linear-gradient(to right, #2D5A27, #97D73F); -fx-padding: 20;">
+        <Label text="Inscrire un Citoyen" style="-fx-font-size: 24; -fx-text-fill: white; -fx-font-weight: bold;" />
+        <Label text="Ajouter une nouvelle participation à un événement." style="-fx-text-fill: white;" />
+    </VBox>
+
+    <VBox spacing="15" style="-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 30; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);">
+        <children>
+            <Label text="Événement" style="-fx-font-weight: bold;" />
+            <ComboBox fx:id="comboEvenement" prefWidth="400.0" promptText="Choisir l'événement..." />
+
+            <Label text="Nom du Citoyen" style="-fx-font-weight: bold;" />
+            <ComboBox fx:id="comboCitoyen" prefWidth="400.0" promptText="Choisir le citoyen..." />
+
+            <Label text="Date d'Inscription" style="-fx-font-weight: bold;" />
+            <DatePicker fx:id="datePicker" prefWidth="400.0" />
+
+            <HBox spacing="15" alignment="CENTER_LEFT" style="-fx-padding: 20 0 0 0;">
+                <Button onAction="#handleSave" prefHeight="40.0" prefWidth="120.0"
+                        style="-fx-background-color: #2D5A27; -fx-text-fill: white; -fx-background-radius: 8;" text="Enregistrer" />
+                <Button onAction="#handleCancel" prefHeight="40.0" prefWidth="120.0"
+                        style="-fx-background-color: #f44336; -fx-text-fill: white; -fx-background-radius: 8;" text="Annuler" />
+            </HBox>
+        </children>
+    </VBox>
+</VBox>
