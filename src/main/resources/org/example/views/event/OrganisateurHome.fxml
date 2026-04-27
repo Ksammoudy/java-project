@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import java.net.URL?>
+
+<BorderPane prefHeight="700.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.controllers.gestionevent.OrganisateurHomeController">
+
+    <stylesheets>
+        <URL value="@/org/example/styles/styleevnt.css" />
+    </stylesheets>
+
+    <left>
+        <VBox prefWidth="250.0" spacing="10.0" styleClass="sidebar">
+            <children>
+                <Label text="WasteWise Pro" styleClass="logo-text">
+                    <VBox.margin><Insets bottom="30.0" left="20.0" top="20.0" /></VBox.margin>
+                </Label>
+
+                <Button onAction="#showMyEvents" maxWidth="Infinity" prefHeight="45.0" styleClass="nav-button" text="📑 Mes Événements">
+                    <VBox.margin><Insets left="10.0" right="10.0" /></VBox.margin>
+                </Button>
+
+                <Button onAction="#showAjouter" maxWidth="Infinity" prefHeight="45.0" styleClass="nav-button" text="➕ Créer Événement">
+                    <VBox.margin><Insets left="10.0" right="10.0" /></VBox.margin>
+                </Button>
+
+                <Region VBox.vgrow="ALWAYS" />
+
+                <Button onAction="#handleLogout" maxWidth="Infinity" prefHeight="45.0" styleClass="nav-button" text="🚪 Déconnexion">
+                    <VBox.margin><Insets bottom="20.0" left="10.0" right="10.0" /></VBox.margin>
+                </Button>
+            </children>
+        </VBox>
+    </left>
+
+    <center>
+        <StackPane fx:id="contentArea" styleClass="main-content" />
+    </center>
+</BorderPane>

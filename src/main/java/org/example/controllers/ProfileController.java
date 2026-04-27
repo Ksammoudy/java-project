@@ -9,7 +9,7 @@ import org.example.Main;
 import org.example.models.User;
 import org.example.services.SessionManager;
 import org.example.services.UserService;
-import org.example.utils.PasswordUtil;
+import org.example.utils.user.PasswordUtil;
 
 public class ProfileController {
 

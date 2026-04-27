@@ -3,6 +3,7 @@ package org.example.services.gestionevent;
 import org.example.models.gestionevent.Participation;
 import org.example.utils.DBConnection;
 import org.example.services.CRUD;
+import org.example.utils.EmailService; // 👈 1. Zid el Import mta3 el Service mta3 el mail
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ public class ParticipationServices implements CRUD<Participation> {
 
     @Override
     public void create(Participation p) throws SQLException {
-        // 🛠️ Thabbet dhibet fil asémi mta3 el colonnes fil Base (pidev_db)
+        // 🛠️ Isked dhibet fil asémi mta3 el colonnes fil Base
         String req = "INSERT INTO participation (dateInscription, evenement_id, idCitoyen, nomCitoyen, nomEvenement, email) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement ps = connection.prepareStatement(req)) {
             ps.setDate(1, p.getDateInscription());
@@ -27,15 +28,25 @@ public class ParticipationServices implements CRUD<Participation> {
             ps.setString(4, p.getNomCitoyen());
             ps.setString(5, p.getNomEvenement());
             ps.setString(6, p.getEmail());
+
             ps.executeUpdate();
             System.out.println("✅ Participation ajoutée fil Base !");
+
+            // 🚀 2. Envoi du mail via Mailtrap
+            try {
+                // Nadou lel méthode static mta3 el service elli sna3neh
+                EmailService.sendNotification(p.getEmail(), p.getNomCitoyen(), p.getNomEvenement());
+                System.out.println("📧 Mail de confirmation envoyé via Mailtrap.");
+            } catch (Exception e) {
+                // Ken el mail ma mchech (moshkla internet wala credentials), l'ajout fil base yo9od s7i7
+                System.err.println("⚠️ Erreur lors de l'envoi du mail: " + e.getMessage());
+            }
         }
     }
 
     @Override
     public List<Participation> read() throws SQLException {
         List<Participation> list = new ArrayList<>();
-        // 🛠️ SELECT l-kol bech ma wellich famma column ne9sa
         String req = "SELECT * FROM participation";
 
         try (Statement st = connection.createStatement();
@@ -48,7 +59,6 @@ public class ParticipationServices implements CRUD<Participation> {
                 p.setEmail(rs.getString("email"));
                 p.setNomEvenement(rs.getString("nomEvenement"));
                 p.setDateInscription(rs.getDate("dateInscription"));
-                // Zid hedhom bech el ID mta3 l-evenement yo9od mrigel
                 p.setIdEvenement(rs.getInt("evenement_id"));
 
                 list.add(p);

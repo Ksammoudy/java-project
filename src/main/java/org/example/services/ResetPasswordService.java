@@ -2,7 +2,7 @@ package org.example.services;
 
 import org.example.models.ResetPasswordToken;
 import org.example.models.User;
-import org.example.utils.MailUtil;
+import org.example.utils.user.MailUtil;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;

@@ -2,21 +2,43 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="700.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.controllers.gestionevent.CitoyenHomeController">
+<BorderPane prefHeight="700.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.controllers.gestionevent.CitoyenHomeController" stylesheets="@/org/example/styles/styleevnt.css">
     <left>
-        <VBox prefWidth="200.0" spacing="15.0" style="-fx-background-color: #ffffff; -fx-border-color: #E0E0E0; -fx-border-width: 0 1 0 0;">
+        <VBox prefWidth="220.0" spacing="10.0" style="-fx-background-color: #ffffff; -fx-border-color: #E0E0E0; -fx-border-width: 0 1 0 0;">
             <children>
-                <Label text="WasteWise Front" style="-fx-font-weight: bold; -fx-text-fill: #27ae60; -fx-font-size: 18px;">
+                <Label text="WasteWise Front" style="-fx-font-weight: bold; -fx-text-fill: #2e7d32; -fx-font-size: 20px;">
                     <VBox.margin><Insets bottom="30.0" left="20.0" top="20.0" /></VBox.margin>
                 </Label>
-                <Button onAction="#showEvents" maxWidth="Infinity" styleClass="nav-btn" text="🌍 Événements" />
-                <Button onAction="#showMyParticipations" maxWidth="Infinity" styleClass="nav-btn" text="📝 Mes Participations" />
-                <Button onAction="#showBadges" maxWidth="Infinity" styleClass="nav-btn" text="🏅 Mes Badges" />
+
+                <Button onAction="#showEvents" maxWidth="Infinity" prefHeight="45.0" style="-fx-background-color: transparent; -fx-text-fill: #333; -fx-alignment: CENTER_LEFT; -fx-padding: 0 0 0 20; -fx-cursor: hand;" text="🌍 Événements">
+                    <VBox.margin><Insets left="10.0" right="10.0" /></VBox.margin>
+                </Button>
+
+                <Button onAction="#showMyParticipations" maxWidth="Infinity" prefHeight="45.0" style="-fx-background-color: transparent; -fx-text-fill: #333; -fx-alignment: CENTER_LEFT; -fx-padding: 0 0 0 20; -fx-cursor: hand;" text="📝 Mes Participations">
+                    <VBox.margin><Insets left="10.0" right="10.0" /></VBox.margin>
+                </Button>
+
+                <Button onAction="#showBadges" maxWidth="Infinity" prefHeight="45.0" style="-fx-background-color: transparent; -fx-text-fill: #333; -fx-alignment: CENTER_LEFT; -fx-padding: 0 0 0 20; -fx-cursor: hand;" text="🏅 Mes Badges">
+                    <VBox.margin><Insets left="10.0" right="10.0" /></VBox.margin>
+                </Button>
+
+                <Button onAction="#showNotifications" maxWidth="Infinity" prefHeight="45.0" style="-fx-background-color: transparent; -fx-text-fill: #333; -fx-alignment: CENTER_LEFT; -fx-padding: 0 0 0 20; -fx-cursor: hand;" text="🔔 Mes Notifications">
+                    <VBox.margin><Insets left="10.0" right="10.0" /></VBox.margin>
+                </Button>
             </children>
         </VBox>
     </left>
     <center>
-        <AnchorPane fx:id="contentArea" style="-fx-background-color: #F8F9FA;" />
+        <StackPane fx:id="contentArea" style="-fx-background-color: #F8F9FA;">
+            <children>
+                <Label text="Bienvenue sur votre Espace Citoyen" textFill="#999">
+                    <font>
+                        <Font name="System Italic" size="18.0" />
+                    </font>
+                </Label>
+            </children>
+        </StackPane>
     </center>
 </BorderPane>

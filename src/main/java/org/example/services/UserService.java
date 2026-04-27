@@ -2,7 +2,7 @@ package org.example.services;
 
 import org.example.models.User;
 import org.example.utils.DBConnection;
-import org.example.utils.PasswordUtil;
+import org.example.utils.user.PasswordUtil;
 
 import java.sql.*;
 import java.time.LocalDateTime;
