@@ -20,4 +20,9 @@ public class DashboardController {
     private void onOpenReponseOffre(ActionEvent event) {
         ViewNavigator.navigate(event, "/fxml/reponseoffre/ReponseOffreCreate.fxml", "WasteWise - Creer une reponse d'offre");
     }
+
+    @FXML
+    private void onOpenBackOffice(ActionEvent event) {
+        ViewNavigator.navigate(event, "/fxml/admin/AdminDashboard.fxml", "WasteWise - Back Office");
+    }
 }

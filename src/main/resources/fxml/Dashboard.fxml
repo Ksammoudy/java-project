@@ -55,6 +55,7 @@
                         text="Reponses"
                         style="-fx-background-color: transparent; -fx-text-fill: #FFFFFF; -fx-font-size: 14px;"/>
                 <Button mnemonicParsing="false"
+                        onAction="#onOpenBackOffice"
                         text="Back Office"
                         style="-fx-background-color: transparent; -fx-text-fill: #FFFFFF; -fx-font-size: 14px;"/>
                 <Button mnemonicParsing="false"
