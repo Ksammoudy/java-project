@@ -17,6 +17,7 @@ import java.net.URL;
 public final class ViewNavigator {
 
     private static final Duration TRANSITION_DURATION = Duration.millis(220);
+    private static final String CURRENT_VIEW_PATH = "wastewise.currentViewPath";
 
     private ViewNavigator() {
     }
@@ -31,7 +32,8 @@ public final class ViewNavigator {
                 throw new IllegalArgumentException("Chemin FXML invalide.");
             }
 
-            URL url = ViewNavigator.class.getResource(normalizePath(fxmlPath));
+            String normalizedPath = normalizePath(fxmlPath);
+            URL url = ViewNavigator.class.getResource(normalizedPath);
             if (url == null) {
                 throw new IllegalStateException("FXML introuvable: " + fxmlPath);
             }
@@ -47,6 +49,7 @@ public final class ViewNavigator {
             FXMLLoader loader = new FXMLLoader(url);
             Parent root = loader.load();
             Scene scene = (width > 0 && height > 0) ? new Scene(root, width, height) : new Scene(root);
+            scene.getProperties().put(CURRENT_VIEW_PATH, normalizedPath);
             stage.setScene(scene);
             stage.setTitle(title);
             if (!stage.isMaximized()) {

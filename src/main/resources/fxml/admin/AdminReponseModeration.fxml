@@ -30,10 +30,15 @@
             <Label text="WasteWise" style="-fx-text-fill: #007A47; -fx-font-size: 16px; -fx-font-weight: bold;"/>
             <Label text="BACK OFFICE" style="-fx-text-fill: #0B5740; -fx-font-size: 12px; -fx-font-weight: bold;"/>
             <Region HBox.hgrow="ALWAYS"/>
-            <Button mnemonicParsing="false" onAction="#onOpenHome" text="Home"
-                    style="-fx-background-color: #F8FFFB; -fx-text-fill: #007A47; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 9 13 9 13; -fx-border-color: #C8E8D6; -fx-border-radius: 10;"/>
+            <Button mnemonicParsing="false" onAction="#onOpenHome" text="🏠"
+                    prefWidth="44.0"
+                    style="-fx-background-color: #F8FFFB; -fx-text-fill: #007A47; -fx-font-size: 15px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 9 12 9 12; -fx-border-color: #C8E8D6; -fx-border-radius: 10;"/>
             <Button mnemonicParsing="false" onAction="#onOpenAdminDashboard" text="Dashboard admin"
                     style="-fx-background-color: #F8FFFB; -fx-text-fill: #007A47; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 9 16 9 16; -fx-border-color: #C8E8D6; -fx-border-radius: 10;"/>
+            <Button mnemonicParsing="false" onAction="#onOpenAppels" text="Appels d'offre"
+                    style="-fx-background-color: #F8FFFB; -fx-text-fill: #007A47; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 9 16 9 16; -fx-border-color: #C8E8D6; -fx-border-radius: 10;"/>
+            <Button mnemonicParsing="false" onAction="#onOpenReponses" text="Reponses"
+                    style="-fx-background-color: #128B57; -fx-text-fill: #FFFFFF; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 9 16 9 16;"/>
             <Button mnemonicParsing="false" onAction="#onOpenStats" text="Statistiques"
                     style="-fx-background-color: #F8FFFB; -fx-text-fill: #007A47; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 9 16 9 16; -fx-border-color: #C8E8D6; -fx-border-radius: 10;"/>
         </HBox>

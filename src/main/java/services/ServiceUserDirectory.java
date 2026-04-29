@@ -1,6 +1,7 @@
 package services;
 
 import entities.UserOption;
+import entities.UserContact;
 import utils.MyConnection;
 import utils.SchemaManager;
 
@@ -61,6 +62,24 @@ public class ServiceUserDirectory {
             return list;
         }
         return recupererDistinctIdsDepuis("reponse_offre", "citoyen_id", "Citoyen");
+    }
+
+    public UserContact recupererContactCitoyen(int citoyenId) throws SQLException {
+        if (citoyenId <= 0) {
+            throw new IllegalArgumentException("citoyenId invalide.");
+        }
+
+        UserContact dedicated = recupererContactDepuisTableCitoyen(citoyenId);
+        if (dedicated != null) {
+            return dedicated;
+        }
+
+        UserContact fromUserTable = recupererContactDepuisTableUtilisateur(citoyenId);
+        if (fromUserTable != null) {
+            return fromUserTable;
+        }
+
+        return new UserContact(citoyenId, "Citoyen #" + citoyenId, null);
     }
 
     private List<UserOption> recupererDepuisTableValorisateur() throws SQLException {
@@ -134,6 +153,77 @@ public class ServiceUserDirectory {
             }
         }
         return list;
+    }
+
+    private UserContact recupererContactDepuisTableCitoyen(int citoyenId) throws SQLException {
+        if (!tableExists("citoyen") || !columnExists("citoyen", "id")) {
+            return null;
+        }
+
+        List<String> columns = getColumns("citoyen");
+        String nomColumn = firstExisting(columns, "nom", "name");
+        String prenomColumn = firstExisting(columns, "prenom", "first_name", "firstname");
+        String emailColumn = firstExisting(columns, "email", "mail");
+
+        String sql = "SELECT "
+                + q("id") + " AS id_value, "
+                + exprOrNull(nomColumn) + " AS nom_value, "
+                + exprOrNull(prenomColumn) + " AS prenom_value, "
+                + exprOrNull(emailColumn) + " AS email_value "
+                + "FROM " + q("citoyen") + " WHERE " + q("id") + "=?";
+
+        try (PreparedStatement pst = getConnection().prepareStatement(sql)) {
+            pst.setInt(1, citoyenId);
+            try (ResultSet rs = pst.executeQuery()) {
+                if (rs.next()) {
+                    String fullName = buildFullName(
+                            trimToNull(rs.getString("nom_value")),
+                            trimToNull(rs.getString("prenom_value")),
+                            "Citoyen #" + citoyenId
+                    );
+                    return new UserContact(citoyenId, fullName, trimToNull(rs.getString("email_value")));
+                }
+            }
+        }
+        return null;
+    }
+
+    private UserContact recupererContactDepuisTableUtilisateur(int userId) throws SQLException {
+        String userTable = detectUserTable();
+        if (userTable == null) {
+            return null;
+        }
+
+        List<String> columns = getColumns(userTable);
+        String idColumn = firstExisting(columns, "id");
+        if (idColumn == null) {
+            return null;
+        }
+        String nomColumn = firstExisting(columns, "nom", "username", "full_name", "name");
+        String prenomColumn = firstExisting(columns, "prenom", "first_name", "firstname");
+        String emailColumn = firstExisting(columns, "email", "mail");
+
+        String sql = "SELECT "
+                + q(idColumn) + " AS id_value, "
+                + exprOrNull(nomColumn) + " AS nom_value, "
+                + exprOrNull(prenomColumn) + " AS prenom_value, "
+                + exprOrNull(emailColumn) + " AS email_value "
+                + "FROM " + q(userTable) + " WHERE " + q(idColumn) + "=?";
+
+        try (PreparedStatement pst = getConnection().prepareStatement(sql)) {
+            pst.setInt(1, userId);
+            try (ResultSet rs = pst.executeQuery()) {
+                if (rs.next()) {
+                    String fullName = buildFullName(
+                            trimToNull(rs.getString("nom_value")),
+                            trimToNull(rs.getString("prenom_value")),
+                            "Citoyen #" + userId
+                    );
+                    return new UserContact(userId, fullName, trimToNull(rs.getString("email_value")));
+                }
+            }
+        }
+        return null;
     }
 
     private List<UserOption> recupererParRole(String roleKeyword) throws SQLException {
@@ -292,6 +382,19 @@ public class ServiceUserDirectory {
             return withId + " - " + email;
         }
         return withId;
+    }
+
+    private String buildFullName(String nom, String prenom, String fallback) {
+        if (nom == null && prenom == null) {
+            return fallback;
+        }
+        if (nom == null) {
+            return prenom;
+        }
+        if (prenom == null) {
+            return nom;
+        }
+        return nom + " " + prenom;
     }
 
     private String trimToNull(String value) {

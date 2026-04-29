@@ -1,7 +1,9 @@
 package controllers.admin;
 
 import controllers.reponseoffre.ReponseOffreFlowState;
+import entities.AppelOffre;
 import entities.ReponseOffre;
+import entities.UserContact;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -17,9 +19,17 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
+import javafx.stage.FileChooser;
+import main.navigation.AppRoutes;
 import main.navigation.ViewNavigator;
+import services.EmailNotificationService;
+import services.ServiceAppelOffre;
 import services.ServiceReponseOffre;
+import services.ServiceUserDirectory;
+import utils.ExportDocumentService;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -78,6 +88,9 @@ public class AdminReponseModerationController {
     private TableColumn<ReponseOffre, Void> colActions;
 
     private final ServiceReponseOffre serviceReponseOffre = new ServiceReponseOffre();
+    private final ServiceAppelOffre serviceAppelOffre = new ServiceAppelOffre();
+    private final ServiceUserDirectory serviceUserDirectory = new ServiceUserDirectory();
+    private final EmailNotificationService emailNotificationService = new EmailNotificationService();
     private final ObservableList<ReponseOffre> pageData = FXCollections.observableArrayList();
     private final List<ReponseOffre> allData = new ArrayList<>();
     private final List<ReponseOffre> filteredData = new ArrayList<>();
@@ -281,32 +294,43 @@ public class AdminReponseModerationController {
 
     @FXML
     private void onExporterPdf() {
-        lblInfo.setText("Export PDF prevu dans la prochaine etape des fonctionnalites avancees.");
+        exporter("PDF", ".pdf", file -> ExportDocumentService.exportPdf(exportTitle(), exportHeaders(), exportRows(), file));
     }
 
     @FXML
     private void onExporterExcel() {
-        lblInfo.setText("Export Excel prevu dans la prochaine etape des fonctionnalites avancees.");
+        exporter("Excel", ".xlsx", file -> ExportDocumentService.exportXlsx(exportTitle(), exportHeaders(), exportRows(), file));
     }
 
     @FXML
     private void onExporterWord() {
-        lblInfo.setText("Export Word prevu dans la prochaine etape des fonctionnalites avancees.");
+        exporter("Word", ".docx", file -> ExportDocumentService.exportDocx(exportTitle(), exportHeaders(), exportRows(), file));
     }
 
     @FXML
     private void onOpenAdminDashboard(ActionEvent event) {
-        ViewNavigator.navigate(event, "/fxml/admin/AdminDashboard.fxml", "WasteWise - Back Office");
+        ViewNavigator.navigate(event, AppRoutes.ADMIN_DASHBOARD, AppRoutes.TITLE_ADMIN_DASHBOARD);
     }
 
     @FXML
     private void onOpenStats(ActionEvent event) {
-        ViewNavigator.navigate(event, "/fxml/admin/AdminDashboard.fxml", "WasteWise - Statistiques admin");
+        ViewNavigator.navigate(event, AppRoutes.ADMIN_REPONSE_STATS, AppRoutes.TITLE_ADMIN_STATS);
     }
 
     @FXML
     private void onOpenHome(ActionEvent event) {
-        ViewNavigator.navigate(event, "/fxml/Dashboard.fxml", "WasteWise - Dashboard");
+        ViewNavigator.navigate(event, AppRoutes.DASHBOARD, AppRoutes.TITLE_DASHBOARD);
+    }
+
+    @FXML
+    private void onOpenAppels(ActionEvent event) {
+        ViewNavigator.navigate(event, AppRoutes.APPEL_OFFRE_LIST, AppRoutes.TITLE_APPELS);
+    }
+
+    @FXML
+    private void onOpenReponses() {
+        chargerDonnees();
+        lblInfo.setText("File de moderation rafraichie.");
     }
 
     private void afficherPage() {
@@ -358,7 +382,7 @@ public class AdminReponseModerationController {
             return;
         }
         ReponseOffreFlowState.setSelectedReponseId(r.getId());
-        ViewNavigator.navigate(tableReponses, "/fxml/reponseoffre/ReponseOffreEdit.fxml", "WasteWise - Modifier la reponse d'offre");
+        ViewNavigator.navigate(tableReponses, AppRoutes.REPONSE_OFFRE_EDIT, AppRoutes.TITLE_REPONSE_EDIT);
     }
 
     private void changerStatut(ReponseOffre r, boolean valider) {
@@ -366,17 +390,44 @@ public class AdminReponseModerationController {
             return;
         }
         try {
+            String resultMessage;
             if (valider) {
                 serviceReponseOffre.accepterReponse(r.getId());
-                lblInfo.setText("Reponse #" + r.getId() + " validee.");
+                resultMessage = envoyerMailValidation(r.getId());
             } else {
                 serviceReponseOffre.refuserReponse(r.getId());
-                lblInfo.setText("Reponse #" + r.getId() + " refusee.");
+                resultMessage = "Reponse #" + r.getId() + " refusee.";
             }
             chargerDonnees();
+            lblInfo.setText(resultMessage);
         } catch (Exception e) {
             lblInfo.setText("Erreur moderation: " + e.getMessage());
         }
+    }
+
+    private String envoyerMailValidation(int reponseId) {
+        try {
+            ReponseOffre reponse = serviceReponseOffre.recupererParId(reponseId);
+            if (reponse == null) {
+                return "Reponse validee, mail non envoye: reponse introuvable.";
+            }
+            AppelOffre appelOffre = serviceAppelOffre.recupererParId(reponse.getAppelOffreId());
+            UserContact citoyen = serviceUserDirectory.recupererContactCitoyen(reponse.getCitoyenId());
+            emailNotificationService.envoyerValidationReponse(citoyen, appelOffre, reponse);
+            return "Reponse #" + reponseId + " validee. Email envoye a " + citoyen.getEmail() + ".";
+        } catch (Exception e) {
+            String message = "Reponse #" + reponseId + " validee, mais email non envoye: " + e.getMessage();
+            showWarning("Email non envoye", message);
+            return message;
+        }
+    }
+
+    private void showWarning(String header, String message) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Notification email");
+        alert.setHeaderText(header);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
     private boolean filterStatut(ReponseOffre r, String statutFilter) {
@@ -461,6 +512,68 @@ public class AdminReponseModerationController {
 
     private String formatDate(Timestamp ts) {
         return ts == null ? "" : formatter.format(ts.toLocalDateTime());
+    }
+
+    private void exporter(String type, String extension, ExportAction action) {
+        if (filteredData.isEmpty()) {
+            lblInfo.setText("Aucune reponse a exporter avec les filtres actuels.");
+            return;
+        }
+
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Exporter les reponses - " + type);
+        chooser.setInitialFileName("moderation_reponses_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmm")) + extension);
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(type + " (*" + extension + ")", "*" + extension));
+
+        File selected = chooser.showSaveDialog(tableReponses.getScene() == null ? null : tableReponses.getScene().getWindow());
+        if (selected == null) {
+            lblInfo.setText("Export " + type + " annule.");
+            return;
+        }
+
+        File target = ensureExtension(selected, extension);
+        try {
+            action.export(target);
+            lblInfo.setText("Export " + type + " genere: " + target.getAbsolutePath());
+        } catch (Exception e) {
+            lblInfo.setText("Erreur export " + type + ": " + e.getMessage());
+        }
+    }
+
+    private String exportTitle() {
+        return "Moderation des reponses d'offre";
+    }
+
+    private List<String> exportHeaders() {
+        return List.of("Id", "Quantite", "Date soumis", "Statut", "Message", "Score", "Appel", "Citoyen");
+    }
+
+    private List<List<String>> exportRows() {
+        return filteredData.stream()
+                .map(r -> List.of(
+                        String.valueOf(r.getId()),
+                        String.format(Locale.ROOT, "%.2f kg", r.getQuantiteProposee()),
+                        formatDate(r.getDateSoumis()),
+                        toDisplayStatut(normaliserStatut(r.getStatut())),
+                        blankToEmpty(r.getMessage()),
+                        scoreModeration(r) + "/100",
+                        "#" + r.getAppelOffreId(),
+                        "#" + r.getCitoyenId()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    private File ensureExtension(File file, String extension) {
+        String path = file.getAbsolutePath();
+        if (path.toLowerCase(Locale.ROOT).endsWith(extension.toLowerCase(Locale.ROOT))) {
+            return file;
+        }
+        return new File(path + extension);
+    }
+
+    @FunctionalInterface
+    private interface ExportAction {
+        void export(File file) throws IOException;
     }
 
     private String safeLower(String value) {

@@ -17,6 +17,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Duration;
+import main.navigation.AppRoutes;
 import main.navigation.ViewNavigator;
 import services.ServiceAppelOffre;
 import services.ServiceReponseOffre;
@@ -233,7 +234,7 @@ public class AdminDashboardController {
     @FXML
     private void onOpenHome(ActionEvent event) {
         stopAutoRefresh();
-        ViewNavigator.navigate(event, "/fxml/Dashboard.fxml", "WasteWise - Dashboard");
+        ViewNavigator.navigate(event, AppRoutes.DASHBOARD, AppRoutes.TITLE_DASHBOARD);
     }
 
     @FXML
@@ -243,19 +244,20 @@ public class AdminDashboardController {
 
     @FXML
     private void onOpenStats(ActionEvent event) {
-        chargerDashboard(true);
+        stopAutoRefresh();
+        ViewNavigator.navigate(event, AppRoutes.ADMIN_REPONSE_STATS, AppRoutes.TITLE_ADMIN_STATS);
     }
 
     @FXML
     private void onOpenAppels(ActionEvent event) {
         stopAutoRefresh();
-        ViewNavigator.navigate(event, "/fxml/appeloffre/AppelOffreList.fxml", "WasteWise - Gestion des appels d'offre");
+        ViewNavigator.navigate(event, AppRoutes.APPEL_OFFRE_LIST, AppRoutes.TITLE_APPELS);
     }
 
     @FXML
     private void onOpenReponses(ActionEvent event) {
         stopAutoRefresh();
-        ViewNavigator.navigate(event, "/fxml/admin/AdminReponseModeration.fxml", "WasteWise - Moderation des reponses");
+        ViewNavigator.navigate(event, AppRoutes.ADMIN_REPONSE_MODERATION, AppRoutes.TITLE_ADMIN_REPONSES);
     }
 
     @FXML

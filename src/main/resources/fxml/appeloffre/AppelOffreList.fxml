@@ -155,6 +155,16 @@
                     </HBox>
                 </VBox>
 
+                <HBox alignment="CENTER_LEFT" spacing="8.0">
+                    <Button mnemonicParsing="false" onAction="#onExporterPdf" text="Exporter PDF"
+                            style="-fx-background-color: #E9F7EF; -fx-text-fill: #007A47; -fx-font-weight: bold; -fx-background-radius: 9; -fx-padding: 8 12 8 12; -fx-border-color: #BFE3CF; -fx-border-radius: 9;"/>
+                    <Button mnemonicParsing="false" onAction="#onExporterExcel" text="Exporter Excel"
+                            style="-fx-background-color: #E9F7EF; -fx-text-fill: #007A47; -fx-font-weight: bold; -fx-background-radius: 9; -fx-padding: 8 12 8 12; -fx-border-color: #BFE3CF; -fx-border-radius: 9;"/>
+                    <Button mnemonicParsing="false" onAction="#onExporterWord" text="Exporter Word"
+                            style="-fx-background-color: #E9F7EF; -fx-text-fill: #007A47; -fx-font-weight: bold; -fx-background-radius: 9; -fx-padding: 8 12 8 12; -fx-border-color: #BFE3CF; -fx-border-radius: 9;"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                </HBox>
+
                 <VBox spacing="8.0"
                       style="-fx-background-color: #FFFFFF; -fx-border-color: #D3E1DA; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 10 10 10 10; -fx-effect: dropshadow(gaussian, rgba(13,43,64,0.07), 7, 0, 0, 2);">
                     <TableView fx:id="tableAppelOffres"

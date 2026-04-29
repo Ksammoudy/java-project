@@ -16,10 +16,15 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
+import javafx.stage.FileChooser;
 import main.navigation.ViewNavigator;
 import services.ServiceAppelOffre;
+import utils.ExportDocumentService;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -78,6 +83,7 @@ public class AppelOffreListController {
 
     private final ServiceAppelOffre serviceAppelOffre = new ServiceAppelOffre();
     private final ObservableList<AppelOffre> data = FXCollections.observableArrayList();
+    private final List<AppelOffre> filteredData = new ArrayList<>();
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @FXML
@@ -191,7 +197,9 @@ public class AppelOffreListController {
     private void chargerDonnees() {
         try {
             List<AppelOffre> list = serviceAppelOffre.recupererTout();
-            data.setAll(list);
+            filteredData.clear();
+            filteredData.addAll(list);
+            data.setAll(filteredData);
             updateCount();
         } catch (Exception e) {
             lblInfo.setText("Erreur chargement: " + e.getMessage());
@@ -221,7 +229,9 @@ public class AppelOffreListController {
                     .collect(Collectors.toList());
 
             sort(filtered, cbTri.getValue(), cbOrdre.getValue());
-            data.setAll(filtered);
+            filteredData.clear();
+            filteredData.addAll(filtered);
+            data.setAll(filteredData);
             updateCount();
             lblInfo.setText("Filtres appliques.");
         } catch (Exception e) {
@@ -256,6 +266,21 @@ public class AppelOffreListController {
 
         AppelOffreFlowState.setSelectedAppelId(selected.getId());
         ViewNavigator.navigate(event, "/fxml/appeloffre/AppelOffreEdit.fxml", "WasteWise - Modifier l'appel d'offre");
+    }
+
+    @FXML
+    private void onExporterPdf() {
+        exporter("PDF", ".pdf", file -> ExportDocumentService.exportPdf(exportTitle(), exportHeaders(), exportRows(), file));
+    }
+
+    @FXML
+    private void onExporterExcel() {
+        exporter("Excel", ".xlsx", file -> ExportDocumentService.exportXlsx(exportTitle(), exportHeaders(), exportRows(), file));
+    }
+
+    @FXML
+    private void onExporterWord() {
+        exporter("Word", ".docx", file -> ExportDocumentService.exportDocx(exportTitle(), exportHeaders(), exportRows(), file));
     }
 
     @FXML
@@ -338,6 +363,84 @@ public class AppelOffreListController {
         if (lblQuantiteTotale != null) {
             lblQuantiteTotale.setText(String.format(Locale.ROOT, "%.1f kg", quantiteTotale));
         }
+    }
+
+    private void exporter(String type, String extension, ExportAction action) {
+        if (filteredData.isEmpty()) {
+            lblInfo.setText("Aucun appel a exporter avec les filtres actuels.");
+            return;
+        }
+
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Exporter les appels - " + type);
+        chooser.setInitialFileName("appels_offre_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmm")) + extension);
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(type + " (*" + extension + ")", "*" + extension));
+
+        File selected = chooser.showSaveDialog(tableAppelOffres.getScene() == null ? null : tableAppelOffres.getScene().getWindow());
+        if (selected == null) {
+            lblInfo.setText("Export " + type + " annule.");
+            return;
+        }
+
+        File target = ensureExtension(selected, extension);
+        try {
+            action.export(target);
+            lblInfo.setText("Export " + type + " genere: " + target.getAbsolutePath());
+        } catch (Exception e) {
+            lblInfo.setText("Erreur export " + type + ": " + e.getMessage());
+        }
+    }
+
+    private String exportTitle() {
+        return "Gestion des appels d'offre";
+    }
+
+    private List<String> exportHeaders() {
+        return List.of("Id", "Titre", "Description", "Quantite", "Date limite", "Etat", "Valorisateur", "Reponses");
+    }
+
+    private List<List<String>> exportRows() {
+        return filteredData.stream()
+                .map(a -> List.of(
+                        String.valueOf(a.getId()),
+                        safeExport(a.getTitre()),
+                        safeExport(a.getDescription()),
+                        String.format(Locale.ROOT, "%.2f kg", a.getQuantiteDemandee()),
+                        a.getDateLimite() == null ? "" : formatter.format(a.getDateLimite().toLocalDateTime()),
+                        isActive(a) ? "Actif" : "Expire",
+                        "#" + a.getValorisateurId(),
+                        compterReponsesSafely(a)
+                ))
+                .collect(Collectors.toList());
+    }
+
+    private String compterReponsesSafely(AppelOffre appelOffre) {
+        try {
+            return String.valueOf(serviceAppelOffre.compterReponsesLiees(appelOffre.getId()));
+        } catch (Exception e) {
+            return "-";
+        }
+    }
+
+    private boolean isActive(AppelOffre appelOffre) {
+        return appelOffre.getDateLimite() != null && appelOffre.getDateLimite().after(new Timestamp(System.currentTimeMillis()));
+    }
+
+    private File ensureExtension(File file, String extension) {
+        String path = file.getAbsolutePath();
+        if (path.toLowerCase(Locale.ROOT).endsWith(extension.toLowerCase(Locale.ROOT))) {
+            return file;
+        }
+        return new File(path + extension);
+    }
+
+    private String safeExport(String value) {
+        return value == null ? "" : value;
+    }
+
+    @FunctionalInterface
+    private interface ExportAction {
+        void export(File file) throws IOException;
     }
 
     private void initialiserSelectionInfo() {
