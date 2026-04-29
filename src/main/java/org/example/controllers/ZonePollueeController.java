@@ -13,8 +13,12 @@ import javafx.scene.text.Text;
 import org.example.Main;
 import org.example.models.ZonePolluee;
 import org.example.models.IndicateurImpact;
+import org.example.models.QRScan;
 import org.example.services.ZonePollueeDAO;
 import org.example.services.IndicateurImpactDAO;
+import org.example.services.QRScanDAO;
+import org.example.services.EmailService;
+import org.example.services.GeocodingService;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -52,8 +56,6 @@ public class ZonePollueeController {
         colGps.setCellValueFactory(new PropertyValueFactory<>("coordonneesGps"));
         colNiveau.setCellValueFactory(new PropertyValueFactory<>("niveauPollution"));
         colDate.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDateIdentification().format(dateFormatter)));
-
-        // Colonne Indicateur - Affichage "ID: X - XX kg"
         colIndicateur.setCellValueFactory(cellData -> {
             IndicateurImpact ind = cellData.getValue().getIndicateur();
             if (ind != null) {
@@ -66,19 +68,23 @@ public class ZonePollueeController {
             private final Button viewBtn = new Button("🔍");
             private final Button editBtn = new Button("✏️");
             private final Button deleteBtn = new Button("🗑️");
+            private final Button qrBtn = new Button("📱");
 
             {
                 viewBtn.setOnAction(e -> viewZone(getTableView().getItems().get(getIndex())));
                 editBtn.setOnAction(e -> editZone(getTableView().getItems().get(getIndex())));
                 deleteBtn.setOnAction(e -> deleteZone(getTableView().getItems().get(getIndex())));
+                qrBtn.setOnAction(e -> generateQR(getTableView().getItems().get(getIndex())));
 
                 viewBtn.setStyle("-fx-background-color: #17a2b8; -fx-text-fill: white; -fx-font-size: 12px; -fx-min-width: 30px; -fx-cursor: hand; -fx-background-radius: 5;");
                 editBtn.setStyle("-fx-background-color: #ffc107; -fx-text-fill: #212529; -fx-font-size: 12px; -fx-min-width: 30px; -fx-cursor: hand; -fx-background-radius: 5;");
                 deleteBtn.setStyle("-fx-background-color: #dc3545; -fx-text-fill: white; -fx-font-size: 12px; -fx-min-width: 30px; -fx-cursor: hand; -fx-background-radius: 5;");
+                qrBtn.setStyle("-fx-background-color: #198754; -fx-text-fill: white; -fx-font-size: 12px; -fx-min-width: 30px; -fx-cursor: hand; -fx-background-radius: 5;");
 
                 viewBtn.setTooltip(new Tooltip("Voir les détails"));
                 editBtn.setTooltip(new Tooltip("Modifier la zone"));
                 deleteBtn.setTooltip(new Tooltip("Supprimer la zone"));
+                qrBtn.setTooltip(new Tooltip("Générer QR code"));
             }
 
             @Override
@@ -87,7 +93,7 @@ public class ZonePollueeController {
                 if (empty) {
                     setGraphic(null);
                 } else {
-                    HBox buttons = new HBox(8, viewBtn, editBtn, deleteBtn);
+                    HBox buttons = new HBox(8, viewBtn, editBtn, deleteBtn, qrBtn);
                     buttons.setAlignment(javafx.geometry.Pos.CENTER);
                     setGraphic(buttons);
                 }
@@ -225,9 +231,63 @@ public class ZonePollueeController {
 
         Optional<ButtonType> result = confirm.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
+            EmailService.sendZoneDeletedNotification(zone.getNomZone(), zone.getNiveauPollution());
             dao.deleteZone(zone.getId());
             loadZones();
             showAlert("Succès", "Zone supprimée avec succès.", Alert.AlertType.INFORMATION);
+        }
+    }
+
+    private void generateQR(ZonePolluee zone) {
+        String[] coords = zone.getCoordonneesGps().split(",");
+        String mapsUrl;
+        if (coords.length == 2) {
+            try {
+                double lat = Double.parseDouble(coords[0].trim());
+                double lng = Double.parseDouble(coords[1].trim());
+                mapsUrl = "https://www.google.com/maps?q=" + lat + "," + lng;
+            } catch (NumberFormatException e) {
+                mapsUrl = "https://www.google.com/maps";
+            }
+        } else {
+            mapsUrl = "https://www.google.com/maps";
+        }
+
+        String qrApiUrl = "https://quickchart.io/qr?text=" + java.net.URLEncoder.encode(mapsUrl) + "&size=300";
+
+        String ipAddress = "127.0.0.1";
+        try {
+            java.net.InetAddress localHost = java.net.InetAddress.getLocalHost();
+            ipAddress = localHost.getHostAddress();
+        } catch (Exception e) {
+            ipAddress = "0.0.0.0";
+        }
+
+        QRScanDAO scanDAO = new QRScanDAO();
+        QRScan scan = new QRScan(zone.getId(), ipAddress, "Tunisia");
+        scanDAO.addScan(scan);
+        System.out.println("✅ Scan enregistré pour la zone " + zone.getId() + " depuis IP: " + ipAddress);
+
+        Dialog<Void> dialog = new Dialog<>();
+        dialog.setTitle("QR Code - " + zone.getNomZone());
+        dialog.setHeaderText("Scannez ce code pour voir la zone sur Google Maps");
+
+        try {
+            java.io.InputStream in = new java.net.URL(qrApiUrl).openStream();
+            javafx.scene.image.Image qrImage = new javafx.scene.image.Image(in);
+            javafx.scene.image.ImageView imageView = new javafx.scene.image.ImageView(qrImage);
+            imageView.setFitWidth(300);
+            imageView.setFitHeight(300);
+
+            dialog.getDialogPane().setContent(imageView);
+
+            ButtonType closeButton = new ButtonType("Fermer", ButtonBar.ButtonData.OK_DONE);
+            dialog.getDialogPane().getButtonTypes().add(closeButton);
+
+            dialog.showAndWait();
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Erreur", "Impossible de générer le QR code", Alert.AlertType.ERROR);
         }
     }
 
@@ -249,6 +309,7 @@ public class ZonePollueeController {
         GridPane.setColumnSpan(titleLabel, 2);
         grid.add(titleLabel, 0, 0);
 
+        // Champ Nom
         Label nomLabel = new Label("Nom de la zone");
         nomLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #333;");
         TextField nomField = new TextField();
@@ -263,6 +324,7 @@ public class ZonePollueeController {
         GridPane.setConstraints(errorNomLabel, 1, 2);
         grid.getChildren().addAll(nomLabel, nomField, errorNomLabel);
 
+        // Champ GPS + Bouton Reverse
         Label gpsLabel = new Label("Coordonnées GPS");
         gpsLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #333;");
         TextField gpsField = new TextField();
@@ -271,15 +333,20 @@ public class ZonePollueeController {
         Label gpsHint = new Label("Format: latitude, longitude");
         gpsHint.setStyle("-fx-text-fill: #6c757d; -fx-font-size: 11px;");
         Label errorGpsLabel = new Label();
-        errorGpsLabel.setStyle("-fx-text-fill: #dc3545; -fx-font-size: 11px;");
+        errorGpsLabel.setStyle("-fx-text-fill: #dc3545; -fx-font-size: 11px");
         errorGpsLabel.setVisible(false);
+
+        Button reverseButton = new Button("📍 Obtenir l'adresse");
+        reverseButton.setStyle("-fx-background-color: #17a2b8; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 15; -fx-background-radius: 8; -fx-cursor: hand;");
 
         GridPane.setConstraints(gpsLabel, 0, 3);
         GridPane.setConstraints(gpsField, 1, 3);
         GridPane.setConstraints(gpsHint, 1, 4);
         GridPane.setConstraints(errorGpsLabel, 1, 5);
-        grid.getChildren().addAll(gpsLabel, gpsField, gpsHint, errorGpsLabel);
+        GridPane.setConstraints(reverseButton, 2, 3);
+        grid.getChildren().addAll(gpsLabel, gpsField, gpsHint, errorGpsLabel, reverseButton);
 
+        // Champ Niveau
         Label niveauLabel = new Label("Niveau de pollution (1-10)");
         niveauLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #333;");
         TextField niveauField = new TextField();
@@ -294,6 +361,7 @@ public class ZonePollueeController {
         GridPane.setConstraints(errorNiveauLabel, 1, 7);
         grid.getChildren().addAll(niveauLabel, niveauField, errorNiveauLabel);
 
+        // Champ Indicateur
         Label indicateurLabel = new Label("Indicateur associé");
         indicateurLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #333;");
         ComboBox<IndicateurImpact> indicateurCombo = new ComboBox<>();
@@ -323,6 +391,92 @@ public class ZonePollueeController {
         GridPane.setConstraints(indicateurCombo, 1, 8);
         GridPane.setConstraints(errorIndicateurLabel, 1, 9);
         grid.getChildren().addAll(indicateurLabel, indicateurCombo, errorIndicateurLabel);
+
+        // Champ Adresse et Géocodage
+        Label adresseLabel = new Label("Adresse (optionnel)");
+        adresseLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #333;");
+        TextField adresseField = new TextField();
+        adresseField.setPromptText("Ex: Avenue Habib Bourguiba, Tunis");
+        adresseField.getStyleClass().add("form-field");
+
+        Button geocodeButton = new Button("📍 Trouver les coordonnées");
+        geocodeButton.setStyle("-fx-background-color: #8bd22f; -fx-text-fill: #1a3a2a; -fx-font-weight: bold; -fx-padding: 8 15; -fx-background-radius: 8; -fx-cursor: hand;");
+
+        Label geocodeStatus = new Label();
+        geocodeStatus.setStyle("-fx-text-fill: #6c757d; -fx-font-size: 11px;");
+
+        GridPane.setConstraints(adresseLabel, 0, 10);
+        GridPane.setConstraints(adresseField, 1, 10);
+        GridPane.setConstraints(geocodeButton, 1, 11);
+        GridPane.setConstraints(geocodeStatus, 1, 12);
+        grid.getChildren().addAll(adresseLabel, adresseField, geocodeButton, geocodeStatus);
+
+        // Reverse geocoding (GPS -> Adresse)
+        reverseButton.setOnAction(e -> {
+            String gpsText = gpsField.getText();
+            if (gpsText == null || gpsText.trim().isEmpty()) {
+                showAlert("Info", "Veuillez d'abord saisir des coordonnées GPS", Alert.AlertType.INFORMATION);
+                return;
+            }
+
+            String[] coords = gpsText.split(",");
+            if (coords.length != 2) {
+                showAlert("Erreur", "Format GPS invalide", Alert.AlertType.ERROR);
+                return;
+            }
+
+            try {
+                double lat = Double.parseDouble(coords[0].trim());
+                double lng = Double.parseDouble(coords[1].trim());
+
+                reverseButton.setText("🔍 Recherche...");
+                reverseButton.setDisable(true);
+
+                new Thread(() -> {
+                    String address = GeocodingService.reverseGeocode(lat, lng);
+                    javafx.application.Platform.runLater(() -> {
+                        if (address != null) {
+                            adresseField.setText(address);
+                            showAlert("Succès", "Adresse trouvée !", Alert.AlertType.INFORMATION);
+                        } else {
+                            showAlert("Erreur", "Impossible de trouver l'adresse", Alert.AlertType.ERROR);
+                        }
+                        reverseButton.setText("📍 Obtenir l'adresse");
+                        reverseButton.setDisable(false);
+                    });
+                }).start();
+
+            } catch (NumberFormatException ex) {
+                showAlert("Erreur", "Coordonnées invalides", Alert.AlertType.ERROR);
+            }
+        });
+
+        // Forward geocoding (Adresse -> GPS)
+        geocodeButton.setOnAction(e -> {
+            String address = adresseField.getText();
+            if (address == null || address.trim().isEmpty()) {
+                geocodeStatus.setText("❌ Veuillez entrer une adresse");
+                geocodeStatus.setStyle("-fx-text-fill: #dc3545;");
+                return;
+            }
+
+            geocodeStatus.setText("🔍 Recherche en cours...");
+            geocodeStatus.setStyle("-fx-text-fill: #ffc107;");
+
+            new Thread(() -> {
+                double[] coords = GeocodingService.geocodeAddress(address);
+                javafx.application.Platform.runLater(() -> {
+                    if (coords != null) {
+                        gpsField.setText(coords[0] + "," + coords[1]);
+                        geocodeStatus.setText("✅ Coordonnées trouvées !");
+                        geocodeStatus.setStyle("-fx-text-fill: #28a745;");
+                    } else {
+                        geocodeStatus.setText("❌ Adresse non trouvée");
+                        geocodeStatus.setStyle("-fx-text-fill: #dc3545;");
+                    }
+                });
+            }).start();
+        });
 
         if (zone != null) {
             nomField.setText(zone.getNomZone());
@@ -368,7 +522,6 @@ public class ZonePollueeController {
         String niveauStr = niveauField.getText();
         IndicateurImpact indicateur = indicateurCombo.getValue();
 
-        // Validation Nom
         if (nom == null || nom.trim().isEmpty()) {
             errorNomLabel.setText("❌ Le nom est obligatoire");
             errorNomLabel.setVisible(true);
@@ -387,7 +540,6 @@ public class ZonePollueeController {
             isValid = false;
         }
 
-        // Validation GPS
         if (gps == null || gps.trim().isEmpty()) {
             errorGpsLabel.setText("❌ Les coordonnées GPS sont obligatoires");
             errorGpsLabel.setVisible(true);
@@ -398,7 +550,6 @@ public class ZonePollueeController {
             isValid = false;
         }
 
-        // Validation Niveau
         if (niveauStr == null || niveauStr.trim().isEmpty()) {
             errorNiveauLabel.setText("❌ Le niveau est obligatoire");
             errorNiveauLabel.setVisible(true);
@@ -418,7 +569,6 @@ public class ZonePollueeController {
             }
         }
 
-        // Validation Indicateur
         if (indicateur == null) {
             errorIndicateurLabel.setText("❌ Veuillez sélectionner un indicateur");
             errorIndicateurLabel.setVisible(true);
@@ -429,16 +579,20 @@ public class ZonePollueeController {
             try {
                 int niveau = Integer.parseInt(niveauStr);
                 ZonePolluee newZone = new ZonePolluee(nom.trim(), gps.trim(), niveau, LocalDateTime.now(), indicateur);
-                if (zone != null) {
-                    newZone.setId(zone.getId());
-                }
 
-                if (newZone.getId() == 0) {
-                    dao.addZone(newZone);
-                    showAlert("Succès", "✅ Zone ajoutée avec succès !", Alert.AlertType.INFORMATION);
-                } else {
+                if (zone != null) {
+                    int oldLevel = zone.getNiveauPollution();
+                    newZone.setId(zone.getId());
                     dao.updateZone(newZone);
                     showAlert("Succès", "✅ Zone modifiée avec succès !", Alert.AlertType.INFORMATION);
+                    EmailService.sendZoneUpdatedNotification(newZone.getNomZone(), oldLevel, newZone.getNiveauPollution(), newZone.getCoordonneesGps());
+                } else {
+                    dao.addZone(newZone);
+                    showAlert("Succès", "✅ Zone ajoutée avec succès !", Alert.AlertType.INFORMATION);
+                    EmailService.sendZoneAddedNotification(newZone.getNomZone(), newZone.getCoordonneesGps(), newZone.getNiveauPollution());
+                    if (newZone.getNiveauPollution() >= 7) {
+                        EmailService.sendCriticalAlertNotification(newZone.getNomZone(), newZone.getNiveauPollution(), newZone.getCoordonneesGps());
+                    }
                 }
                 loadZones();
                 return true;
@@ -459,13 +613,13 @@ public class ZonePollueeController {
         alert.showAndWait();
     }
 
+    @FXML private void goToDashboard() { Main.showDashboardAdmin(); }
+    @FXML private void goToIndicateurs() { Main.showIndicateurImpactListPage(); }
+    @FXML private void goToQRDashboard() { Main.showQRDashboardPage(); }
+    @FXML private void goToMap() { Main.showMapPage(); }
     @FXML
-    private void goToDashboard() {
-        Main.showDashboardAdmin();
+    private void openChatbot() {
+        Main.showChatbot();
     }
-
-    @FXML
-    private void goToIndicateurs() {
-        Main.showIndicateurImpactListPage();
-    }
+    @FXML private void goToAdvancedDashboard() { Main.showAdvancedDashboard(); }
 }

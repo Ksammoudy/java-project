@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import org.example.controllers.IndicateurImpactController;
 import org.example.controllers.ZonePollueeController;
 
@@ -55,7 +56,6 @@ public class Main extends Application {
 
             IndicateurImpactController controller = loader.getController();
 
-            // Lier le rafraîchissement des zones
             controller.setZoneRefreshCallback(() -> {
                 if (zonePollueeController != null) {
                     zonePollueeController.loadZones();
@@ -73,6 +73,13 @@ public class Main extends Application {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    // =========================
+    // QR DASHBOARD PAGE
+    // =========================
+    public static void showQRDashboardPage() {
+        loadPage("/org/example/views/qr_dashboard.fxml", "Dashboard Scans QR | WasteWise TN", 1200, 750);
     }
 
     // =========================
@@ -134,6 +141,42 @@ public class Main extends Application {
         loadPage("/org/example/views/admin_user_delete.fxml", "Supprimer utilisateur | WasteWise TN", 700, 400);
     }
 
+    public static void showMapPage() {
+        loadPage("/org/example/views/map.fxml", "Carte interactive | WasteWise TN", 1200, 750);
+    }
+
+    public static void showAdvancedDashboard() {
+        loadPage("/org/example/views/advanced_dashboard.fxml", "Dashboard Avancé | WasteWise TN Analytics", 1400, 850);
+    }
+
+    // =========================
+    // CHATBOT FEATURE - NEW WINDOW
+    // =========================
+    public static void showChatbot() {
+        try {
+            FXMLLoader loader = new FXMLLoader(Main.class.getResource("/org/example/views/chatbot.fxml"));
+            Scene scene = new Scene(loader.load(), 500, 700);
+
+            URL cssUrl = Main.class.getResource("/org/example/styles/style.css");
+            if (cssUrl != null) {
+                scene.getStylesheets().add(cssUrl.toExternalForm());
+            }
+
+            Stage chatbotStage = new Stage();
+            chatbotStage.setTitle("🤖 WasteWise Assistant IA");
+            chatbotStage.setScene(scene);
+            chatbotStage.setMinWidth(450);
+            chatbotStage.setMinHeight(600);
+            chatbotStage.setWidth(500);
+            chatbotStage.setHeight(700);
+            chatbotStage.initStyle(StageStyle.DECORATED);
+            chatbotStage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            showErrorAlert("Erreur", "Impossible de charger le chatbot: " + e.getMessage());
+        }
+    }
+
     // =========================
     // GENERIC LOADER
     // =========================
@@ -160,6 +203,14 @@ public class Main extends Application {
             alert.setContentText(e.getMessage());
             alert.showAndWait();
         }
+    }
+
+    private static void showErrorAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
     public static Stage getPrimaryStage() {
@@ -430,6 +481,9 @@ public class Main extends Application {
         System.out.println("-----------------------------------------------------------------------------------------------------------------");
     }
 
+    // =========================
+    // MAIN
+    // =========================
     public static void main(String[] args) {
         launch(args);
     }

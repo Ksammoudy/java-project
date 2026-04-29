@@ -70,4 +70,8 @@ public class DashboardAdminController {
         SessionManager.clearSession();
         Main.showLoginPage();
     }
+    @FXML
+    private void openChatbot() {
+        Main.showChatbot();
+    }
 }
