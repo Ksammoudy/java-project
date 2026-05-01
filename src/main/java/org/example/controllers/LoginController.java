@@ -2,11 +2,7 @@ package org.example.controllers;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import org.example.Main;
 import org.example.models.SocialLoginResult;
 import org.example.models.User;
@@ -21,17 +17,10 @@ import java.util.UUID;
 
 public class LoginController {
 
-    @FXML
-    private TextField emailField;
-
-    @FXML
-    private PasswordField passwordField;
-
-    @FXML
-    private CheckBox rememberMeCheckBox;
-
-    @FXML
-    private Label messageLabel;
+    @FXML private TextField emailField;
+    @FXML private PasswordField passwordField;
+    @FXML private CheckBox rememberMeCheckBox;
+    @FXML private Label messageLabel;
 
     private final UserService userService = UserService.getInstance();
     private final FacebookAuthService facebookAuthService = new FacebookAuthService();
@@ -196,19 +185,25 @@ public class LoginController {
     }
 
     private User createSocialUser(String email, String fullName, String type) {
-        if (email == null || email.isBlank()) {
+        String cleanEmail = email != null ? email.trim().toLowerCase() : "";
+
+        cleanEmail = cleanEmail.replace("\\u0040", "@");
+
+        System.out.println("EMAIL SOCIAL RECU = [" + cleanEmail + "]");
+
+        if (cleanEmail.isBlank() || !isValidEmail(cleanEmail)) {
+            showError("Email social invalide : " + cleanEmail);
             return null;
         }
 
-        User existing = userService.getUserByEmail(email.trim().toLowerCase());
+        User existing = userService.getUserByEmail(cleanEmail);
 
         if (existing != null) {
             return existing;
         }
 
         User user = new User();
-
-        user.setEmail(email.trim().toLowerCase());
+        user.setEmail(cleanEmail);
 
         String prenom = "User";
         String nom = "Social";
@@ -216,11 +211,10 @@ public class LoginController {
         if (fullName != null && !fullName.isBlank()) {
             String[] parts = fullName.trim().split("\\s+");
 
-            if (parts.length > 0) {
+            if (parts.length == 1) {
                 prenom = parts[0];
-            }
-
-            if (parts.length > 1) {
+            } else if (parts.length >= 2) {
+                prenom = parts[0];
                 nom = parts[parts.length - 1];
             }
         }
@@ -229,14 +223,14 @@ public class LoginController {
         user.setNom(nom);
         user.setPassword(UUID.randomUUID().toString());
         user.setRoles("[]");
-        user.setType(type);
+        user.setType(type != null ? type.trim().toUpperCase() : "CITIZEN");
         user.setCreatedAt(LocalDateTime.now());
         user.setActive(true);
         user.setVerified(true);
         user.setTwoFactorEnabled(false);
         user.setFaceEmbedding(null);
         user.setFaceUpdatedAt(null);
-        user.setLastSeenAt(null);
+        user.setLastSeenAt(LocalDateTime.now());
         user.setGoogleAuthenticatorSecret(null);
 
         boolean added = userService.addUser(user);
@@ -274,7 +268,7 @@ public class LoginController {
                 break;
 
             default:
-                showError("Type utilisateur inconnu.");
+                showError("Type utilisateur inconnu : " + type);
                 break;
         }
     }
@@ -307,8 +301,7 @@ public class LoginController {
             messageLabel.setStyle("-fx-text-fill:green;");
             messageLabel.setText(message);
         } else {
-            showAlert(Alert.AlertType.INFORMATION, "Succès", message);
-        }
+            showAlert(Alert.AlertType.INFORMATION, "Succès", message);        }
     }
 
     private void showAlert(Alert.AlertType type, String title, String message) {

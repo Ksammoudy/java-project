@@ -7,23 +7,22 @@ import org.example.models.User;
 import java.awt.Desktop;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.InetSocketAddress;
-import java.net.URI;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
+import java.net.*;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class GoogleAuthService {
 
     private final UserService userService = UserService.getInstance();
 
-    private final String clientId = System.getenv("GOOGLE_CLIENT_ID");
-    private final String clientSecret = System.getenv("GOOGLE_CLIENT_SECRET");
-    private final String redirectUri = "http://localhost:8000/connect/google/check";
+    private final String clientId = "a";
+    private final String clientSecret = "b";
+    private final String redirectUri = "c";
 
     public interface AuthCallback {
         void onSuccess(SocialLoginResult result);
@@ -33,7 +32,7 @@ public class GoogleAuthService {
     public void loginWithGoogle(AuthCallback callback) {
         try {
             URI redirect = URI.create(redirectUri);
-            int port = redirect.getPort() == -1 ? 80 : redirect.getPort();
+            int port = redirect.getPort();
             String path = redirect.getPath();
 
             HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
@@ -57,7 +56,7 @@ public class GoogleAuthService {
                     return;
                 }
 
-                sendHtml(exchange, "Connexion Google réussie. Vous pouvez fermer cette fenêtre.");
+                sendHtml(exchange, "Connexion réussie. Vous pouvez fermer cette fenêtre.");
                 server.stop(0);
 
                 CompletableFuture.runAsync(() -> handleCode(code, callback));
@@ -65,13 +64,13 @@ public class GoogleAuthService {
 
             server.start();
 
-            String authUrl = "https://accounts.google.com/o/oauth2/v2/auth"
-                    + "?client_id=" + urlEncode(clientId)
-                    + "&redirect_uri=" + urlEncode(redirectUri)
-                    + "&response_type=code"
-                    + "&scope=" + urlEncode("openid email profile")
-                    + "&access_type=offline"
-                    + "&prompt=select_account";
+            String authUrl =
+                    "https://accounts.google.com/o/oauth2/v2/auth"
+                            + "?client_id=" + urlEncode(clientId)
+                            + "&redirect_uri=" + urlEncode(redirectUri)
+                            + "&response_type=code"
+                            + "&scope=" + urlEncode("openid email profile")
+                            + "&prompt=select_account";
 
             if (Desktop.isDesktopSupported()) {
                 Desktop.getDesktop().browse(URI.create(authUrl));
@@ -88,11 +87,12 @@ public class GoogleAuthService {
         try {
             HttpClient client = HttpClient.newHttpClient();
 
-            String form = "code=" + urlEncode(code)
-                    + "&client_id=" + urlEncode(clientId)
-                    + "&client_secret=" + urlEncode(clientSecret)
-                    + "&redirect_uri=" + urlEncode(redirectUri)
-                    + "&grant_type=authorization_code";
+            String form =
+                    "code=" + urlEncode(code)
+                            + "&client_id=" + urlEncode(clientId)
+                            + "&client_secret=" + urlEncode(clientSecret)
+                            + "&redirect_uri=" + urlEncode(redirectUri)
+                            + "&grant_type=authorization_code";
 
             HttpRequest tokenRequest = HttpRequest.newBuilder()
                     .uri(URI.create("https://oauth2.googleapis.com/token"))
@@ -100,11 +100,20 @@ public class GoogleAuthService {
                     .POST(HttpRequest.BodyPublishers.ofString(form))
                     .build();
 
-            HttpResponse<String> tokenResponse = client.send(tokenRequest, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> tokenResponse =
+                    client.send(tokenRequest, HttpResponse.BodyHandlers.ofString());
+
+            System.out.println("GOOGLE TOKEN RESPONSE = " + tokenResponse.body());
+
+            if (tokenResponse.statusCode() != 200) {
+                callback.onError("Erreur token Google : " + tokenResponse.body());
+                return;
+            }
+
             String accessToken = extractJsonValue(tokenResponse.body(), "access_token");
 
             if (isBlank(accessToken)) {
-                callback.onError("Impossible de récupérer le token Google.");
+                callback.onError("Token Google introuvable.");
                 return;
             }
 
@@ -114,17 +123,26 @@ public class GoogleAuthService {
                     .GET()
                     .build();
 
-            HttpResponse<String> profileResponse = client.send(profileRequest, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> profileResponse =
+                    client.send(profileRequest, HttpResponse.BodyHandlers.ofString());
+
+            System.out.println("GOOGLE PROFILE RESPONSE = " + profileResponse.body());
+
+            if (profileResponse.statusCode() != 200) {
+                callback.onError("Erreur profil Google : " + profileResponse.body());
+                return;
+            }
 
             String email = extractJsonValue(profileResponse.body(), "email");
             String fullName = extractJsonValue(profileResponse.body(), "name");
 
             if (isBlank(email)) {
-                callback.onError("Impossible de récupérer l'email Google.");
+                callback.onError("Google n'a pas retourné l'email.");
                 return;
             }
 
             email = email.trim().toLowerCase();
+
             User existingUser = userService.getUserByEmail(email);
 
             if (existingUser != null) {
@@ -139,8 +157,10 @@ public class GoogleAuthService {
         }
     }
 
-    private void sendHtml(com.sun.net.httpserver.HttpExchange exchange, String message) throws IOException {
-        byte[] bytes = ("<html><body><h3>" + message + "</h3></body></html>").getBytes(StandardCharsets.UTF_8);
+    private void sendHtml(com.sun.net.httpserver.HttpExchange exchange, String msg) throws IOException {
+        byte[] bytes = ("<html><body><h2>" + msg + "</h2></body></html>")
+                .getBytes(StandardCharsets.UTF_8);
+
         exchange.getResponseHeaders().add("Content-Type", "text/html; charset=UTF-8");
         exchange.sendResponseHeaders(200, bytes.length);
 
@@ -160,6 +180,7 @@ public class GoogleAuthService {
                 return URLDecoder.decode(pair[1], StandardCharsets.UTF_8);
             }
         }
+
         return null;
     }
 
@@ -168,34 +189,14 @@ public class GoogleAuthService {
             return null;
         }
 
-        String pattern = "\"" + key + "\":";
-        int start = json.indexOf(pattern);
+        Pattern pattern = Pattern.compile("\"" + Pattern.quote(key) + "\"\\s*:\\s*\"([^\"]*)\"");
+        Matcher matcher = pattern.matcher(json);
 
-        if (start == -1) {
-            return null;
+        if (matcher.find()) {
+            return matcher.group(1);
         }
 
-        start += pattern.length();
-
-        while (start < json.length() && Character.isWhitespace(json.charAt(start))) {
-            start++;
-        }
-
-        if (start < json.length() && json.charAt(start) == '"') {
-            start++;
-            int end = json.indexOf("\"", start);
-            if (end == -1) {
-                return null;
-            }
-            return json.substring(start, end);
-        }
-
-        int end = start;
-        while (end < json.length() && json.charAt(end) != ',' && json.charAt(end) != '}') {
-            end++;
-        }
-
-        return json.substring(start, end).trim();
+        return null;
     }
 
     private String urlEncode(String value) {

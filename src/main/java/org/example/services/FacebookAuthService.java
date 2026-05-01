@@ -12,7 +12,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public class FacebookAuthService {
@@ -63,17 +62,14 @@ public class FacebookAuthService {
 
             server.start();
 
-            String authUrl = "https://www.facebook.com/v19.0/dialog/oauth"
-                    + "?client_id=" + urlEncode(clientId)
-                    + "&redirect_uri=" + urlEncode(redirectUri)
-                    + "&scope=" + urlEncode("email,public_profile")
-                    + "&response_type=code";
+            String authUrl =
+                    "https://www.facebook.com/v19.0/dialog/oauth"
+                            + "?client_id=" + urlEncode(clientId)
+                            + "&redirect_uri=" + urlEncode(redirectUri)
+                            + "&scope=" + urlEncode("email,public_profile")
+                            + "&response_type=code";
 
-            if (Desktop.isDesktopSupported()) {
-                Desktop.getDesktop().browse(URI.create(authUrl));
-            } else {
-                callback.onError("Impossible d’ouvrir le navigateur.");
-            }
+            Desktop.getDesktop().browse(URI.create(authUrl));
 
         } catch (Exception e) {
             callback.onError("Erreur Facebook OAuth : " + e.getMessage());
@@ -84,49 +80,82 @@ public class FacebookAuthService {
         try {
             HttpClient client = HttpClient.newHttpClient();
 
-            String tokenUrl = "https://graph.facebook.com/v19.0/oauth/access_token"
-                    + "?client_id=" + urlEncode(clientId)
-                    + "&redirect_uri=" + urlEncode(redirectUri)
-                    + "&client_secret=" + urlEncode(clientSecret)
-                    + "&code=" + urlEncode(code);
+            String tokenUrl =
+                    "https://graph.facebook.com/v19.0/oauth/access_token"
+                            + "?client_id=" + urlEncode(clientId)
+                            + "&redirect_uri=" + urlEncode(redirectUri)
+                            + "&client_secret=" + urlEncode(clientSecret)
+                            + "&code=" + urlEncode(code);
 
             HttpRequest tokenRequest = HttpRequest.newBuilder()
                     .uri(URI.create(tokenUrl))
                     .GET()
                     .build();
 
-            HttpResponse<String> tokenResponse = client.send(tokenRequest, HttpResponse.BodyHandlers.ofString());
-            String accessToken = extractJsonValue(tokenResponse.body(), "access_token");
+            HttpResponse<String> tokenResponse =
+                    client.send(tokenRequest, HttpResponse.BodyHandlers.ofString());
+
+            String accessToken =
+                    extractJsonValue(tokenResponse.body(), "access_token");
 
             if (isBlank(accessToken)) {
                 callback.onError("Impossible de récupérer le token Facebook.");
                 return;
             }
 
-            String profileUrl = "https://graph.facebook.com/me?fields=id,name,email&access_token=" + urlEncode(accessToken);
+            String profileUrl =
+                    "https://graph.facebook.com/me?fields=id,name,email"
+                            + "&access_token=" + urlEncode(accessToken);
 
             HttpRequest profileRequest = HttpRequest.newBuilder()
                     .uri(URI.create(profileUrl))
                     .GET()
                     .build();
 
-            HttpResponse<String> profileResponse = client.send(profileRequest, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> profileResponse =
+                    client.send(profileRequest, HttpResponse.BodyHandlers.ofString());
+
+            System.out.println("FACEBOOK PROFILE = " + profileResponse.body());
 
             String email = extractJsonValue(profileResponse.body(), "email");
             String fullName = extractJsonValue(profileResponse.body(), "name");
 
             if (isBlank(email)) {
-                email = "fb_" + UUID.randomUUID() + "@facebook.local";
+                callback.onError(
+                        "Facebook n'a pas fourni l'email réel.\n"
+                                + "Ajoutez un email confirmé sur Facebook puis reconnectez-vous."
+                );
+                return;
             }
 
             email = email.trim().toLowerCase();
+
             User existingUser = userService.getUserByEmail(email);
 
             if (existingUser != null) {
                 userService.updateLastSeen(existingUser.getId());
-                callback.onSuccess(new SocialLoginResult(true, existingUser, email, fullName, "FACEBOOK"));
+
+                callback.onSuccess(
+                        new SocialLoginResult(
+                                true,
+                                existingUser,
+                                email,
+                                fullName,
+                                "FACEBOOK"
+                        )
+                );
+
             } else {
-                callback.onSuccess(new SocialLoginResult(false, null, email, fullName, "FACEBOOK"));
+
+                callback.onSuccess(
+                        new SocialLoginResult(
+                                false,
+                                null,
+                                email,
+                                fullName,
+                                "FACEBOOK"
+                        )
+                );
             }
 
         } catch (Exception e) {
@@ -134,9 +163,16 @@ public class FacebookAuthService {
         }
     }
 
-    private void sendHtml(com.sun.net.httpserver.HttpExchange exchange, String message) throws IOException {
-        byte[] bytes = ("<html><body><h3>" + message + "</h3></body></html>").getBytes(StandardCharsets.UTF_8);
-        exchange.getResponseHeaders().add("Content-Type", "text/html; charset=UTF-8");
+    private void sendHtml(com.sun.net.httpserver.HttpExchange exchange, String message)
+            throws IOException {
+
+        byte[] bytes =
+                ("<html><body><h3>" + message + "</h3></body></html>")
+                        .getBytes(StandardCharsets.UTF_8);
+
+        exchange.getResponseHeaders()
+                .add("Content-Type", "text/html; charset=UTF-8");
+
         exchange.sendResponseHeaders(200, bytes.length);
 
         try (OutputStream os = exchange.getResponseBody()) {
@@ -151,10 +187,12 @@ public class FacebookAuthService {
 
         for (String param : query.split("&")) {
             String[] pair = param.split("=", 2);
+
             if (pair.length == 2 && pair[0].equals(key)) {
                 return URLDecoder.decode(pair[1], StandardCharsets.UTF_8);
             }
         }
+
         return null;
     }
 
@@ -171,6 +209,7 @@ public class FacebookAuthService {
         }
 
         start += pattern.length();
+
         int end = json.indexOf("\"", start);
 
         if (end == -1) {
