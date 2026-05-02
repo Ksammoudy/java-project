@@ -19,10 +19,10 @@ import java.util.regex.Pattern;
 public class GoogleAuthService {
 
     private final UserService userService = UserService.getInstance();
+    private final String clientId = System.getenv("GOOGLE_CLIENT_ID");
+    private final String clientSecret = System.getenv("GOOGLE_CLIENT_SECRET");
 
-    private final String clientId = "a";
-    private final String clientSecret = "b";
-    private final String redirectUri = "c";
+    private final String redirectUri = "http://localhost:8000/connect/google/check";
 
     public interface AuthCallback {
         void onSuccess(SocialLoginResult result);
