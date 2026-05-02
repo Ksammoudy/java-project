@@ -2,7 +2,6 @@ package services;
 
 import entities.ReponseOffre;
 import utils.MyConnection;
-import utils.SchemaManager;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,11 +12,9 @@ import java.util.List;
 
 public class ServiceReponseOffre {
     private Connection cnx;
-    private boolean schemaChecked;
 
     public ServiceReponseOffre() {
         this.cnx = null;
-        this.schemaChecked = false;
     }
 
     private Connection getConnection() throws SQLException {
@@ -28,23 +25,9 @@ public class ServiceReponseOffre {
             if (cnx == null || cnx.isClosed()) {
                 throw new SQLException("Connexion JDBC fermee ou indisponible.");
             }
-            ensureSchemaSafely();
             return cnx;
         } catch (IllegalStateException e) {
             throw new SQLException("Connexion JDBC indisponible: " + e.getMessage(), e);
-        }
-    }
-
-    private void ensureSchemaSafely() {
-        if (schemaChecked) {
-            return;
-        }
-        try {
-            SchemaManager.ensureCoreForeignKeys();
-            schemaChecked = true;
-        } catch (Exception e) {
-            schemaChecked = true;
-            System.err.println("[WARN] SchemaManager ignore: " + e.getMessage());
         }
     }
 
@@ -58,7 +41,13 @@ public class ServiceReponseOffre {
             pst.setString(4, normaliserMessage(r.getMessage()));
             pst.setInt(5, r.getAppelOffreId());
             pst.setInt(6, r.getCitoyenId());
-            pst.executeUpdate();
+            int affected = pst.executeUpdate();
+            if (affected == 0) {
+                throw new SQLException("Insertion echouee: aucune ligne ajoutee dans reponse_offre.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
         }
     }
 

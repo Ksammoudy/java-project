@@ -2,7 +2,6 @@ package services;
 
 import entities.AppelOffre;
 import utils.MyConnection;
-import utils.SchemaManager;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,11 +13,9 @@ import java.util.List;
 
 public class ServiceAppelOffre {
     private Connection cnx;
-    private boolean schemaChecked;
 
     public ServiceAppelOffre() {
         this.cnx = null;
-        this.schemaChecked = false;
     }
 
     private Connection getConnection() throws SQLException {
@@ -29,23 +26,9 @@ public class ServiceAppelOffre {
             if (cnx == null || cnx.isClosed()) {
                 throw new SQLException("Connexion JDBC fermee ou indisponible.");
             }
-            ensureSchemaSafely();
             return cnx;
         } catch (IllegalStateException e) {
             throw new SQLException("Connexion JDBC indisponible: " + e.getMessage(), e);
-        }
-    }
-
-    private void ensureSchemaSafely() {
-        if (schemaChecked) {
-            return;
-        }
-        try {
-            SchemaManager.ensureCoreForeignKeys();
-            schemaChecked = true;
-        } catch (Exception e) {
-            schemaChecked = true;
-            System.err.println("[WARN] SchemaManager ignore: " + e.getMessage());
         }
     }
 
@@ -64,6 +47,9 @@ public class ServiceAppelOffre {
             if (affected == 0) {
                 throw new SQLException("Insertion echouee: aucune ligne ajoutee dans appel_offre.");
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
         }
     }
 

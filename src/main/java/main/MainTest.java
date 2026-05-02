@@ -7,6 +7,9 @@ import services.ServiceReponseOffre;
 import utils.MyConnection;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Scanner;
@@ -14,23 +17,87 @@ import java.util.Scanner;
 public class MainTest {
 
     private static final Scanner scanner = new Scanner(System.in);
+    private static final String[] REQUIRED_TABLES = {
+            "appel_offre",
+            "reponse_offre",
+            "citoyen",
+            "valorisateur"
+    };
+    private static final String[][] REQUIRED_COLUMNS = {
+            {"appel_offre", "id"},
+            {"appel_offre", "titre"},
+            {"appel_offre", "description"},
+            {"appel_offre", "quantite_demandee"},
+            {"appel_offre", "date_limite"},
+            {"appel_offre", "valorisateur_id"},
+            {"reponse_offre", "id"},
+            {"reponse_offre", "quantite_proposee"},
+            {"reponse_offre", "date_soumis"},
+            {"reponse_offre", "statut"},
+            {"reponse_offre", "message"},
+            {"reponse_offre", "appel_offre_id"},
+            {"reponse_offre", "citoyen_id"},
+            {"citoyen", "id"},
+            {"valorisateur", "id"}
+    };
 
     public static void main(String[] args) {
         try {
             Connection cnx = MyConnection.getInstance().getConnection();
             System.out.println("=== TEST JDBC WasteWiseJava ===");
-            System.out.println("Connected: " + (cnx != null && !cnx.isClosed()));
-            System.out.println("Database: " + cnx.getCatalog());
-            System.out.println("JDBC URL: " + MyConnection.getInstance().getActiveUrl());
-            System.out.println("Message: JDBC connection to shared Symfony DB is OK.");
+            System.out.println("Connexion reussie !");
+            System.out.println("Base actuelle : " + cnx.getCatalog());
+            System.out.println("URL JDBC : " + MyConnection.getInstance().getActiveUrl());
+            verifierSchemaLectureSeule(cnx);
+
+            if (args.length > 0 && "--connection-only".equals(args[0])) {
+                return;
+            }
 
             ServiceAppelOffre serviceAppelOffre = new ServiceAppelOffre();
             ServiceReponseOffre serviceReponseOffre = new ServiceReponseOffre();
 
             lancerMenu(serviceAppelOffre, serviceReponseOffre);
         } catch (Exception e) {
-            System.out.println("Connection failed.");
+            System.out.println("Connexion echouee.");
             e.printStackTrace();
+        }
+    }
+
+    private static void verifierSchemaLectureSeule(Connection cnx) throws SQLException {
+        for (String table : REQUIRED_TABLES) {
+            if (!tableExists(cnx, table)) {
+                throw new SQLException("Table introuvable dans pidev: " + table);
+            }
+            System.out.println("Table OK : " + table);
+        }
+
+        for (String[] column : REQUIRED_COLUMNS) {
+            if (!columnExists(cnx, column[0], column[1])) {
+                throw new SQLException("Colonne introuvable dans pidev: " + column[0] + "." + column[1]);
+            }
+            System.out.println("Colonne OK : " + column[0] + "." + column[1]);
+        }
+    }
+
+    private static boolean tableExists(Connection cnx, String tableName) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND LOWER(table_name) = LOWER(?)";
+        try (PreparedStatement pst = cnx.prepareStatement(sql)) {
+            pst.setString(1, tableName);
+            try (ResultSet rs = pst.executeQuery()) {
+                return rs.next() && rs.getInt(1) > 0;
+            }
+        }
+    }
+
+    private static boolean columnExists(Connection cnx, String tableName, String columnName) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() AND LOWER(table_name) = LOWER(?) AND LOWER(column_name) = LOWER(?)";
+        try (PreparedStatement pst = cnx.prepareStatement(sql)) {
+            pst.setString(1, tableName);
+            pst.setString(2, columnName);
+            try (ResultSet rs = pst.executeQuery()) {
+                return rs.next() && rs.getInt(1) > 0;
+            }
         }
     }
 
@@ -80,6 +147,7 @@ public class MainTest {
                 }
             } catch (Exception e) {
                 System.out.println("Erreur: " + e.getMessage());
+                e.printStackTrace();
             }
 
         } while (choix != 0);

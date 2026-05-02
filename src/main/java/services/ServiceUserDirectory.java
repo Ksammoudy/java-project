@@ -3,7 +3,6 @@ package services;
 import entities.UserOption;
 import entities.UserContact;
 import utils.MyConnection;
-import utils.SchemaManager;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -227,11 +226,6 @@ public class ServiceUserDirectory {
     }
 
     private List<UserOption> recupererParRole(String roleKeyword) throws SQLException {
-        try {
-            SchemaManager.ensureCoreForeignKeys();
-        } catch (Exception e) {
-            System.err.println("[WARN] SchemaManager ignore in ServiceUserDirectory: " + e.getMessage());
-        }
         String userTable = detectUserTable();
         if (userTable == null) {
             return new ArrayList<>();
