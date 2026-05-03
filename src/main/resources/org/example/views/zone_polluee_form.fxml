@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<GridPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.controllers.ZonePollueeController"
+          hgap="15" vgap="15" alignment="CENTER" style="-fx-background-color: white; -fx-background-radius: 15;">
+
+    <padding>
+        <Insets top="30" right="30" bottom="30" left="30"/>
+    </padding>
+
+    <Label text="Ajouter / Modifier une zone" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1a3a2a;" GridPane.columnSpan="2"/>
+
+    <Label text="Nom de la zone" GridPane.rowIndex="1" GridPane.columnIndex="0" style="-fx-font-weight: bold;"/>
+    <TextField fx:id="nomField" GridPane.rowIndex="1" GridPane.columnIndex="1" prefWidth="300"/>
+
+    <Label text="Coordonnées GPS" GridPane.rowIndex="2" GridPane.columnIndex="0" style="-fx-font-weight: bold;"/>
+    <TextField fx:id="gpsField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+    <Label text="Niveau (1-10)" GridPane.rowIndex="3" GridPane.columnIndex="0" style="-fx-font-weight: bold;"/>
+    <TextField fx:id="niveauField" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+    <Label text="Indicateur" GridPane.rowIndex="4" GridPane.columnIndex="0" style="-fx-font-weight: bold;"/>
+    <ComboBox fx:id="indicateurCombo" GridPane.rowIndex="4" GridPane.columnIndex="1" prefWidth="300"/>
+
+    <HBox spacing="15" alignment="CENTER" GridPane.rowIndex="5" GridPane.columnIndex="1">
+        <Button text="Enregistrer" onAction="#saveZone" style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;"/>
+        <Button text="Annuler" onAction="#cancelForm" style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;"/>
+        <Button text="📈 Indicateurs d'Impact" styleClass="sidebar-btn" onAction="#goToIndicateurs"/>
+    </HBox>
+</GridPane>

@@ -81,6 +81,10 @@ public class DashboardAdminController {
         SessionManager.logout();
         Main.showLoginPage();
     }
+    @FXML
+    private void openChatbot() {
+        Main.showChatbot();
+    }
 
     private void populateCharts() {
         XYChart.Series<String, Number> series = new XYChart.Series<>();

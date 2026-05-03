@@ -1,4 +1,4 @@
-package org.example;
+﻿package org.example;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -12,7 +12,6 @@ import javafx.stage.Stage;
 import org.example.controllers.TwoFactorVerifyController;
 import org.example.controllers.UserController;
 import org.example.models.User;
-
 import java.io.IOException;
 import java.net.URL;
 import java.util.function.Consumer;
@@ -24,6 +23,7 @@ import java.util.function.Consumer;
 public class Main extends Application {
 
     private static Stage primaryStage;
+    private static ZonePollueeController zonePollueeController;
 
     /**
      * Stage principal (lanceur + navigation). Expose pour les ecrans qui chargent du FXML hors {@link #navigateTo}.
@@ -215,6 +215,62 @@ public class Main extends Application {
 
     public static void showCitizenSettingsPage() {
         navigateTo("/org/example/views/citizen_settings.fxml", "Parametres", 1200, 750);
+    }
+
+    // =========================
+    // ZONES POLLUÉES
+    // =========================
+    private static org.example.controllers.ZonePollueeController zonePollueeController;
+
+    public static void showZonePollueeListPage() {
+        try {
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(Main.class.getResource("/org/example/views/zone_polluee_list.fxml"));
+            javafx.scene.Scene scene = new javafx.scene.Scene(loader.load(), 1200, 700);
+            zonePollueeController = loader.getController();
+            applyGlobalStylesheet(scene);
+            primaryStage.setTitle("Gestion des Zones Polluées | WasteWise TN");
+            primaryStage.setScene(scene);
+            primaryStage.centerOnScreen();
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+
+    public static void showIndicateurImpactListPage() {
+        try {
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(Main.class.getResource("/org/example/views/indicateur_impact_list.fxml"));
+            javafx.scene.Scene scene = new javafx.scene.Scene(loader.load(), 1200, 750);
+            org.example.controllers.IndicateurImpactController controller = loader.getController();
+            controller.setZoneRefreshCallback(() -> { if (zonePollueeController != null) zonePollueeController.loadZones(); });
+            applyGlobalStylesheet(scene);
+            primaryStage.setTitle("Indicateurs d'Impact | WasteWise TN");
+            primaryStage.setScene(scene);
+            primaryStage.centerOnScreen();
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+
+    public static void showQRDashboardPage() {
+        navigateTo("/org/example/views/qr_dashboard.fxml", "Dashboard Scans QR | WasteWise TN", 1200, 750);
+    }
+
+    public static void showMapPage() {
+        navigateTo("/org/example/views/map.fxml", "Carte interactive | WasteWise TN", 1200, 750);
+    }
+
+    public static void showAdvancedDashboard() {
+        navigateTo("/org/example/views/advanced_dashboard.fxml", "Dashboard Avancé | WasteWise TN", 1400, 850);
+    }
+
+    public static void showChatbot() {
+        try {
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(Main.class.getResource("/org/example/views/chatbot.fxml"));
+            javafx.scene.Scene scene = new javafx.scene.Scene(loader.load(), 500, 700);
+            applyGlobalStylesheet(scene);
+            javafx.stage.Stage chatbotStage = new javafx.stage.Stage();
+            chatbotStage.setTitle("WasteWise Assistant IA");
+            chatbotStage.setScene(scene);
+            chatbotStage.setMinWidth(450);
+            chatbotStage.setMinHeight(600);
+            chatbotStage.show();
+        } catch (Exception e) { e.printStackTrace(); }
     }
 
     public static void main(String[] args) {

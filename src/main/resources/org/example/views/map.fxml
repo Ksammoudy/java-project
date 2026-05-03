@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.web.WebView?>
+<?import javafx.scene.text.Text?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.controllers.MapController"
+            stylesheets="@../styles/style.css">
+
+    <!-- SIDEBAR -->
+    <left>
+        <VBox styleClass="sidebar" prefWidth="280" style="-fx-background-color: #1a3a2a;">
+            <VBox styleClass="sidebar-header" spacing="10" alignment="CENTER" style="-fx-padding: 30 0 30 0;">
+                <Text text="🌱 WasteWise" style="-fx-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;"/>
+            </VBox>
+
+            <VBox styleClass="sidebar-menu" spacing="5" style="-fx-padding: 20 15 0 15;">
+                <Text style="-fx-fill: rgba(255,255,255,0.4); -fx-font-size: 11px; -fx-font-weight: bold;">MAIN</Text>
+                <Button text="📊 Dashboard" styleClass="sidebar-btn" onAction="#goToDashboard"/>
+                <Button text="📍 Zones Polluées" styleClass="sidebar-btn" onAction="#goToZones"/>
+                <Button text="📈 Indicateurs" styleClass="sidebar-btn" onAction="#goToIndicateurs"/>
+                <Button text="🗺️ Carte" styleClass="sidebar-btn active"/>
+                <Button text="📱 Scans QR" styleClass="sidebar-btn" onAction="#goToQRDashboard"/>
+            </VBox>
+        </VBox>
+    </left>
+
+    <!-- MAIN CONTENT -->
+    <center>
+        <VBox styleClass="main-content" spacing="20" style="-fx-padding: 20;">
+
+            <!-- Top Header -->
+            <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 0 0 10 0;">
+                <Label text="Dashboard / Carte interactive" style="-fx-font-size: 14px; -fx-text-fill: #6c757d;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="🔔" style="-fx-background-color: transparent;"/>
+                <Button text="👤 Admin" style="-fx-background-color: transparent; -fx-font-weight: bold;"/>
+            </HBox>
+
+            <!-- Hero Banner -->
+            <VBox styleClass="hero" spacing="10" style="-fx-background-color: linear-gradient(to right, #2f6b4f, #8bd22f); -fx-background-radius: 20; -fx-padding: 40;">
+                <Label text="🗺️ Carte interactive des zones polluées" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                <Label text="Visualisez toutes les zones polluées avec leurs niveaux de risque" style="-fx-text-fill: rgba(255,255,255,0.85);"/>
+            </VBox>
+
+            <!-- Contrôles de la carte - Première ligne -->
+            <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 10 0;">
+                <Button text="📍 Rafraîchir" styleClass="btn-green" onAction="#refreshMap"/>
+                <Button text="🎯 Centrer" styleClass="btn-outline" onAction="#centerMap"/>
+                <Button text="📍 Ma position" styleClass="btn-outline" onAction="#showMyLocation"/>
+                <Button text="🔍 Rechercher" styleClass="btn-outline" onAction="#searchZone"/>
+                <Button text="🔥 Heatmap" styleClass="btn-outline" onAction="#toggleHeatmap"/>
+                <Button text="📏 Mesurer" styleClass="btn-outline" onAction="#startMeasurement"/>
+                <Region HBox.hgrow="ALWAYS"/>
+            </HBox>
+
+            <!-- Contrôles de la carte - Deuxième ligne (Filtres) -->
+            <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 0 0 10 0;">
+                <Label text="Filtres : " style="-fx-font-weight: bold;"/>
+                <Button text="🔴 Haut risque" styleClass="btn-outline" onAction="#filterHighRisk"/>
+                <Button text="🟡 Risque moyen" styleClass="btn-outline" onAction="#filterMediumRisk"/>
+                <Button text="🟢 Risque faible" styleClass="btn-outline" onAction="#filterLowRisk"/>
+                <Button text="👁️ Toutes les zones" styleClass="btn-green" onAction="#showAllZones"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label text="Légende : " style="-fx-font-weight: bold;"/>
+                <Label text="🔴 Haut (≥7)" style="-fx-text-fill: #dc3545;"/>
+                <Label text="🟡 Moyen (4-6)" style="-fx-text-fill: #ffc107;"/>
+                <Label text="🟢 Faible (≤3)" style="-fx-text-fill: #28a745;"/>
+            </HBox>
+
+            <!-- Carte Leaflet -->
+            <WebView fx:id="mapWebView" VBox.vgrow="ALWAYS" prefHeight="550"/>
+
+        </VBox>
+    </center>
+</BorderPane>

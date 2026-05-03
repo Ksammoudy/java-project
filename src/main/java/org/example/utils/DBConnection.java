@@ -21,6 +21,7 @@ public class DBConnection {
         return instance;
     }
 
+    // Crée une NOUVELLE connexion à chaque appel
     public Connection getConnection() {
         try {
             if (connection == null || connection.isClosed()) {
