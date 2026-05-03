@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane prefHeight="860.0"
+            prefWidth="1400.0"
+            style="-fx-background-color: linear-gradient(to right, #D8F0E5, #C9ECE8);"
+            xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="controllers.admin.AdminReponseModerationController">
+
+    <top>
+        <HBox alignment="CENTER_LEFT"
+              spacing="14.0"
+              style="-fx-background-color: #E7F7EE; -fx-border-color: #BDE0CE; -fx-border-width: 0 0 1 0; -fx-padding: 14 20 14 20;">
+            <Label text="WasteWise" style="-fx-text-fill: #007A47; -fx-font-size: 16px; -fx-font-weight: bold;"/>
+            <Label text="BACK OFFICE" style="-fx-text-fill: #0B5740; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button mnemonicParsing="false" onAction="#onOpenHome" text="🏠"
+                    prefWidth="44.0"
+                    style="-fx-background-color: #F8FFFB; -fx-text-fill: #007A47; -fx-font-size: 15px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 9 12 9 12; -fx-border-color: #C8E8D6; -fx-border-radius: 10;"/>
+            <Button mnemonicParsing="false" onAction="#onOpenAdminDashboard" text="Dashboard admin"
+                    style="-fx-background-color: #F8FFFB; -fx-text-fill: #007A47; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 9 16 9 16; -fx-border-color: #C8E8D6; -fx-border-radius: 10;"/>
+            <Button mnemonicParsing="false" onAction="#onOpenAppels" text="Appels d'offre"
+                    style="-fx-background-color: #F8FFFB; -fx-text-fill: #007A47; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 9 16 9 16; -fx-border-color: #C8E8D6; -fx-border-radius: 10;"/>
+            <Button mnemonicParsing="false" onAction="#onOpenReponses" text="Reponses"
+                    style="-fx-background-color: #128B57; -fx-text-fill: #FFFFFF; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 9 16 9 16;"/>
+            <Button mnemonicParsing="false" onAction="#onOpenStats" text="Statistiques"
+                    style="-fx-background-color: #F8FFFB; -fx-text-fill: #007A47; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 9 16 9 16; -fx-border-color: #C8E8D6; -fx-border-radius: 10;"/>
+        </HBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true"
+                    hbarPolicy="NEVER"
+                    style="-fx-background: transparent; -fx-background-color: transparent;">
+            <content>
+                <StackPane>
+                    <padding>
+                        <Insets top="20.0" right="24.0" bottom="24.0" left="24.0"/>
+                    </padding>
+
+                    <VBox maxWidth="980.0"
+                          spacing="14.0"
+                          style="-fx-background-color: #FFFFFF; -fx-background-radius: 16; -fx-border-color: #CAE4D5; -fx-border-radius: 16; -fx-padding: 18 18 18 18; -fx-effect: dropshadow(gaussian, rgba(12,71,50,0.15), 30, 0, 0, 10);">
+                        <HBox alignment="CENTER_LEFT">
+                            <Label text="Moderation des reponses d'offre"
+                                   style="-fx-text-fill: #062D28; -fx-font-size: 25px; -fx-font-weight: bold;"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label fx:id="lblCount" text="0 ligne(s)"
+                                   style="-fx-background-color: #E9F7EF; -fx-text-fill: #007A47; -fx-font-size: 12px; -fx-font-weight: bold; -fx-background-radius: 999; -fx-padding: 6 10 6 10;"/>
+                        </HBox>
+
+                        <VBox spacing="10.0"
+                              style="-fx-background-color: #FAFFFC; -fx-border-color: #CBE6D8; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 12 12 14 12;">
+                            <Label text="Filtres et tri" style="-fx-text-fill: #236451; -fx-font-size: 14px;"/>
+                            <GridPane hgap="10.0" vgap="10.0">
+                                <columnConstraints>
+                                    <ColumnConstraints hgrow="ALWAYS" percentWidth="33.0"/>
+                                    <ColumnConstraints hgrow="ALWAYS" percentWidth="33.0"/>
+                                    <ColumnConstraints hgrow="ALWAYS" percentWidth="34.0"/>
+                                </columnConstraints>
+
+                                <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                    <Label text="Recherche texte" style="-fx-text-fill: #3F6D5D; -fx-font-size: 11px;"/>
+                                    <TextField fx:id="txtRecherche"
+                                               promptText="Statut ou message"
+                                               prefHeight="38.0"
+                                               style="-fx-background-color: #FAFFFC; -fx-border-color: #BFE3CF; -fx-border-radius: 10; -fx-background-radius: 10;"/>
+                                </VBox>
+                                <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                    <Label text="Statut" style="-fx-text-fill: #3F6D5D; -fx-font-size: 11px;"/>
+                                    <ComboBox fx:id="cbStatut"
+                                              prefHeight="38.0"
+                                              maxWidth="Infinity"
+                                              style="-fx-background-color: #FAFFFC; -fx-border-color: #BFE3CF; -fx-border-radius: 10; -fx-background-radius: 10;"/>
+                                </VBox>
+                                <VBox spacing="4.0" GridPane.columnIndex="2" GridPane.rowIndex="0">
+                                    <Label text="Quantite min" style="-fx-text-fill: #3F6D5D; -fx-font-size: 11px;"/>
+                                    <TextField fx:id="txtQuantiteMin"
+                                               promptText="Ex: 40"
+                                               prefHeight="38.0"
+                                               style="-fx-background-color: #FAFFFC; -fx-border-color: #BFE3CF; -fx-border-radius: 10; -fx-background-radius: 10;"/>
+                                </VBox>
+                                <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                    <Label text="Trier par" style="-fx-text-fill: #3F6D5D; -fx-font-size: 11px;"/>
+                                    <ComboBox fx:id="cbTri"
+                                              prefHeight="38.0"
+                                              maxWidth="Infinity"
+                                              style="-fx-background-color: #FAFFFC; -fx-border-color: #BFE3CF; -fx-border-radius: 10; -fx-background-radius: 10;"/>
+                                </VBox>
+                                <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                    <Label text="Ordre" style="-fx-text-fill: #3F6D5D; -fx-font-size: 11px;"/>
+                                    <ComboBox fx:id="cbOrdre"
+                                              prefHeight="38.0"
+                                              maxWidth="Infinity"
+                                              style="-fx-background-color: #FAFFFC; -fx-border-color: #BFE3CF; -fx-border-radius: 10; -fx-background-radius: 10;"/>
+                                </VBox>
+                            </GridPane>
+
+                            <HBox spacing="8.0" alignment="CENTER_LEFT">
+                                <Button mnemonicParsing="false" onAction="#onAppliquerFiltres" text="Appliquer"
+                                        prefHeight="40.0"
+                                        style="-fx-background-color: #128B57; -fx-text-fill: #FFFFFF; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 8 15 8 15;"/>
+                                <Button mnemonicParsing="false" onAction="#onReinitialiserFiltres" text="Reinitialiser"
+                                        prefHeight="40.0"
+                                        style="-fx-background-color: #E9F7EF; -fx-text-fill: #007A47; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 8 15 8 15; -fx-border-color: #BFE3CF; -fx-border-radius: 10;"/>
+                            </HBox>
+                        </VBox>
+
+                        <HBox alignment="CENTER_LEFT" spacing="8.0">
+                            <Button mnemonicParsing="false" onAction="#onExporterPdf" text="Exporter PDF"
+                                    style="-fx-background-color: #E9F7EF; -fx-text-fill: #007A47; -fx-font-weight: bold; -fx-background-radius: 9; -fx-padding: 8 12 8 12; -fx-border-color: #BFE3CF; -fx-border-radius: 9;"/>
+                            <Button mnemonicParsing="false" onAction="#onExporterExcel" text="Exporter Excel"
+                                    style="-fx-background-color: #E9F7EF; -fx-text-fill: #007A47; -fx-font-weight: bold; -fx-background-radius: 9; -fx-padding: 8 12 8 12; -fx-border-color: #BFE3CF; -fx-border-radius: 9;"/>
+                            <Button mnemonicParsing="false" onAction="#onExporterWord" text="Exporter Word"
+                                    style="-fx-background-color: #E9F7EF; -fx-text-fill: #007A47; -fx-font-weight: bold; -fx-background-radius: 9; -fx-padding: 8 12 8 12; -fx-border-color: #BFE3CF; -fx-border-radius: 9;"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label text="Afficher" style="-fx-text-fill: #3F6D5D; -fx-font-size: 12px;"/>
+                            <ComboBox fx:id="cbPageSize"
+                                      prefHeight="36.0"
+                                      prefWidth="72.0"
+                                      style="-fx-background-color: #FAFFFC; -fx-border-color: #BFE3CF; -fx-border-radius: 9; -fx-background-radius: 9;"/>
+                            <Label text="lignes" style="-fx-text-fill: #3F6D5D; -fx-font-size: 12px;"/>
+                        </HBox>
+
+                        <TableView fx:id="tableReponses"
+                                   prefHeight="310.0"
+                                   style="-fx-background-color: #FFFFFF; -fx-border-color: #D7EAE0; -fx-border-radius: 10; -fx-background-radius: 10; -fx-control-inner-background: #FFFFFF; -fx-control-inner-background-alt: #FBFEFC; -fx-selection-bar: #D8F3E5; -fx-selection-bar-non-focused: #E9F7EF; -fx-fixed-cell-size: 56;">
+                            <columns>
+                                <TableColumn fx:id="colId" prefWidth="42.0" text="Id"/>
+                                <TableColumn fx:id="colQuantite" prefWidth="120.0" text="Quantite proposee"/>
+                                <TableColumn fx:id="colDateSoumis" prefWidth="150.0" text="Date soumis"/>
+                                <TableColumn fx:id="colStatut" prefWidth="100.0" text="Statut"/>
+                                <TableColumn fx:id="colMessage" prefWidth="230.0" text="Message"/>
+                                <TableColumn fx:id="colScore" prefWidth="82.0" text="Score"/>
+                                <TableColumn fx:id="colActions" prefWidth="300.0" text="Actions"/>
+                            </columns>
+                        </TableView>
+
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                            <Label fx:id="lblInfo"
+                                   text="Chargement..."
+                                   style="-fx-background-color: #E9F7EF; -fx-text-fill: #0B5740; -fx-font-size: 12px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 9 12 9 12;"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Button fx:id="btnPrecedent" mnemonicParsing="false" onAction="#onPagePrecedente" text="Precedent"
+                                    style="-fx-background-color: #E9F7EF; -fx-text-fill: #6AA68D; -fx-font-weight: bold; -fx-background-radius: 9; -fx-padding: 8 12 8 12; -fx-border-color: #BFE3CF; -fx-border-radius: 9;"/>
+                            <Label fx:id="lblPage" text="Page 0 / 0"
+                                   style="-fx-text-fill: #0B5740; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                            <Button fx:id="btnSuivant" mnemonicParsing="false" onAction="#onPageSuivante" text="Suivant"
+                                    style="-fx-background-color: #E9F7EF; -fx-text-fill: #007A47; -fx-font-weight: bold; -fx-background-radius: 9; -fx-padding: 8 12 8 12; -fx-border-color: #BFE3CF; -fx-border-radius: 9;"/>
+                        </HBox>
+                    </VBox>
+                </StackPane>
+            </content>
+        </ScrollPane>
+    </center>
+</BorderPane>
