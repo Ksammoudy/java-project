@@ -2,6 +2,8 @@ package org.example.controllers.gestionevent;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -30,93 +32,118 @@ public class ParticipationsController implements Initializable {
     @FXML private TableColumn<Participation, String> colEvenement;
     @FXML private TableColumn<Participation, Date> colDate;
     @FXML private TableColumn<Participation, Void> colActions;
+    @FXML private TextField searchField;
+    @FXML private ComboBox<String> sortComboBox; // 👈 Zid hathi fx:id fil FXML
 
     private final ParticipationServices ps = new ParticipationServices();
-    private ObservableList<Participation> participationList = FXCollections.observableArrayList();
+    private ObservableList<Participation> masterData = FXCollections.observableArrayList();
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // 1. Mapping el Columns - LEZEM l-asémi bin l-guillemets ykounou nafs Getters mta3 el Model
+        // 1. Setup Columns
         colCitoyen.setCellValueFactory(new PropertyValueFactory<>("nomCitoyen"));
-        // Salla7tlek hedhi mel "titreEvenement" l- "titreEv" kima fil Service
         colEvenement.setCellValueFactory(new PropertyValueFactory<>("nomEvenement"));
         colDate.setCellValueFactory(new PropertyValueFactory<>("dateInscription"));
 
-        // 2. Configuration des Buttons d'action (CRUD)
         setupActions();
-
-        // 3. Chargement des données
         loadData();
+
+        // 2. Recherche Dynamique (FilteredList)
+        FilteredList<Participation> filteredData = new FilteredList<>(masterData, p -> true);
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+            filteredData.setPredicate(participation -> {
+                if (newValue == null || newValue.isEmpty()) return true;
+                String lowerCaseFilter = newValue.toLowerCase();
+                return participation.getNomCitoyen().toLowerCase().contains(lowerCaseFilter) ||
+                        participation.getNomEvenement().toLowerCase().contains(lowerCaseFilter);
+            });
+        });
+
+        // 3. Tri Dynamique (SortedList)
+        SortedList<Participation> sortedData = new SortedList<>(filteredData);
+        sortedData.comparatorProperty().bind(participationTable.comparatorProperty());
+        participationTable.setItems(sortedData);
+
+        // 4. Action de Tri b-el ComboBox (kima image_37.png)
+        if (sortComboBox != null) {
+            sortComboBox.setItems(FXCollections.observableArrayList("Nom (A-Z)", "Nom (Z-A)"));
+            sortComboBox.setOnAction(event -> {
+                String choice = sortComboBox.getValue();
+                if ("Nom (A-Z)".equals(choice)) {
+                    masterData.sort((p1, p2) -> p1.getNomCitoyen().compareToIgnoreCase(p2.getNomCitoyen()));
+                } else if ("Nom (Z-A)".equals(choice)) {
+                    masterData.sort((p1, p2) -> p2.getNomCitoyen().compareToIgnoreCase(p1.getNomCitoyen()));
+                }
+            });
+        }
     }
 
     private void loadData() {
         try {
-            participationList.clear();
             List<Participation> data = ps.read();
-
-            // Debug bech na3rfou ken el lista fiha data mel base wala lé
-            System.out.println("📊 Debug: Nombre de participations l9inehom = " + data.size());
-
-            if (data.isEmpty()) {
-                System.out.println("⚠️ Warning: El base de données raj3et lista fergha!");
-            }
-
-            participationList.addAll(data);
-            participationTable.setItems(participationList);
-            participationTable.refresh();
-
+            masterData.setAll(data);
         } catch (SQLException e) {
-            System.err.println("❌ Erreur SQL lors du chargement: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
     private void setupActions() {
         colActions.setCellFactory(param -> new TableCell<>() {
-            private final Button btnDelete = new Button("🗑️");
             private final Button btnDetails = new Button("📄");
-            private final HBox pane = new HBox(btnDetails, btnDelete);
+            private final Button btnEdit = new Button("✏️");
+            private final Button btnDelete = new Button("🗑️");
+            private final HBox pane = new HBox(btnDetails, btnEdit, btnDelete);
 
             {
-                pane.setSpacing(10);
+                pane.setSpacing(8);
                 pane.setAlignment(Pos.CENTER);
-
                 btnDetails.getStyleClass().add("button-view");
+                btnEdit.getStyleClass().add("button-edit");
                 btnDelete.getStyleClass().add("button-delete");
 
-                btnDelete.setOnAction(event -> {
-                    Participation p = getTableView().getItems().get(getIndex());
-                    handleDelete(p);
-                });
-
-                // Zid action lel details ken t7eb t-warri description
-                btnDetails.setOnAction(event -> {
-                    System.out.println("Viewing details for participation ID: " + getTableView().getItems().get(getIndex()).getId());
-                });
+                btnDetails.setOnAction(event -> handleDetails(getTableView().getItems().get(getIndex())));
+                btnEdit.setOnAction(event -> handleEdit(getTableView().getItems().get(getIndex())));
+                btnDelete.setOnAction(event -> handleDelete(getTableView().getItems().get(getIndex())));
             }
 
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty) {
-                    setGraphic(null);
-                } else {
-                    setGraphic(pane);
-                }
+                setGraphic(empty ? null : pane);
             }
         });
     }
 
-    private void handleDelete(Participation p) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Supprimer cette participation ?", ButtonType.YES, ButtonType.NO);
+    private void handleDetails(Participation p) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Détails");
         alert.setHeaderText(null);
+        alert.setContentText("Citoyen: " + p.getNomCitoyen() + "\nÉvénement: " + p.getNomEvenement());
+        alert.showAndWait();
+    }
+
+    private void handleEdit(Participation p) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/views/event/ModifierParticipation.fxml"));
+            Parent root = loader.load();
+            ModifierParticipationController controller = loader.getController();
+            controller.initData(p);
+            AnchorPane contentArea = (AnchorPane) participationTable.getScene().lookup("#contentArea");
+            if (contentArea != null) contentArea.getChildren().setAll(root);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void handleDelete(Participation p) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Supprimer ?", ButtonType.YES, ButtonType.NO);
         alert.showAndWait().ifPresent(response -> {
             if (response == ButtonType.YES) {
                 try {
                     ps.delete(p);
-                    loadData(); // Refresh automatique ba3d el delete
+                    loadData();
                 } catch (SQLException e) {
-                    System.err.println("❌ Erreur lors de la suppression: " + e.getMessage());
+                    e.printStackTrace();
                 }
             }
         });
@@ -124,32 +151,11 @@ public class ParticipationsController implements Initializable {
 
     @FXML
     private void handleAjouterParticipant(ActionEvent event) {
-        System.out.println("🚀 Clikit 3al bouton ajouter!");
         try {
-            URL fxmlUrl = getClass().getResource("/org/example/views/event/AjouterParticipation.fxml");
-            if (fxmlUrl == null) {
-                System.err.println("❌ Mal9itech el fichier FXML! Thabbet fil Path: /org/example/views/event/AjouterParticipation.fxml");
-                return;
-            }
-            Parent root = FXMLLoader.load(fxmlUrl);
-
-            // Nel9aw el contentArea mel scene mta3 el bouton elli nzelna 3lih (ID CSS #contentArea)
+            Parent root = FXMLLoader.load(getClass().getResource("/org/example/views/event/AjouterParticipation.fxml"));
             AnchorPane contentArea = (AnchorPane) ((Node) event.getSource()).getScene().lookup("#contentArea");
-
-            if (contentArea != null) {
-                contentArea.getChildren().clear();
-                contentArea.getChildren().add(root);
-
-                // Beich el page j'dida t-ji mrigla 3al kbor
-                AnchorPane.setTopAnchor(root, 0.0);
-                AnchorPane.setBottomAnchor(root, 0.0);
-                AnchorPane.setLeftAnchor(root, 0.0);
-                AnchorPane.setRightAnchor(root, 0.0);
-            } else {
-                System.err.println("❌ Erreur: contentArea mal9inehouch! Thabbet fil Admin.fxml (lezem id='contentArea')");
-            }
+            if (contentArea != null) contentArea.getChildren().setAll(root);
         } catch (IOException e) {
-            System.err.println("❌ Erreur IOException: " + e.getMessage());
             e.printStackTrace();
         }
     }

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<VBox alignment="TOP_CENTER" spacing="25.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.controllers.gestionevent.DetailsOrgController">
+    <children>
+        <Label text="Détails de l'Événement" textFill="#0077b6">
+            <font>
+                <Font name="System Bold" size="26.0" />
+            </font>
+        </Label>
+
+        <VBox spacing="15.0" style="-fx-background-color: #f8f9fa; -fx-background-radius: 10; -fx-border-color: #dee2e6; -fx-border-radius: 10;">
+            <padding>
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            </padding>
+            <children>
+                <HBox spacing="10.0">
+                    <Label style="-fx-font-weight: bold;" text="Titre :" />
+                    <Label fx:id="lblTitre" text="---" />
+                </HBox>
+
+                <HBox spacing="10.0">
+                    <Label style="-fx-font-weight: bold;" text="Lieu :" />
+                    <Label fx:id="lblLieu" text="---" />
+                </HBox>
+
+                <HBox spacing="10.0">
+                    <Label style="-fx-font-weight: bold;" text="Date :" />
+                    <Label fx:id="lblDate" text="---" />
+                </HBox>
+
+                <HBox spacing="10.0">
+                    <Label style="-fx-font-weight: bold;" text="Organisateur :" />
+                    <Label fx:id="lblOrganisateur" text="---" />
+                </HBox>
+
+                <Separator prefWidth="200.0" />
+
+                <Label style="-fx-font-weight: bold;" text="Description :" />
+                <TextArea fx:id="txtDescription" editable="false" prefHeight="150.0" style="-fx-background-color: transparent;" wrapText="true" />
+            </children>
+        </VBox>
+
+        <Button mnemonicParsing="false" onAction="#handleRetour" prefHeight="40.0" prefWidth="150.0" style="-fx-background-color: #00B4D8; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5;" text="Retour à la liste" />
+    </children>
+    <padding>
+        <Insets bottom="40.0" left="50.0" right="50.0" top="40.0" />
+    </padding>
+</VBox>

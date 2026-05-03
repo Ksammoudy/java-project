@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
+<?import java.lang.String?>
+<?import javafx.collections.FXCollections?>
 
-<VBox spacing="20" styleClass="main-content" stylesheets="@../../style.css"
+<VBox spacing="20" styleClass="main-content"
       xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="org.example.controllers.gestionevent.ParticipationsController">
+      fx:controller="org.example.controllers.gestionevent.ParticipationsController"
+      stylesheets="@participation.css">
 
     <VBox styleClass="header-banner">
         <Label text="Gestion des Participations" styleClass="header-title" />
@@ -15,12 +17,24 @@
 
     <HBox alignment="CENTER_LEFT" spacing="20" styleClass="list-header-container">
         <Label text="👥 Liste des Participants" styleClass="list-title" />
-
         <Region HBox.hgrow="ALWAYS" />
 
         <HBox spacing="10" alignment="CENTER">
-            <TextField promptText="Rechercher un citoyen..." styleClass="search-container" />
-            <Button onAction="#handleAjouterParticipant" styleClass="nav-button-active" text="+ Ajouter Participant" />
+            <!-- Recherche Field -->
+            <TextField fx:id="searchField" promptText="🔍 Rechercher un citoyen..."
+                       styleClass="search-container" prefWidth="250.0" />
+
+            <!-- ComboBox Tri -->
+            <ComboBox fx:id="sortComboBox" promptText="Sort By" prefWidth="150.0" styleClass="search-container">
+                <items>
+                    <FXCollections fx:factory="observableArrayList">
+                        <String fx:value="Nom (A-Z)" />
+                        <String fx:value="Nom (Z-A)" />
+                    </FXCollections>
+                </items>
+            </ComboBox>
+
+            <Button onAction="#handleAjouterParticipant" styleClass="nav-button-active" text="+ Inscrire" />
         </HBox>
     </HBox>
 
@@ -35,5 +49,4 @@
             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
         </columnResizePolicy>
     </TableView>
-
 </VBox>

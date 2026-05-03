@@ -11,9 +11,11 @@ public class MainEventFX extends Application {
     public void start(Stage stage) throws Exception {
 
         System.out.println(getClass().getResource("/org/example/views/event/RoleSelection.fxml"));
+        //System.out.println(getClass().getResource("/org/example/views/event/admin.fxml"));
 
         FXMLLoader loader = new FXMLLoader(
                 getClass().getResource("/org/example/views/event/RoleSelection.fxml")
+                //getClass().getResource("/org/example/views/event/admin.fxml")
         );
 
         Scene scene = new Scene(loader.load());

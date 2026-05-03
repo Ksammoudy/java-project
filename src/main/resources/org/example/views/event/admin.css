@@ -1,0 +1,56 @@
+/* =========================================
+   WASTEWISE TN - ADMIN INTERFACE STYLE
+   ========================================= */
+
+/* 1. El Background mta3 el application */
+.root {
+    -fx-font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+    -fx-background-color: #F4F7F6;
+}
+
+/* 2. SIDEBAR STYLE */
+.sidebar {
+    -fx-background-color: #1a3a2a; /* El khdar el ghamaq mta3 WasteWise */
+    -fx-padding: 10 0 0 0;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);
+}
+
+/* 3. LOGO TEXT */
+.logo-text {
+    -fx-text-fill: #8bd22f; /* El khdar el faté7 */
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-letter-spacing: 2px;
+}
+
+/* 4. NAVIGATION BUTTONS */
+.nav-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #ecf0f1;
+    -fx-font-size: 14px;
+    -fx-font-weight: 500;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 0 0 0 25; /* Tab3id el ktiba 3al left */
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+    -fx-transition: 0.3s;
+}
+
+/* Effect wa9telli t-7ot el souris (Hover) */
+.nav-button:hover {
+    -fx-background-color: rgba(139, 210, 47, 0.2); /* Khdar transparent */
+    -fx-text-fill: #8bd22f;
+}
+
+/* Style mta3 el bouton ki ykoun sélectionné (Focus) */
+.nav-button:focused {
+    -fx-background-color: #8bd22f;
+    -fx-text-fill: #1a3a2a;
+    -fx-font-weight: bold;
+}
+
+/* 5. CONTENT AREA (Center) */
+#contentArea {
+    -fx-background-color: #F4F7F6;
+    -fx-background-radius: 15 0 0 15; /* Rounded corners m3a el sidebar */
+}

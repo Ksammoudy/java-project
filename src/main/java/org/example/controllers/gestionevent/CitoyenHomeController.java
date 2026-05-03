@@ -3,19 +3,23 @@ package org.example.controllers.gestionevent;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
 import java.io.IOException;
 import java.net.URL;
 
 public class CitoyenHomeController {
 
     @FXML
-    private StackPane contentArea; // Mrigla m3a el FXML tawa
+    private StackPane contentArea;
 
     @FXML
     public void initialize() {
-        // Chargement de la page par défaut
         showBienvenue();
     }
 
@@ -44,6 +48,28 @@ public class CitoyenHomeController {
         loadPage("NotificationFront");
     }
 
+    // ✅ Méthode Déconnexion
+    @FXML
+    private void handleLogout(ActionEvent event) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Déconnexion");
+        alert.setHeaderText("Voulez-vous vraiment vous déconnecter ?");
+        alert.setContentText("Vous allez revenir à la page de sélection du rôle.");
+
+        if (alert.showAndWait().get() == ButtonType.OK) {
+            try {
+                // Thabbet mel path mta3 el ChooseRole mte3ek
+                Parent root = FXMLLoader.load(getClass().getResource("/org/example/views/event/RoleSelection.fxml"));
+                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                Scene scene = new Scene(root);
+                stage.setScene(scene);
+                stage.show();
+            } catch (IOException e) {
+                System.err.println("❌ Erreur redirection ChooseRole: " + e.getMessage());
+            }
+        }
+    }
+
     private void loadPage(String fxml) {
         String path = "/org/example/views/event/" + fxml + ".fxml";
         URL url = getClass().getResource(path);
@@ -56,11 +82,7 @@ public class CitoyenHomeController {
         try {
             FXMLLoader loader = new FXMLLoader(url);
             Parent root = loader.load();
-
-            // StackPane ya3mel remplaçement lel contenu wa7dou
             contentArea.getChildren().setAll(root);
-            System.out.println("✅ Page " + fxml + " chargée.");
-
         } catch (IOException e) {
             System.err.println("❌ Erreur lors du chargement de la page: " + fxml);
             e.printStackTrace();

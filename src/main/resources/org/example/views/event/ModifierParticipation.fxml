@@ -6,11 +6,11 @@
 
 <VBox spacing="20" styleClass="main-content"
       xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="org.example.controllers.gestionevent.AjouterParticipationController"  stylesheets="@ajouter_participation.css">
+      fx:controller="org.example.controllers.gestionevent.ModifierParticipationController" stylesheets="@ModifierParticipation.css">
 
-    <VBox styleClass="header-banner" style="-fx-background-color: linear-gradient(to right, #2D5A27, #97D73F); -fx-padding: 20;">
-        <Label text="Inscrire un Citoyen" style="-fx-font-size: 24; -fx-text-fill: white; -fx-font-weight: bold;" />
-        <Label text="Ajouter une nouvelle participation à un événement." style="-fx-text-fill: white;" />
+    <VBox styleClass="header-banner" style="-fx-background-color: linear-gradient(to right, #2D5A27, #3498db); -fx-padding: 20;">
+        <Label text="Modifier Participation" style="-fx-font-size: 24; -fx-text-fill: white; -fx-font-weight: bold;" />
+        <Label text="Mettre à jour les informations de l'inscription." style="-fx-text-fill: white;" />
     </VBox>
 
     <VBox spacing="15" style="-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 30; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);">
@@ -19,17 +19,20 @@
             <ComboBox fx:id="comboEvenement" prefWidth="400.0" promptText="Choisir l'événement..." />
 
             <Label text="Nom du Citoyen" style="-fx-font-weight: bold;" />
-            <TextField fx:id="txtNomCitoyen" prefWidth="400.0" promptText="Entrez le nom du citoyen..."
+            <TextField fx:id="txtNomCitoyen" prefWidth="400.0" promptText="Modifier le nom..."
                        style="-fx-background-radius: 5; -fx-border-color: #ddd; -fx-border-radius: 5;"/>
 
             <Label text="Date d'Inscription" style="-fx-font-weight: bold;" />
             <DatePicker fx:id="datePicker" prefWidth="400.0" />
 
             <HBox spacing="15" alignment="CENTER_LEFT" style="-fx-padding: 20 0 0 0;">
-                <Button onAction="#handleSave" prefHeight="40.0" prefWidth="120.0"
-                        style="-fx-background-color: #2D5A27; -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand;" text="Enregistrer" />
+                <Button onAction="#handleUpdate" prefHeight="40.0" prefWidth="150.0"
+                        style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand; -fx-font-weight: bold;"
+                        text="Enregistrer Modification" />
+
                 <Button onAction="#handleCancel" prefHeight="40.0" prefWidth="120.0"
-                        style="-fx-background-color: #f44336; -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand;" text="Annuler" />
+                        style="-fx-background-color: #f44336; -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand;"
+                        text="Annuler" />
             </HBox>
         </children>
     </VBox>

@@ -1,0 +1,75 @@
+/* =========================================
+   WASTEWISE TN - MODIFIER PARTICIPATION
+   ========================================= */
+
+/* Container kbir */
+.main-content {
+    -fx-padding: 25;
+    -fx-background-color: #f8fafc;
+}
+
+/* Header Banner m-rigel */
+.header-banner {
+    -fx-background-color: linear-gradient(to right, #2D5A27, #3498db);
+    -fx-background-radius: 15;
+    -fx-padding: 25;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);
+}
+
+.header-title {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+/* Form Container */
+.form-container {
+    -fx-background-color: white;
+    -fx-background-radius: 15;
+    -fx-padding: 30;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 15, 0, 0, 5);
+}
+
+.field-label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #1e293b;
+    -fx-font-size: 14px;
+}
+
+/* Inputs (TextField, ComboBox, DatePicker) */
+.text-field, .combo-box, .date-picker {
+    -fx-background-radius: 8;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8;
+    -fx-background-color: #ffffff;
+    -fx-padding: 8;
+}
+
+.text-field:focused, .combo-box:focused, .date-picker:focused {
+    -fx-border-color: #3498db;
+    -fx-background-color: #f0f9ff;
+}
+
+/* Buttons */
+.btn-save {
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+    -fx-background-radius: 8;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.btn-save:hover {
+    -fx-background-color: #2980b9;
+}
+
+.btn-cancel {
+    -fx-background-color: #f1f5f9;
+    -fx-text-fill: #64748b;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+
+.btn-cancel:hover {
+    -fx-background-color: #e2e8f0;
+}

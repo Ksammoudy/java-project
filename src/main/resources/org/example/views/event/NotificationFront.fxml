@@ -19,12 +19,19 @@
             </children>
         </HBox>
 
-        <TableView fx:id="notificationTable" layoutX="30.0" layoutY="150.0" prefHeight="350.0" prefWidth="740.0" style="-fx-border-color: #e0e0e0; -fx-border-radius: 5;">
+        <!-- El TableView wallat invisible mel loul -->
+        <TableView fx:id="notificationTable" layoutX="30.0" layoutY="150.0" prefHeight="350.0" prefWidth="740.0" visible="false" style="-fx-border-color: #e0e0e0; -fx-border-radius: 5;">
             <columns>
                 <TableColumn fx:id="subjectColumn" prefWidth="250.0" text="Sujet (Événement)" />
                 <TableColumn fx:id="dateColumn" prefWidth="180.0" text="Date de Notification" />
                 <TableColumn fx:id="emailColumn" prefWidth="308.0" text="Email Destinataire" />
             </columns>
         </TableView>
+
+        <Label fx:id="statusLabel" layoutX="30.0" layoutY="510.0" text="Veuillez saisir votre nom pour consulter vos notifications." textFill="#777777">
+            <font>
+                <Font name="System Italic" size="12.0" />
+            </font>
+        </Label>
     </children>
 </AnchorPane>

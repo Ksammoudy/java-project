@@ -93,7 +93,7 @@ public class Main extends Application {
             FXMLLoader loader = new FXMLLoader(fxmlUrl);
             Scene scene = new Scene(loader.load(), width, height);
 
-            URL cssUrl = Main.class.getResource("/org/example/styles/style.css");
+            URL cssUrl = Main.class.getResource("/org/example/styles/admin.css");
             if (cssUrl != null) {
                 scene.getStylesheets().add(cssUrl.toExternalForm());
             }

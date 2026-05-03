@@ -28,15 +28,16 @@
             </children>
         </HBox>
 
-        <TableView fx:id="participationTable" layoutX="40.0" layoutY="160.0" prefHeight="380.0" prefWidth="820.0" style="-fx-background-radius: 10; -fx-border-radius: 10;">
+        <!-- El TableView wallat invisible mel loul fx:visible="false" -->
+        <TableView fx:id="participationTable" layoutX="40.0" layoutY="160.0" prefHeight="380.0" prefWidth="820.0" visible="false" style="-fx-background-radius: 10; -fx-border-radius: 10;">
             <columns>
-                <TableColumn fx:id="eventColumn" prefWidth="300.0" text="Événement" />
-                <TableColumn fx:id="nameColumn" prefWidth="250.0" text="Votre Nom" />
-                <TableColumn fx:id="statusColumn" prefWidth="268.0" text="Contact (Email)" />
+                <TableColumn fx:id="colEvenement" prefWidth="300.0" text="Événement" />
+                <TableColumn fx:id="colCitoyen" prefWidth="250.0" text="Votre Nom" />
+                <TableColumn fx:id="colDate" prefWidth="268.0" text="Date Inscription" />
             </columns>
         </TableView>
 
-        <Label layoutX="320.0" layoutY="550.0" text="Saisissez votre nom pour afficher la liste de vos engagements." textFill="#777">
+        <Label fx:id="infoLabel" layoutX="320.0" layoutY="550.0" text="Saisissez votre nom pour afficher la liste de vos engagements." textFill="#777">
             <font>
                 <Font name="System Italic" size="13.0" />
             </font>

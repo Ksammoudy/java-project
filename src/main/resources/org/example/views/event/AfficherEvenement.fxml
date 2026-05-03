@@ -1,31 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
+<?import java.net.URL?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import java.lang.String?>
+<?import javafx.collections.FXCollections?>
 
-<VBox spacing="10" prefHeight="500.0" prefWidth="800.0" style="-fx-padding: 20; -fx-background-color: white;"
+<VBox spacing="15" prefHeight="600.0" prefWidth="1000.0" style="-fx-padding: 25; -fx-background-color: #f4f7f6;"
       xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="org.example.controllers.gestionevent.AfficherEvenementsController" stylesheets="@/org/example/styles/styleevnt.css">
+      fx:controller="org.example.controllers.gestionevent.AfficherEvenementsController" stylesheets="@evnement.css">
 
     <children>
-        <Label text="Liste des Événements" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2d5a27;"/>
-
-        <TableView fx:id="eventTable" prefHeight="400.0" VBox.vgrow="ALWAYS">
-            <columns>
-                <TableColumn fx:id="colTitre" text="Titre" prefWidth="150"/>
-                <TableColumn fx:id="colDescription" text="Description" prefWidth="200"/>
-                <TableColumn fx:id="colDate" text="Date &amp; Heure" prefWidth="150"/>
-                <TableColumn fx:id="colOrganisateur" text="Organisateur" prefWidth="150"/>
-                <TableColumn fx:id="colActions" text="Actions" prefWidth="120"/>
-            </columns>
-        </TableView>
-
-        <HBox alignment="CENTER_RIGHT">
+        <HBox alignment="CENTER_LEFT" spacing="15">
             <children>
-                <Button text="+ Créer un événement" onAction="#handleAjouter"
-                        style="-fx-background-color: #97D73F; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20;"/>
+                <Label text="🗓️ Liste des Événements" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1b4332;"/>
+                <Region HBox.hgrow="ALWAYS" />
+
+                <TextField fx:id="searchField" promptText="🔍 Rechercher..." prefWidth="200.0"
+                           style="-fx-background-radius: 10; -fx-padding: 8;"/>
+
+                <ComboBox fx:id="sortComboBox" promptText="Titre (A-Z)" prefWidth="150.0" style="-fx-background-radius: 10;">
+                    <items>
+                        <FXCollections fx:factory="observableArrayList">
+                            <String fx:value="Titre (A-Z)" />
+                            <String fx:value="Titre (Z-A)" />
+                        </FXCollections>
+                    </items>
+                </ComboBox>
+
+                <Button text="+ Créer" onAction="#handleGoToAjouter"
+                        style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 20; -fx-background-radius: 10; -fx-cursor: hand;"/>
             </children>
         </HBox>
+
+        <TableView fx:id="eventTable" prefHeight="450.0" VBox.vgrow="ALWAYS" style="-fx-background-radius: 10; -fx-border-radius: 10;">
+            <columns>
+                <TableColumn fx:id="colTitre" text="Titre" prefWidth="130"/>
+                <TableColumn fx:id="colAdresse" text="📍 Adresse" prefWidth="150"/>
+                <TableColumn fx:id="colImpactIA" text="🤖 Impact IA" prefWidth="200"/>
+                <TableColumn fx:id="colDate" text="🕒 Date &amp; Heure" prefWidth="140"/>
+                <TableColumn fx:id="colOrganisateur" text="👤 Organisateur" prefWidth="130"/>
+                <TableColumn fx:id="colActions" text="Actions" prefWidth="150"/>
+            </columns>
+            <columnResizePolicy>
+                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+            </columnResizePolicy>
+        </TableView>
     </children>
 </VBox>
-

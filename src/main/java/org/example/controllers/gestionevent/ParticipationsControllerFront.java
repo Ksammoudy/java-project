@@ -2,65 +2,78 @@ package org.example.controllers.gestionevent;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.fxml.Initializable;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.example.models.gestionevent.Participation;
 import org.example.services.gestionevent.ParticipationServices;
 
+import java.net.URL;
+import java.sql.Date;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
-public class ParticipationsControllerFront {
+public class ParticipationsControllerFront implements Initializable {
 
-    @FXML private TextField searchField; // El barre de recherche
     @FXML private TableView<Participation> participationTable;
-    @FXML private TableColumn<Participation, String> eventColumn;
-    @FXML private TableColumn<Participation, String> nameColumn;
-    @FXML private TableColumn<Participation, String> statusColumn; // Inscrit, etc.
+    @FXML private TableColumn<Participation, String> colCitoyen;
+    @FXML private TableColumn<Participation, String> colEvenement;
+    @FXML private TableColumn<Participation, Date> colDate;
+    @FXML private TextField searchField;
+    @FXML private Label infoLabel;
 
-    private ParticipationServices ps = new ParticipationServices();
-    private ObservableList<Participation> masterData = FXCollections.observableArrayList();
+    private final ParticipationServices ps = new ParticipationServices();
+    private ObservableList<Participation> allParticipations = FXCollections.observableArrayList();
 
-    @FXML
-    public void initialize() {
-        // 1. Liaison des colonnes avec le modèle Participation
-        eventColumn.setCellValueFactory(new PropertyValueFactory<>("nomEvenement"));
-        nameColumn.setCellValueFactory(new PropertyValueFactory<>("nomCitoyen"));
-        statusColumn.setCellValueFactory(new PropertyValueFactory<>("email")); // wala ay champ ekher t7eb t-affichih
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+        // Mapping el columns m3a el Model Participation
+        colCitoyen.setCellValueFactory(new PropertyValueFactory<>("nomCitoyen"));
+        colEvenement.setCellValueFactory(new PropertyValueFactory<>("nomEvenement"));
+        colDate.setCellValueFactory(new PropertyValueFactory<>("dateInscription"));
 
-        // 2. Charger les données mel base
-        loadData();
+        // Njibou el data mel loul ama n-khabbiwha
+        loadAllData();
+        participationTable.setVisible(false);
     }
 
-    private void loadData() {
+    private void loadAllData() {
         try {
-            List<Participation> list = ps.read();
-            masterData.setAll(list);
-            participationTable.setItems(masterData);
+            List<Participation> data = ps.read();
+            allParticipations.setAll(data);
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("❌ Erreur chargement SQL: " + e.getMessage());
         }
     }
 
     @FXML
-    void handleVerifier(ActionEvent event) {
-        String searchText = searchField.getText().toLowerCase().trim();
+    private void handleVerifier() {
+        String searchText = searchField.getText().trim().toLowerCase();
 
         if (searchText.isEmpty()) {
-            participationTable.setItems(masterData);
+            participationTable.setVisible(false);
+            infoLabel.setText("Veuillez saisir un nom pour vérifier.");
+            infoLabel.setStyle("-fx-text-fill: red;");
             return;
         }
 
-        // 3. Filtrage par nom de citoyen
-        FilteredList<Participation> filteredData = new FilteredList<>(masterData, p -> {
-            return p.getNomCitoyen().toLowerCase().contains(searchText);
-        });
+        // Filter el list b-ism el citoyen barka
+        List<Participation> filtered = allParticipations.stream()
+                .filter(p -> p.getNomCitoyen().toLowerCase().contains(searchText))
+                .collect(Collectors.toList());
 
-        participationTable.setItems(filteredData);
+        if (filtered.isEmpty()) {
+            participationTable.setVisible(false);
+            infoLabel.setText("Aucune participation trouvée pour ce nom.");
+            infoLabel.setStyle("-fx-text-fill: orange;");
+        } else {
+            participationTable.setItems(FXCollections.observableArrayList(filtered));
+            participationTable.setVisible(true);
+            infoLabel.setText("Liste de vos engagements affichée.");
+            infoLabel.setStyle("-fx-text-fill: #2e7d32;");
+        }
     }
 }

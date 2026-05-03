@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.net.URL?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.image.*?>
@@ -7,9 +8,9 @@
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
             prefHeight="600.0" prefWidth="1000.0"
-            stylesheets="@/org/example/styles/styleevnt.css"
             xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="org.example.controllers.gestionevent.AdminController">
+            fx:controller="org.example.controllers.gestionevent.AdminController"  stylesheets="@admin.css">
+
 
     <left>
         <VBox prefWidth="220.0" styleClass="sidebar" BorderPane.alignment="CENTER">

@@ -6,6 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import org.example.models.gestionevent.Participation;
@@ -20,71 +21,88 @@ public class AjouterParticipationControllerFront {
     @FXML private TextField nomInput;
     @FXML private TextField emailInput;
 
-    // Hedhom lezem yabdaw m-khabyin (Private)
     private int eventId;
     private String nomEvenement;
 
-    // --- 1. Passation des données ---
     public void setEventData(int id, String titre) {
         this.eventId = id;
         this.nomEvenement = titre;
-        System.out.println("✅ Données reçues fil Formulaire: ID=" + id + " | Titre=" + titre);
+        System.out.println("✅ Données reçues: ID=" + id + " | Titre=" + titre);
     }
 
     @FXML
     void handleValiderParticipation(ActionEvent event) {
-        String nom = nomInput.getText();
-        String email = emailInput.getText();
+        String nom = nomInput.getText().trim();
+        String email = emailInput.getText().trim();
 
-        // --- 2. Vérification de sécurité ---
+        // --- 1. Contrôle de saisie: Champs vides ---
         if (nom.isEmpty() || email.isEmpty()) {
-            System.err.println("❌ Erreur: Formulaire vide !");
+            showAlert("Erreur", "Veuillez remplir tous les champs.");
+            return;
+        }
+
+        // --- 2. Contrôle de saisie: Nom (Lettres et espaces uniquement) ---
+        // Regex: ^[a-zA-Z\\s]+$ (hrouf kbar w sghar w espace barka)
+        if (!nom.matches("^[a-zA-Z\\s]+$")) {
+            showAlert("Erreur de saisie", "Le nom ne doit contenir que des lettres et des espaces.");
+            return;
+        }
+
+        // --- 3. Contrôle de saisie: Email (doit contenir @) ---
+        if (!email.contains("@")) {
+            showAlert("Erreur de saisie", "L'adresse email doit être valide (contient @).");
             return;
         }
 
         if (this.eventId == 0) {
-            System.err.println("❌ Erreur Critique: ID Evenement est 0! Verifier le passage de données.");
+            showAlert("Erreur Critique", "ID Événement introuvable.");
             return;
         }
 
         try {
-            // --- 3. Construction de l'objet Participation ---
             Participation p = new Participation();
             p.setDateInscription(new Date(System.currentTimeMillis()));
             p.setIdEvenement(this.eventId);
-            p.setIdCitoyen(1); // Simulation d'un citoyen connecté (ID=1)
+            p.setIdCitoyen(1);
             p.setNomCitoyen(nom);
             p.setNomEvenement(this.nomEvenement);
             p.setEmail(email);
 
-            // --- 4. Appel au Service ---
             ParticipationServices ps = new ParticipationServices();
             ps.create(p);
 
-            System.out.println("✅ Participation validée pour l'événement: " + this.nomEvenement);
+            System.out.println("✅ Participation validée pour: " + this.nomEvenement);
 
-            // --- 5. Retour automatique vers l'accueil ou la liste après succès ---
+            // Notification de succès avant de quitter
+            Alert success = new Alert(Alert.AlertType.INFORMATION);
+            success.setContentText("Votre participation a été enregistrée !");
+            success.showAndWait();
+
             handleRetour(event);
 
         } catch (SQLException e) {
-            // Hedhi dhibet t-warrik ken l-ID mahouch mawjoud fil base (Foreign Key Error)
-            System.err.println("❌ Erreur SQL: Verifiez que l'ID " + this.eventId + " existe dans la table 'evenement'.");
+            showAlert("Erreur SQL", "Problème lors de l'enregistrement dans la base.");
             e.printStackTrace();
         }
+    }
+
+    // Méthode simple bech t-affichi erreur lel user
+    private void showAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
     @FXML
     void handleRetour(ActionEvent event) {
         try {
-            // Path salla7tou bech yarja3 lel page mta3 l-evenements (badlou ken t7eb path ekher)
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/views/event/RoleSelection.fxml"));
             Parent root = loader.load();
-
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.show();
-
-            System.out.println("✅ Retour à l'accueil réussi !");
         } catch (IOException e) {
             System.err.println("❌ Erreur Navigation: " + e.getMessage());
         }

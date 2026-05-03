@@ -5,7 +5,7 @@
 
 <VBox spacing="20" style="-fx-padding: 30; -fx-background-color: white;"
       xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="org.example.controllers.gestionevent.AjouterEvenementController">
+      fx:controller="org.example.controllers.gestionevent.AjouterEvenementController" stylesheets="@AjouterEvenement.css">
 
     <children>
         <Label fx:id="labelTitrePage" text="Ajouter un nouvel Événement"
@@ -30,8 +30,13 @@
                 <DatePicker fx:id="datePicker" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
                 <Label text="Organisateur :" GridPane.columnIndex="0" GridPane.rowIndex="3" />
-                <TextField fx:id="txtNomOrg" promptText="Nom de la personné ou association"
+                <TextField fx:id="txtNomOrg" promptText="Nom de la personne ou association"
                            GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+                <!-- El Lieu elli ken ne9es 👈 -->
+                <Label text="Lieu :" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+                <TextField fx:id="txtLieu" promptText="Ex: Tunis, Marsa..."
+                           GridPane.columnIndex="1" GridPane.rowIndex="4" />
             </children>
         </GridPane>
 

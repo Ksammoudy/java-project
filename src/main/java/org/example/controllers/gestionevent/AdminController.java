@@ -17,13 +17,14 @@ public class AdminController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // Charji el page acceuil automatique awel ma t-runni
+        // 🚀 Tawa awel ma t-runni, y-affichilek el Dashboard (Statistiques)
         loadPage("acceuil");
     }
 
     @FXML
     private void handleNavigationDashboard(ActionEvent event) {
-        loadPage("acceuil");
+        // 📊 Rabt el bouton Dashboard bel page jdida
+        loadPage("Dashboard");
     }
 
     @FXML
@@ -36,7 +37,6 @@ public class AdminController implements Initializable {
         loadPage("AfficherParticipations");
     }
 
-    // 📅 EL IZÉFA EL JDIDA LEL CALENDRIER
     @FXML
     private void handleNavigationCalendrier(ActionEvent event) {
         loadPage("Calendrier");
@@ -44,7 +44,7 @@ public class AdminController implements Initializable {
 
     private void loadPage(String pageName) {
         try {
-            // Path mrigel 100% kima tfahemna
+            // Path lezem ykoun m-rigel m3a el dossier mte3ek
             String path = "/org/example/views/event/" + pageName + ".fxml";
             URL fxmlUrl = getClass().getResource(path);
 
@@ -56,10 +56,10 @@ public class AdminController implements Initializable {
             FXMLLoader loader = new FXMLLoader(fxmlUrl);
             Parent root = loader.load();
 
-            // Nadhfou el blassa
+            // Nadhfou el contentArea (el blassa el bidha)
             contentArea.getChildren().clear();
 
-            // Beich el page j-jdida takhou el blassa el kol (Responsive)
+            // Beich el page takhou el blassa el kol (Responsive)
             AnchorPane.setTopAnchor(root, 0.0);
             AnchorPane.setBottomAnchor(root, 0.0);
             AnchorPane.setLeftAnchor(root, 0.0);

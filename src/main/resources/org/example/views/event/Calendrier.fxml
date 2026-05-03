@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.net.URL?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.control.Label?>
@@ -11,6 +12,7 @@
             prefHeight="700.0" prefWidth="900.0"
             style="-fx-background-color: #f4f4f4;">
 
+
     <children>
         <VBox spacing="10" AnchorPane.topAnchor="20.0" AnchorPane.leftAnchor="20.0">
             <Label text="Planning des Événements" style="-fx-text-fill: #2ecc71;">
@@ -18,7 +20,7 @@
                     <Font name="System Bold" size="24.0" />
                 </font>
             </Label>
-            <Label text="Visualisez tous les événements WasteWise sur le calendrier" style="-fx-text-fill: #7f8c8d;">
+            <Label text="Visualisez tous les événements WasteWise sur le calendrier" style="-fx-text-fill: #7f8c8d;" stylesheets="@Calendrier.css">
                 <font>
                     <Font size="14.0" />
                 </font>
