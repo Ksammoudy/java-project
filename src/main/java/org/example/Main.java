@@ -63,8 +63,9 @@ public class Main extends Application {
         Button btnZones = createBtn("Zones Polluées", "#2b6cb0");
         btnZones.setOnAction(e -> showZonePollueeListPage());
 
-        Button btnOffres = createBtn("Appels d'Offres", "#744210");
-        btnOffres.setOnAction(e -> navigateTo("/fxml/appeloffre/AppelOffreList.fxml", "Offres", 1200, 750));
+        Button btnOffres = createBtn("Appels d'Offres (N/A)", "#b7791f");
+        btnOffres.setDisable(true);
+        btnOffres.setStyle(btnOffres.getStyle() + "-fx-opacity: 0.5;");
 
         // ── Ligne 3 : Autres ──
         Button btnDeclarations = createBtn("Déclarations Déchets", "#276749");

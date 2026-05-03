@@ -28,11 +28,17 @@ public class DBConnection {
                 connect();
             }
         } catch (SQLException e) {
-            throw new IllegalStateException("Connexion JDBC indisponible.", e);
+            System.err.println("Erreur vérification connexion: " + e.getMessage());
         }
 
         if (connection == null) {
-            throw new IllegalStateException("Connexion JDBC indisponible.");
+            System.err.println("⚠️  Base de données indisponible. Vérifiez que MySQL tourne et que la base 'pidev' existe.");
+            throw new IllegalStateException(
+                "Base de données indisponible.\n" +
+                "→ Vérifiez que MySQL est démarré\n" +
+                "→ Créez la base : CREATE DATABASE pidev;\n" +
+                "→ Vérifiez database.properties"
+            );
         }
 
         return connection;
