@@ -83,6 +83,7 @@ public class DashboardCitizenController {
         citizenNameLabel.setText(CitizenSession.fullName(user));
         headerEmailLabel.setText(user.getEmail() != null ? user.getEmail() : "—");
 
+<<<<<<< HEAD
         CitizenSidebarHelper.applyActive(navHome,
                 navHome, navDeclare, navMyDeclarations, navStatistics, navNews, navAir, navWithdraw, navSettings);
 
@@ -251,7 +252,7 @@ public class DashboardCitizenController {
 
     @FXML
     public void handleLogout() {
-        SessionManager.clearSession();
+        SessionManager.logout();
         Main.showLoginPage();
     }
 }

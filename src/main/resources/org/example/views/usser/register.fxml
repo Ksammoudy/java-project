@@ -1,99 +1,172 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 
 <BorderPane xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="org.example.controllers.RegisterController">
+            fx:controller="org.example.controllers.RegisterController"
+            prefWidth="1200.0"
+            prefHeight="750.0">
 
-    <!-- LEFT IMAGE / MESSAGE -->
     <left>
-        <StackPane prefWidth="400" style="-fx-background-color:#e8f5e9;">
-            <VBox alignment="CENTER" spacing="15">
-                <Label text="🌿" style="-fx-font-size:80px;"/>
-                <Label text="Rejoins WasteWise"
-                       style="-fx-font-size:22px;-fx-font-weight:bold;"/>
-                <Label text="Gagne des EcoPoints ♻️"
-                       style="-fx-text-fill:gray;"/>
-            </VBox>
+        <StackPane prefWidth="420.0" style="-fx-background-color: #e8f5e9;">
+            <children>
+                <VBox alignment="CENTER" spacing="15.0">
+                    <children>
+                        <Label text="🌿" style="-fx-font-size: 80px;"/>
+                        <Label text="Rejoins WasteWise"
+                               style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
+                        <Label text="Gagne des EcoPoints ♻️"
+                               style="-fx-text-fill: gray;"/>
+                    </children>
+                </VBox>
+            </children>
         </StackPane>
     </left>
 
-    <!-- RIGHT FORM -->
     <center>
-        <ScrollPane fitToWidth="true">
-            <VBox spacing="12" alignment="CENTER" style="-fx-padding:30;">
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER">
+            <content>
+                <VBox spacing="14.0" alignment="CENTER" style="-fx-padding: 30;">
+                    <children>
 
-                <Label text="Créer un compte"
-                       style="-fx-font-size:26px;-fx-font-weight:bold;"/>
+                        <Label text="Créer un compte"
+                               style="-fx-font-size: 26px; -fx-font-weight: bold;"/>
 
-                <Label text="Rejoins WasteWise 🌿"
-                       style="-fx-text-fill:gray;"/>
+                        <Label text="Inscription avec option caméra"
+                               style="-fx-text-fill: gray;"/>
 
-                <!-- NOM + PRENOM -->
-                <HBox spacing="10">
-                    <TextField fx:id="nomField" promptText="Nom" HBox.hgrow="ALWAYS"/>
-                    <TextField fx:id="prenomField" promptText="Prénom" HBox.hgrow="ALWAYS"/>
-                </HBox>
-
-                <!-- EMAIL -->
-                <TextField fx:id="emailField" promptText="Email"/>
-
-                <!-- PASSWORD -->
-                <PasswordField fx:id="passwordField" promptText="Mot de passe"/>
-                <PasswordField fx:id="confirmPasswordField" promptText="Confirmer mot de passe"/>
-
-                <!-- TELEPHONE + ROLE -->
-                <HBox spacing="10">
-                    <TextField fx:id="telephoneField" promptText="Téléphone" HBox.hgrow="ALWAYS"/>
-
-                    <VBox spacing="5">
-                        <Label text="Rôle"/>
-                        <HBox spacing="10">
-                            <RadioButton fx:id="citoyenRadio" text="Citoyen" selected="true">
-                                <toggleGroup>
-                                    <ToggleGroup fx:id="roleGroup"/>
-                                </toggleGroup>
-                            </RadioButton>
-                            <RadioButton fx:id="valorizerRadio" text="Valorisateur" toggleGroup="$roleGroup"/>
+                        <HBox spacing="10.0" maxWidth="500.0">
+                            <children>
+                                <TextField fx:id="nomField" promptText="Nom"/>
+                                <TextField fx:id="prenomField" promptText="Prénom"/>
+                            </children>
                         </HBox>
-                    </VBox>
-                </HBox>
 
-                <!-- FACE -->
-                <Label text="Face embedding (optionnel)"/>
-                <TextArea fx:id="faceEmbeddingArea" prefRowCount="3"/>
+                        <TextField fx:id="emailField"
+                                   promptText="Email"
+                                   maxWidth="500.0"/>
 
-                <!-- TERMS -->
-                <CheckBox fx:id="agreeTermsCheckBox" text="J'accepte les conditions"/>
+                        <PasswordField fx:id="passwordField"
+                                       promptText="Mot de passe"
+                                       maxWidth="500.0"/>
 
-                <!-- BUTTON -->
-                <Button text="Créer un compte"
-                        onAction="#handleRegister"
-                        maxWidth="Infinity"
-                        style="-fx-background-color:#198754;-fx-text-fill:white;"/>
+                        <PasswordField fx:id="confirmPasswordField"
+                                       promptText="Confirmer mot de passe"
+                                       maxWidth="500.0"/>
 
-                <!-- SOCIAL -->
-                <Label text="OU s’inscrire avec"/>
+                        <HBox spacing="10.0" maxWidth="500.0">
+                            <children>
+                                <TextField fx:id="telephoneField"
+                                           promptText="Téléphone"/>
 
-                <HBox spacing="10">
-                    <Button text="Google"/>
-                    <Button text="Facebook"/>
-                    <Button text="GitHub"/>
-                </HBox>
+                                <VBox spacing="5.0">
+                                    <children>
+                                        <Label text="Rôle"/>
+                                        <HBox spacing="10.0">
+                                            <children>
+                                                <RadioButton fx:id="citoyenRadio" text="Citoyen" selected="true">
+                                                    <toggleGroup>
+                                                        <ToggleGroup fx:id="roleGroup"/>
+                                                    </toggleGroup>
+                                                </RadioButton>
 
-                <!-- LOGIN LINK -->
-                <HBox alignment="CENTER">
-                    <Label text="Déjà un compte ? "/>
-                    <Hyperlink text="Se connecter"
-                               onAction="#handleBackToLogin"/>
-                </HBox>
+                                                <RadioButton fx:id="valorizerRadio"
+                                                             text="Valorisateur"
+                                                             toggleGroup="$roleGroup"/>
+                                            </children>
+                                        </HBox>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </HBox>
 
-                <Label fx:id="messageLabel"/>
+                        <Label text="------------------------------------------------------------"
+                               style="-fx-text-fill: #cbd5e1;"/>
 
-            </VBox>
+                        <Label text="Capture du visage"
+                               style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+
+                        <StackPane prefWidth="500.0"
+                                   prefHeight="280.0"
+                                   style="-fx-background-color: #000000; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-background-radius: 8;">
+                            <children>
+                                <ImageView fx:id="cameraPreview"
+                                           fitWidth="500.0"
+                                           fitHeight="280.0"
+                                           preserveRatio="true"/>
+                                <Label fx:id="cameraPlaceholderLabel"
+                                       text="Aperçu caméra"
+                                       style="-fx-text-fill: white; -fx-font-size: 18px;"/>
+                            </children>
+                        </StackPane>
+
+                        <HBox spacing="10.0" alignment="CENTER">
+                            <children>
+                                <Button text="Ouvrir caméra"
+                                        onAction="#handleOpenCamera"
+                                        style="-fx-background-color: #2563eb; -fx-text-fill: white; -fx-font-weight: bold;"/>
+
+                                <Button text="Capturer visage"
+                                        onAction="#handleCaptureFace"
+                                        style="-fx-background-color: #16a34a; -fx-text-fill: white; -fx-font-weight: bold;"/>
+
+                                <Button text="Fermer caméra"
+                                        onAction="#handleCloseCamera"
+                                        style="-fx-background-color: #dc2626; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                            </children>
+                        </HBox>
+
+                        <Label text="Face embedding (optionnel)"
+                               wrapText="true"
+                               maxWidth="500.0"/>
+
+                        <TextArea fx:id="faceEmbeddingArea"
+                                  prefRowCount="4"
+                                  maxWidth="500.0"
+                                  wrapText="true"
+                                  promptText="[0.1, 0.2, 0.3, ...]"/>
+
+                        <CheckBox fx:id="agreeTermsCheckBox"
+                                  text="J'accepte les conditions"/>
+
+                        <Button text="Créer un compte"
+                                onAction="#handleRegister"
+                                maxWidth="500.0"
+                                style="-fx-background-color: #198754; -fx-text-fill: white; -fx-font-weight: bold;"/>
+
+                        <HBox alignment="CENTER">
+                            <children>
+                                <Label text="Déjà un compte ? "/>
+                                <Hyperlink text="Se connecter"
+                                           onAction="#handleBackToLogin"/>
+                            </children>
+                        </HBox>
+
+                        <Label fx:id="messageLabel"
+                               wrapText="true"
+                               maxWidth="500.0"
+                               style="-fx-font-size: 13px;"/>
+
+                    </children>
+                </VBox>
+            </content>
         </ScrollPane>
     </center>
+
 </BorderPane>

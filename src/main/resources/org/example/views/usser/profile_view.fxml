@@ -5,73 +5,78 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane fx:id="rootPane"
             xmlns="http://javafx.com/javafx/21"
-            xmlns:fx="http://javafx.com/fxml"
+            xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="org.example.controllers.ProfileController"
-            styleClass="root-container">
+            prefWidth="1200.0" prefHeight="750.0"
+            styleClass="citizen-root"
+            stylesheets="@../styles/style.css">
 
     <center>
-        <VBox spacing="20.0" styleClass="main-area">
+        <VBox spacing="20.0" styleClass="citizen-main">
             <padding>
-                <Insets top="30" right="30" bottom="30" left="30"/>
+                <Insets top="30.0" right="30.0" bottom="30.0" left="30.0"/>
             </padding>
 
-            <HBox spacing="20" alignment="CENTER_LEFT">
-                <VBox spacing="5">
-                    <Label text="👤 Mon profil" styleClass="page-title"/>
-                    <Label text="Consulte et mets à jour tes informations" styleClass="page-subtitle"/>
+            <HBox spacing="20.0" alignment="CENTER_LEFT">
+                <VBox spacing="5.0">
+                    <Label text="👤 Mon profil" styleClass="citizen-h1"/>
+                    <Label text="Consulte et mets à jour tes informations" styleClass="citizen-sub"/>
                 </VBox>
+
+                <Region HBox.hgrow="ALWAYS"/>
 
                 <Button text="✏ Modifier"
                         onAction="#handleEditProfilePage"
-                        styleClass="primary-button"/>
+                        styleClass="citizen-top-btn primary"/>
             </HBox>
 
-            <VBox spacing="15" styleClass="big-card">
-                <Label text="Informations" styleClass="card-title"/>
+            <VBox spacing="15.0" styleClass="citizen-card2">
+                <Label text="Informations" styleClass="citizen-card-title"/>
 
-                <HBox spacing="16">
-                    <VBox spacing="4" styleClass="small-box">
+                <HBox spacing="16.0">
+                    <VBox spacing="4.0" HBox.hgrow="ALWAYS" styleClass="small-box">
                         <Label text="Nom" styleClass="small-box-title"/>
                         <Label fx:id="nomLabel" text="--" styleClass="small-box-text"/>
                     </VBox>
 
-                    <VBox spacing="4" styleClass="small-box">
+                    <VBox spacing="4.0" HBox.hgrow="ALWAYS" styleClass="small-box">
                         <Label text="Prénom" styleClass="small-box-title"/>
                         <Label fx:id="prenomLabel" text="--" styleClass="small-box-text"/>
                     </VBox>
                 </HBox>
 
-                <HBox spacing="16">
-                    <VBox spacing="4" styleClass="small-box">
+                <HBox spacing="16.0">
+                    <VBox spacing="4.0" HBox.hgrow="ALWAYS" styleClass="small-box">
                         <Label text="Téléphone" styleClass="small-box-title"/>
                         <Label fx:id="telephoneLabel" text="--" styleClass="small-box-text"/>
                     </VBox>
 
-                    <VBox spacing="4" styleClass="small-box">
+                    <VBox spacing="4.0" HBox.hgrow="ALWAYS" styleClass="small-box">
                         <Label text="Email" styleClass="small-box-title"/>
                         <Label fx:id="emailLabel" text="--" styleClass="small-box-text"/>
                     </VBox>
                 </HBox>
 
-                <HBox spacing="16">
-                    <VBox spacing="4" styleClass="small-box">
+                <HBox spacing="16.0">
+                    <VBox spacing="4.0" HBox.hgrow="ALWAYS" styleClass="small-box">
                         <Label text="Type" styleClass="small-box-title"/>
                         <Label fx:id="roleLabel" text="--" styleClass="small-box-text"/>
                     </VBox>
                 </HBox>
 
-                <HBox spacing="12">
+                <HBox spacing="12.0">
                     <Button text="✏ Modifier mon profil"
                             onAction="#handleEditProfilePage"
-                            styleClass="primary-button"/>
+                            styleClass="citizen-action-btn"/>
 
                     <Button text="↩ Retour au dashboard"
                             onAction="#handleBackToDashboard"
-                            styleClass="secondary-button"/>
+                            styleClass="citizen-action-btn"/>
                 </HBox>
             </VBox>
         </VBox>

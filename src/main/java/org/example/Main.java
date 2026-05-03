@@ -9,9 +9,13 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import org.example.controllers.TwoFactorVerifyController;
+import org.example.controllers.UserController;
+import org.example.models.User;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.function.Consumer;
 
 /**
  * Point d'entrée : lanceur dev (accès direct aux dashboards) + navigation centralisée

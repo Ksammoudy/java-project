@@ -60,7 +60,7 @@ public class DashboardValorizerController {
 
     @FXML
     public void handleLogout() {
-        SessionManager.clearSession();
+        SessionManager.logout();
         Main.showLoginPage();
     }
 

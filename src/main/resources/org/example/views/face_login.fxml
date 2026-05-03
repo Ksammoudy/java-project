@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.example.controllers.FaceLoginController"
+      spacing="15"
+      alignment="CENTER"
+      style="-fx-background-color: #f6f8fb;">
+
+    <padding>
+        <Insets top="25" right="25" bottom="25" left="25"/>
+    </padding>
+
+    <Label text="Connexion par visage"
+           style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
+
+    <StackPane prefWidth="500" prefHeight="280"
+               style="-fx-background-color: black; -fx-border-color: #cbd5e1;">
+        <ImageView fx:id="cameraPreview"
+                   fitWidth="500"
+                   fitHeight="280"
+                   preserveRatio="true"/>
+        <Label fx:id="cameraPlaceholderLabel"
+               text="Aperçu caméra"
+               style="-fx-text-fill: white; -fx-font-size: 18px;"/>
+    </StackPane>
+
+    <HBox spacing="10" alignment="CENTER">
+        <Button text="Ouvrir caméra"
+                onAction="#handleOpenCamera"
+                style="-fx-background-color: #2563eb; -fx-text-fill: white; -fx-font-weight: bold;"/>
+
+        <Button text="Se connecter avec visage"
+                onAction="#handleFaceLogin"
+                style="-fx-background-color: #16a34a; -fx-text-fill: white; -fx-font-weight: bold;"/>
+
+        <Button text="Fermer caméra"
+                onAction="#handleCloseCamera"
+                style="-fx-background-color: #dc2626; -fx-text-fill: white; -fx-font-weight: bold;"/>
+    </HBox>
+
+    <TextArea fx:id="embeddingArea"
+              prefWidth="700"
+              prefHeight="120"
+              wrapText="true"
+              promptText="Embedding visage généré automatiquement"/>
+
+    <Button text="Retour"
+            onAction="#handleBack"
+            style="-fx-background-color: #e5e7eb; -fx-text-fill: black;" />
+
+    <Label fx:id="messageLabel"
+           style="-fx-font-size: 13px;" />
+</VBox>

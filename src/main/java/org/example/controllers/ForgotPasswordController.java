@@ -83,14 +83,14 @@ public class ForgotPasswordController {
 
     private void showError(String message) {
         if (messageLabel != null) {
-            messageLabel.setStyle("-fx-text-fill: red;");
+            messageLabel.getStyleClass().setAll("message-label", "message-error");
             messageLabel.setText(message);
         }
     }
 
     private void showSuccess(String message) {
         if (messageLabel != null) {
-            messageLabel.setStyle("-fx-text-fill: green;");
+            messageLabel.getStyleClass().setAll("message-label", "message-success");
             messageLabel.setText(message);
         }
     }

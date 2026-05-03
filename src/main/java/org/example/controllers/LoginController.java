@@ -2,33 +2,29 @@ package org.example.controllers;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import org.example.Main;
+import org.example.models.SocialLoginResult;
 import org.example.models.User;
 import org.example.services.FacebookAuthService;
+import org.example.services.GoogleAuthService;
 import org.example.services.SessionManager;
 import org.example.services.UserService;
+import org.example.utils.UserTypeDialog;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 public class LoginController {
 
-    @FXML
-    private TextField emailField;
-
-    @FXML
-    private PasswordField passwordField;
-
-    @FXML
-    private CheckBox rememberMeCheckBox;
-
-    @FXML
-    private Label messageLabel;
+    @FXML private TextField emailField;
+    @FXML private PasswordField passwordField;
+    @FXML private CheckBox rememberMeCheckBox;
+    @FXML private Label messageLabel;
 
     private final UserService userService = UserService.getInstance();
     private final FacebookAuthService facebookAuthService = new FacebookAuthService();
+    private final GoogleAuthService googleAuthService = new GoogleAuthService();
 
     @FXML
     public void initialize() {
@@ -39,13 +35,8 @@ public class LoginController {
 
     @FXML
     public void handleLogin() {
-        String email = emailField != null && emailField.getText() != null
-                ? emailField.getText().trim().toLowerCase()
-                : "";
-
-        String password = passwordField != null && passwordField.getText() != null
-                ? passwordField.getText()
-                : "";
+        String email = emailField != null ? emailField.getText().trim().toLowerCase() : "";
+        String password = passwordField != null ? passwordField.getText() : "";
 
         if (email.isEmpty()) {
             showError("Le champ email est obligatoire.");
@@ -62,36 +53,49 @@ public class LoginController {
             return;
         }
 
-        if (password.length() < 6) {
-            showError("Le mot de passe doit contenir au moins 6 caractères.");
-            return;
-        }
-
-        System.out.println("Tentative login avec : " + email);
-
         User user = userService.login(email, password);
 
         if (user == null) {
             showError("Email ou mot de passe incorrect.");
-            System.out.println("Login échoué.");
             return;
         }
 
-        System.out.println("Login réussi pour : " + user.getEmail());
-        System.out.println("Type utilisateur : " + user.getType());
-
-        SessionManager.setCurrentUser(user);
-
-        if (rememberMeCheckBox != null && rememberMeCheckBox.isSelected()) {
-            System.out.println("Option 'Se souvenir de moi' cochée.");
+        if (!user.isActive()) {
+            showError("Compte désactivé.");
+            return;
         }
 
+        if (rememberMeCheckBox != null && rememberMeCheckBox.isSelected()) {
+            System.out.println("Remember me activé.");
+        }
+
+        if (user.isTwoFactorEnabled()) {
+            SessionManager.setPendingUser(user);
+            showInfo("Veuillez saisir le code Google Authenticator.");
+            Main.showTwoFactorVerifyPage(user);
+            return;
+        }
+
+        SessionManager.setCurrentUser(user);
+        showSuccess("Connexion réussie.");
         redirectByUserType(user);
     }
 
     @FXML
     public void handleGoogleLogin() {
-        showInfo("Login Google non encore implémenté en JavaFX.");
+        showInfo("Ouverture de Google...");
+
+        googleAuthService.loginWithGoogle(new GoogleAuthService.AuthCallback() {
+            @Override
+            public void onSuccess(SocialLoginResult result) {
+                Platform.runLater(() -> processSocialLogin(result));
+            }
+
+            @Override
+            public void onError(String message) {
+                Platform.runLater(() -> showError(message));
+            }
+        });
     }
 
     @FXML
@@ -100,17 +104,8 @@ public class LoginController {
 
         facebookAuthService.loginWithFacebook(new FacebookAuthService.AuthCallback() {
             @Override
-            public void onSuccess(User user) {
-                Platform.runLater(() -> {
-                    if (user == null) {
-                        showError("Connexion Facebook échouée.");
-                        return;
-                    }
-
-                    SessionManager.setCurrentUser(user);
-                    showInfo("Connexion Facebook réussie.");
-                    redirectByUserType(user);
-                });
+            public void onSuccess(SocialLoginResult result) {
+                Platform.runLater(() -> processSocialLogin(result));
             }
 
             @Override
@@ -122,7 +117,7 @@ public class LoginController {
 
     @FXML
     public void handleGithubLogin() {
-        showInfo("Login GitHub non encore implémenté en JavaFX.");
+        showInfo("Connexion GitHub non encore implémentée.");
     }
 
     @FXML
@@ -132,7 +127,7 @@ public class LoginController {
 
     @FXML
     public void handleFaceLogin() {
-        showInfo("Connexion avec visage à implémenter.");
+        Main.showFaceLoginPage();
     }
 
     @FXML
@@ -140,31 +135,152 @@ public class LoginController {
         Main.showRegisterPage();
     }
 
-    private void redirectByUserType(User user) {
-        String type = user.getType() != null ? user.getType().trim().toUpperCase() : "";
+    private void processSocialLogin(SocialLoginResult result) {
+        if (result == null) {
+            showError("Connexion sociale échouée.");
+            return;
+        }
 
-        if ("ADMIN".equals(type)) {
-            System.out.println("Ouverture dashboard ADMIN");
-            Main.showDashboardAdmin();
-        } else if ("VALORIZER".equals(type) || "VALORISATEUR".equals(type)) {
-            System.out.println("Ouverture dashboard VALORIZER");
-            Main.showDashboardValorizer();
-        } else if ("CITIZEN".equals(type) || "CITOYEN".equals(type)) {
-            System.out.println("Ouverture dashboard CITIZEN");
-            Main.showDashboardCitizen();
-        } else {
-            showError("Type utilisateur inconnu.");
-            System.out.println("Type utilisateur inconnu : " + type);
+        if (result.isExistingUser()) {
+            User user = result.getUser();
+
+            if (user == null) {
+                showError("Utilisateur introuvable.");
+                return;
+            }
+
+            if (user.isTwoFactorEnabled()) {
+                SessionManager.setPendingUser(user);
+                Main.showTwoFactorVerifyPage(user);
+                return;
+            }
+
+            SessionManager.setCurrentUser(user);
+            showSuccess("Connexion " + result.getProvider() + " réussie.");
+            redirectByUserType(user);
+            return;
+        }
+
+        String selectedType = UserTypeDialog.showDialog();
+
+        if (selectedType == null || selectedType.isBlank()) {
+            showInfo("Choix annulé.");
+            return;
+        }
+
+        User createdUser = createSocialUser(
+                result.getEmail(),
+                result.getFullName(),
+                selectedType
+        );
+
+        if (createdUser == null) {
+            showError("Impossible de créer le compte.");
+            return;
+        }
+
+        SessionManager.setCurrentUser(createdUser);
+        showSuccess("Compte créé avec succès.");
+        redirectByUserType(createdUser);
+    }
+
+    private User createSocialUser(String email, String fullName, String type) {
+        String cleanEmail = email != null ? email.trim().toLowerCase() : "";
+
+        cleanEmail = cleanEmail.replace("\\u0040", "@");
+
+        System.out.println("EMAIL SOCIAL RECU = [" + cleanEmail + "]");
+
+        if (cleanEmail.isBlank() || !isValidEmail(cleanEmail)) {
+            showError("Email social invalide : " + cleanEmail);
+            return null;
+        }
+
+        User existing = userService.getUserByEmail(cleanEmail);
+
+        if (existing != null) {
+            return existing;
+        }
+
+        User user = new User();
+        user.setEmail(cleanEmail);
+
+        String prenom = "User";
+        String nom = "Social";
+
+        if (fullName != null && !fullName.isBlank()) {
+            String[] parts = fullName.trim().split("\\s+");
+
+            if (parts.length == 1) {
+                prenom = parts[0];
+            } else if (parts.length >= 2) {
+                prenom = parts[0];
+                nom = parts[parts.length - 1];
+            }
+        }
+
+        user.setPrenom(prenom);
+        user.setNom(nom);
+        user.setPassword(UUID.randomUUID().toString());
+        user.setRoles("[]");
+        user.setType(type != null ? type.trim().toUpperCase() : "CITIZEN");
+        user.setCreatedAt(LocalDateTime.now());
+        user.setActive(true);
+        user.setVerified(true);
+        user.setTwoFactorEnabled(false);
+        user.setFaceEmbedding(null);
+        user.setFaceUpdatedAt(null);
+        user.setLastSeenAt(LocalDateTime.now());
+        user.setGoogleAuthenticatorSecret(null);
+
+        boolean added = userService.addUser(user);
+
+        if (!added) {
+            return null;
+        }
+
+        return userService.getUserByEmail(user.getEmail());
+    }
+
+    private void redirectByUserType(User user) {
+        if (user == null) {
+            showError("Utilisateur introuvable.");
+            return;
+        }
+
+        String type = user.getType() != null
+                ? user.getType().trim().toUpperCase()
+                : "";
+
+        switch (type) {
+            case "ADMIN":
+                Main.showDashboardAdmin();
+                break;
+
+            case "VALORIZER":
+            case "VALORISATEUR":
+                Main.showDashboardValorizer();
+                break;
+
+            case "CITIZEN":
+            case "CITOYEN":
+                Main.showDashboardCitizen();
+                break;
+
+            default:
+                showError("Type utilisateur inconnu : " + type);
+                break;
         }
     }
 
     private boolean isValidEmail(String email) {
-        return email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
+        return email != null &&
+                email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
     }
 
     private void showError(String message) {
         if (messageLabel != null) {
-            messageLabel.setStyle("-fx-text-fill: #dc3545;");
+            messageLabel.setStyle("-fx-text-fill:red;");
             messageLabel.setText(message);
         } else {
             showAlert(Alert.AlertType.ERROR, "Erreur", message);
@@ -173,9 +289,19 @@ public class LoginController {
 
     private void showInfo(String message) {
         if (messageLabel != null) {
-            messageLabel.setStyle("-fx-text-fill: #0d6efd;");
+            messageLabel.setStyle("-fx-text-fill:blue;");
             messageLabel.setText(message);
+        } else {
+            showAlert(Alert.AlertType.INFORMATION, "Info", message);
         }
+    }
+
+    private void showSuccess(String message) {
+        if (messageLabel != null) {
+            messageLabel.setStyle("-fx-text-fill:green;");
+            messageLabel.setText(message);
+        } else {
+            showAlert(Alert.AlertType.INFORMATION, "Succès", message);        }
     }
 
     private void showAlert(Alert.AlertType type, String title, String message) {

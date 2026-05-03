@@ -10,7 +10,6 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Priority?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
@@ -18,49 +17,81 @@
 <BorderPane xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="org.example.controllers.LoginController"
-            prefWidth="1100.0" prefHeight="700.0"
-            styleClass="root-pane">
+            prefWidth="1180.0" prefHeight="760.0"
+            styleClass="root-pane"
+            stylesheets="@../styles/style.css">
 
     <left>
-        <StackPane prefWidth="520.0" styleClass="left-pane">
-            <VBox alignment="CENTER" spacing="20.0" maxWidth="360.0">
-                <Label text="Bienvenue sur WasteWise TN" styleClass="left-title"/>
-                <Label text="Déclare tes déchets et gagne des EcoPoints 🌿"
+        <StackPane prefWidth="470.0" minWidth="420.0" styleClass="left-pane">
+            <VBox alignment="CENTER_LEFT" spacing="26.0" maxWidth="360.0" styleClass="left-content">
+                <padding>
+                    <Insets top="40.0" right="35.0" bottom="40.0" left="35.0"/>
+                </padding>
+
+                <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="left-badge">
+                    <Label text="♻" styleClass="left-badge-icon"/>
+                    <Label text="Plateforme écoresponsable" styleClass="left-badge-text"/>
+                </HBox>
+
+                <Label text="Bienvenue sur WasteWise TN"
+                       wrapText="true"
+                       styleClass="left-title"/>
+
+                <Label text="Déclare tes déchets, suis tes contributions et gagne des EcoPoints dans une expérience simple, moderne et intelligente."
                        wrapText="true"
                        styleClass="left-subtitle"/>
-                <Label text="♻️"
-                       style="-fx-font-size: 110px;"/>
+
+                <HBox alignment="CENTER_LEFT" spacing="14.0">
+                    <VBox alignment="CENTER" spacing="6.0" styleClass="info-card">
+                        <Label text="24/7" styleClass="info-value"/>
+                        <Label text="Accès rapide" styleClass="info-label"/>
+                    </VBox>
+
+                    <VBox alignment="CENTER" spacing="6.0" styleClass="info-card">
+                        <Label text="+100" styleClass="info-value"/>
+                        <Label text="EcoPoints" styleClass="info-label"/>
+                    </VBox>
+
+                    <VBox alignment="CENTER" spacing="6.0" styleClass="info-card">
+                        <Label text="TN" styleClass="info-value"/>
+                        <Label text="Communauté" styleClass="info-label"/>
+                    </VBox>
+                </HBox>
+
+                <StackPane styleClass="left-visual-box">
+                    <Label text="♻" styleClass="left-big-icon"/>
+                </StackPane>
             </VBox>
         </StackPane>
     </left>
 
     <center>
         <StackPane styleClass="right-pane">
-            <VBox spacing="18.0" maxWidth="420.0" styleClass="auth-card">
+            <VBox spacing="20.0" maxWidth="440.0" styleClass="auth-card">
                 <padding>
-                    <Insets top="35" right="35" bottom="35" left="35"/>
+                    <Insets top="40.0" right="40.0" bottom="40.0" left="40.0"/>
                 </padding>
 
-                <VBox spacing="8.0" alignment="CENTER">
+                <VBox spacing="8.0" alignment="CENTER_LEFT">
                     <Label text="Connexion" styleClass="title-label"/>
-                    <Label text="Connecte-toi à ton compte" styleClass="subtitle-label"/>
+                    <Label text="Connecte-toi à ton compte pour continuer" styleClass="subtitle-label"/>
                 </VBox>
 
-                <VBox spacing="10.0">
+                <VBox spacing="12.0">
                     <Button text="Continuer avec Google"
                             onAction="#handleGoogleLogin"
                             maxWidth="Infinity"
-                            styleClass="btn-light"/>
+                            styleClass="btn-social btn-light"/>
 
                     <Button text="Continuer avec Facebook"
                             onAction="#handleFacebookLogin"
                             maxWidth="Infinity"
-                            styleClass="btn-primary"/>
+                            styleClass="btn-social btn-primary"/>
 
                     <Button text="Continuer avec GitHub"
                             onAction="#handleGithubLogin"
                             maxWidth="Infinity"
-                            styleClass="btn-dark"/>
+                            styleClass="btn-social btn-dark"/>
                 </VBox>
 
                 <HBox alignment="CENTER" spacing="10.0">
@@ -69,14 +100,14 @@
                     <Separator HBox.hgrow="ALWAYS"/>
                 </HBox>
 
-                <VBox spacing="6.0">
+                <VBox spacing="7.0">
                     <Label text="Email" styleClass="field-label"/>
                     <TextField fx:id="emailField"
                                promptText="ex: khalil@email.com"
                                styleClass="input-field"/>
                 </VBox>
 
-                <VBox spacing="6.0">
+                <VBox spacing="7.0">
                     <Label text="Mot de passe" styleClass="field-label"/>
                     <PasswordField fx:id="passwordField"
                                    promptText="********"
@@ -91,10 +122,10 @@
                                styleClass="link-action"/>
                 </HBox>
 
-                <Button text="Connexion"
+                <Button text="Se connecter"
                         onAction="#handleLogin"
                         maxWidth="Infinity"
-                        styleClass="btn-success"/>
+                        styleClass="btn-success login-btn"/>
 
                 <Button text="Connexion avec visage"
                         onAction="#handleFaceLogin"
@@ -115,4 +146,5 @@
             </VBox>
         </StackPane>
     </center>
+
 </BorderPane>

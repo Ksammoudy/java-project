@@ -78,7 +78,7 @@ public class DashboardAdminController {
 
     @FXML
     public void handleLogout() {
-        SessionManager.clearSession();
+        SessionManager.logout();
         Main.showLoginPage();
     }
 
