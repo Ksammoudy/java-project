@@ -83,16 +83,19 @@ public class ParticipationServices implements CRUD<Participation> {
     }
 
     @Override
-    public void delete(Participation p) throws SQLException {
+    public void delete(int id) throws SQLException {
         String req = "DELETE FROM participation WHERE id = ?";
         try (PreparedStatement ps = connection.prepareStatement(req)) {
-            ps.setInt(1, p.getId());
+            ps.setInt(1, id);
             ps.executeUpdate();
             System.out.println("✅ Participation supprimée");
         }
     }
 
-    @Override
+    public void delete(Participation p) throws SQLException {
+        delete(p.getId());
+    }
+
     public void createPrepared(Participation p) throws SQLException {
         create(p);
     }

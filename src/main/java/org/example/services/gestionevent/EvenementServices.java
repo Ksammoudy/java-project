@@ -91,16 +91,19 @@ public class EvenementServices implements CRUD<Evenement> {
     }
 
     @Override
-    public void delete(Evenement e) throws SQLException {
+    public void delete(int id) throws SQLException {
         String req = "DELETE FROM evenement WHERE id = ?";
         try (PreparedStatement ps = connection.prepareStatement(req)) {
-            ps.setInt(1, e.getId());
+            ps.setInt(1, id);
             ps.executeUpdate();
             System.out.println("✅ Événement supprimé!");
         }
     }
 
-    @Override
+    public void delete(Evenement e) throws SQLException {
+        delete(e.getId());
+    }
+
     public void createPrepared(Evenement e) throws SQLException {
         create(e);
     }

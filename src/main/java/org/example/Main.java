@@ -1,4 +1,4 @@
-﻿package org.example;
+package org.example;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -11,6 +11,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import org.example.controllers.TwoFactorVerifyController;
 import org.example.controllers.UserController;
+import org.example.controllers.ZonePollueeController;
 import org.example.models.User;
 import java.io.IOException;
 import java.net.URL;
@@ -23,7 +24,6 @@ import java.util.function.Consumer;
 public class Main extends Application {
 
     private static Stage primaryStage;
-    private static ZonePollueeController zonePollueeController;
 
     /**
      * Stage principal (lanceur + navigation). Expose pour les ecrans qui chargent du FXML hors {@link #navigateTo}.
@@ -39,57 +39,82 @@ public class Main extends Application {
     }
 
     private void showDevLauncher() {
-        Text title = new Text("Mode Developpement");
+        // ── Titre ──
+        Text title = new Text("WasteWise TN — Dev Launcher");
         title.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-fill: #2d3748;");
 
-        Text subtitle = new Text("Choisissez un espace a ouvrir directement");
+        Text subtitle = new Text("Choisissez un module a ouvrir directement");
         subtitle.setStyle("-fx-font-size: 14px; -fx-fill: #718096;");
 
-        Button btnAdmin = new Button("Dashboard Admin");
-        btnAdmin.setPrefWidth(200);
-        btnAdmin.setPrefHeight(48);
-        btnAdmin.setStyle(
-                "-fx-background-color: #6c63ff; -fx-text-fill: white; "
-                        + "-fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8;"
-        );
+        // ── Ligne 1 : Dashboards utilisateurs ──
+        Button btnAdmin = createBtn("Dashboard Admin", "#6c63ff");
         btnAdmin.setOnAction(e -> showDashboardAdmin());
 
-        Button btnCitoyen = new Button("Dashboard Citoyen");
-        btnCitoyen.setPrefWidth(200);
-        btnCitoyen.setPrefHeight(48);
-        btnCitoyen.setStyle(
-                "-fx-background-color: #48bb78; -fx-text-fill: white; "
-                        + "-fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8;"
-        );
+        Button btnCitoyen = createBtn("Dashboard Citoyen", "#48bb78");
         btnCitoyen.setOnAction(e -> showDashboardCitizen());
 
-        Button btnValorizer = new Button("Dashboard Valorisateur");
-        btnValorizer.setPrefWidth(200);
-        btnValorizer.setPrefHeight(48);
-        btnValorizer.setStyle(
-                "-fx-background-color: #ed8936; -fx-text-fill: white; "
-                        + "-fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8;"
-        );
+        Button btnValorizer = createBtn("Dashboard Valorisateur", "#ed8936");
         btnValorizer.setOnAction(e -> showDashboardValorizer());
 
-        Button btnLogin = new Button("Aller au Login (auth normale)");
+        // ── Ligne 2 : Modules métier ──
+        Button btnEvenements = createBtn("Gestion Événements", "#e53e3e");
+        btnEvenements.setOnAction(e -> navigateTo("/org/example/views/event/RoleSelection.fxml", "Événements", 1200, 750));
+
+        Button btnZones = createBtn("Zones Polluées", "#2b6cb0");
+        btnZones.setOnAction(e -> showZonePollueeListPage());
+
+        Button btnOffres = createBtn("Appels d'Offres", "#744210");
+        btnOffres.setOnAction(e -> navigateTo("/fxml/appeloffre/AppelOffreList.fxml", "Offres", 1200, 750));
+
+        // ── Ligne 3 : Autres ──
+        Button btnDeclarations = createBtn("Déclarations Déchets", "#276749");
+        btnDeclarations.setOnAction(e -> showDeclarationListPage());
+
+        Button btnMap = createBtn("Carte Interactive", "#553c9a");
+        btnMap.setOnAction(e -> showMapPage());
+
+        Button btnChatbot = createBtn("Chatbot IA", "#2c7a7b");
+        btnChatbot.setOnAction(e -> showChatbot());
+
+        // ── Login ──
+        Button btnLogin = new Button("→ Aller au Login (auth normale)");
         btnLogin.setStyle(
                 "-fx-background-color: transparent; -fx-text-fill: #a0aec0; "
-                        + "-fx-font-size: 12px; -fx-border-color: #e2e8f0; -fx-border-radius: 6; -fx-background-radius: 6;"
+                        + "-fx-font-size: 12px; -fx-border-color: #e2e8f0; "
+                        + "-fx-border-radius: 6; -fx-background-radius: 6; -fx-cursor: hand;"
         );
         btnLogin.setOnAction(e -> showLoginPage());
 
-        HBox buttons = new HBox(16, btnAdmin, btnCitoyen, btnValorizer);
-        buttons.setStyle("-fx-alignment: center;");
+        // ── Layout ──
+        HBox row1 = new HBox(12, btnAdmin, btnCitoyen, btnValorizer);
+        row1.setStyle("-fx-alignment: center;");
 
-        VBox root = new VBox(20, title, subtitle, buttons, btnLogin);
-        root.setStyle("-fx-alignment: center; -fx-padding: 60; -fx-background-color: #f7fafc;");
+        HBox row2 = new HBox(12, btnEvenements, btnZones, btnOffres);
+        row2.setStyle("-fx-alignment: center;");
 
-        Scene scene = new Scene(root, 760, 320);
+        HBox row3 = new HBox(12, btnDeclarations, btnMap, btnChatbot);
+        row3.setStyle("-fx-alignment: center;");
+
+        VBox root = new VBox(16, title, subtitle, row1, row2, row3, btnLogin);
+        root.setStyle("-fx-alignment: center; -fx-padding: 40; -fx-background-color: #f7fafc;");
+
+        Scene scene = new Scene(root, 900, 420);
         applyGlobalStylesheet(scene);
         primaryStage.setTitle("PiDev JavaFX — Dev Launcher");
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    private Button createBtn(String label, String color) {
+        Button btn = new Button(label);
+        btn.setPrefWidth(200);
+        btn.setPrefHeight(44);
+        btn.setStyle(
+                "-fx-background-color: " + color + "; -fx-text-fill: white; "
+                        + "-fx-font-size: 13px; -fx-font-weight: bold; "
+                        + "-fx-background-radius: 8; -fx-cursor: hand;"
+        );
+        return btn;
     }
 
     private static void applyGlobalStylesheet(Scene scene) {
@@ -130,23 +155,23 @@ public class Main extends Application {
     }
 
     public static void showLoginPage() {
-        navigateTo("/org/example/views/login.fxml", "Connexion", 900, 600);
+        navigateTo("/org/example/views/usser/login.fxml", "Connexion", 1100, 700);
     }
 
     public static void showRegisterPage() {
-        navigateTo("/org/example/views/register.fxml", "Inscription", 900, 600);
+        navigateTo("/org/example/views/usser/register.fxml", "Inscription", 1100, 750);
     }
 
     public static void showForgotPasswordPage() {
-        navigateTo("/org/example/views/forgot_password.fxml", "Mot de passe oublie", 900, 600);
+        navigateTo("/org/example/views/usser/forgot_password.fxml", "Mot de passe oublie", 900, 600);
     }
 
     public static void showResetPasswordPage() {
-        navigateTo("/org/example/views/reset_password.fxml", "Reinitialisation", 900, 600);
+        navigateTo("/org/example/views/usser/reset_password.fxml", "Reinitialisation", 900, 600);
     }
 
     public static void showDashboardAdmin() {
-        navigateTo("/org/example/views/dashboard_admin.fxml", "Dashboard Admin", 1200, 750);
+        navigateTo("/org/example/views/usser/dashboard_admin.fxml", "Dashboard Admin", 1200, 750);
     }
 
     public static void showDashboardCitizen() {
@@ -154,11 +179,44 @@ public class Main extends Application {
     }
 
     public static void showDashboardValorizer() {
-        navigateTo("/org/example/views/dashboard_valorizer.fxml", "Dashboard Valorisateur", 1200, 750);
+        navigateTo("/org/example/views/usser/dashboard_valorizer.fxml", "Dashboard Valorisateur", 1200, 750);
     }
 
     public static void showAdminUsersPage() {
-        navigateTo("/org/example/views/admin_users.fxml", "Utilisateurs", 1200, 750);
+        navigateTo("/org/example/views/usser/admin_users.fxml", "Utilisateurs", 1200, 750);
+    }
+
+    public static void showAdminUserEditPage(User user) {
+        navigateTo("/org/example/views/usser/admin_user_form.fxml", "Modifier utilisateur", 950, 650);
+    }
+
+    // =========================
+    // AUTH AVANCÉE (2FA, Face)
+    // =========================
+    public static void showTwoFactorVerifyPage(User user) {
+        navigateTo("/org/example/views/two_factor_verify.fxml", "Vérification 2FA", 450, 320);
+    }
+
+    public static void showTwoFactorSetupPage() {
+        navigateTo("/org/example/views/two_factor_setup.fxml", "Activation Google Authenticator", 650, 620);
+    }
+
+    public static void showFaceLoginPage() {
+        navigateTo("/org/example/views/face_login.fxml", "Connexion par visage", 900, 600);
+    }
+
+    public static void showFaceEnrollPage() {
+        navigateTo("/org/example/views/face_enroll.fxml", "Enregistrement du visage", 900, 550);
+    }
+
+    public static void redirectByUserType(User user) {
+        if (user == null) { showLoginPage(); return; }
+        String type = user.getType() != null ? user.getType().trim().toUpperCase() : "";
+        switch (type) {
+            case "ADMIN" -> showDashboardAdmin();
+            case "VALORIZER", "VALORISATEUR" -> showDashboardValorizer();
+            default -> showDashboardCitizen();
+        }
     }
 
     public static void showDeclarationListPage() {
@@ -182,11 +240,11 @@ public class Main extends Application {
     }
 
     public static void showProfileViewPage() {
-        navigateTo("/org/example/views/profile_view.fxml", "Profil", 1000, 700);
+        navigateTo("/org/example/views/usser/profile_view.fxml", "Profil", 1000, 700);
     }
 
     public static void showProfileEditPage() {
-        navigateTo("/org/example/views/profile_edit.fxml", "Modifier le profil", 1000, 700);
+        navigateTo("/org/example/views/usser/profile_edit.fxml", "Modifier le profil", 1000, 700);
     }
 
     public static void showDeclarationCitizenFormPage() {
