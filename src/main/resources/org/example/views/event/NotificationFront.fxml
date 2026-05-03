@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="550.0" prefWidth="800.0" style="-fx-background-color: #ffffff; -fx-background-radius: 15;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.controllers.gestionevent.NotificationControllerFront">
+    <children>
+        <Label layoutX="30.0" layoutY="25.0" text="Historique des Notifications" textFill="#2e7d32">
+            <font>
+                <Font name="System Bold" size="24.0" />
+            </font>
+        </Label>
+
+        <HBox alignment="CENTER_LEFT" layoutX="30.0" layoutY="80.0" prefHeight="45.0" prefWidth="740.0" spacing="10.0">
+            <children>
+                <TextField fx:id="searchField" prefHeight="35.0" prefWidth="600.0" promptText="Saisissez votre nom pour voir vos alertes..." style="-fx-background-radius: 10;" />
+                <Button onAction="#handleSearchNotification" prefHeight="35.0" prefWidth="120.0" style="-fx-background-color: #2e7d32; -fx-text-fill: white; -fx-background-radius: 10; -fx-cursor: hand;" text="Vérifier" />
+            </children>
+        </HBox>
+
+        <!-- El TableView wallat invisible mel loul -->
+        <TableView fx:id="notificationTable" layoutX="30.0" layoutY="150.0" prefHeight="350.0" prefWidth="740.0" visible="false" style="-fx-border-color: #e0e0e0; -fx-border-radius: 5;">
+            <columns>
+                <TableColumn fx:id="subjectColumn" prefWidth="250.0" text="Sujet (Événement)" />
+                <TableColumn fx:id="dateColumn" prefWidth="180.0" text="Date de Notification" />
+                <TableColumn fx:id="emailColumn" prefWidth="308.0" text="Email Destinataire" />
+            </columns>
+        </TableView>
+
+        <Label fx:id="statusLabel" layoutX="30.0" layoutY="510.0" text="Veuillez saisir votre nom pour consulter vos notifications." textFill="#777777">
+            <font>
+                <Font name="System Italic" size="12.0" />
+            </font>
+        </Label>
+    </children>
+</AnchorPane>

@@ -1,0 +1,84 @@
+/* Container el kbir */
+.root {
+    -fx-background-color: #f4f7f6; /* Lon el background el Dashboard */
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+}
+
+/* El Title mta3 el Page */
+#labelTitrePage {
+    -fx-text-fill: #1b4332; /* El a5dhar el ghomeq mta3 WasteWise */
+    -fx-padding: 0 0 10 0;
+}
+
+/* Style el Labels (Titre, Date, Lieu...) */
+.label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #2d3436;
+    -fx-font-weight: bold;
+}
+
+/* Style mta3 el Input Fields (TextField, TextArea, DatePicker) */
+.text-field, .text-area, .date-picker {
+    -fx-background-color: white;
+    -fx-border-color: #dfe6e9;
+    -fx-border-width: 1.5px;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 8;
+    -fx-transition: all 0.3s;
+}
+
+/* Ki t-cliqui 3la input field (Focus) */
+.text-field:focused, .text-area:focused, .date-picker:focused {
+    -fx-border-color: #1b4332;
+    -fx-effect: dropshadow(three-pass-box, rgba(27, 67, 50, 0.1), 5, 0, 0, 0);
+}
+
+/* El TextArea (Description) */
+.text-area .content {
+    -fx-background-color: white;
+}
+
+/* Style mta3 el DatePicker button */
+.date-picker > .arrow-button {
+    -fx-background-color: #1b4332;
+    -fx-background-radius: 0 8 8 0;
+}
+
+.date-picker > .arrow-button > .arrow {
+    -fx-background-color: white;
+}
+
+/* --- Buttons --- */
+
+/* Button Valider */
+#btnValider {
+    -fx-background-color: #1b4332;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-background-radius: 10;
+    -fx-padding: 10 30;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 2);
+}
+
+#btnValider:hover {
+    -fx-background-color: #2d5a44;
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+/* Button Annuler */
+.button[text="Annuler"] {
+    -fx-background-color: #b2bec3;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 10;
+    -fx-padding: 10 25;
+    -fx-cursor: hand;
+}
+
+.button[text="Annuler"]:hover {
+    -fx-background-color: #636e72;
+}

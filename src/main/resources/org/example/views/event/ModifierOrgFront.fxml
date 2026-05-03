@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<VBox alignment="TOP_CENTER" spacing="20.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.controllers.gestionevent.ModifierOrgController">
+    <children>
+        <Label text="Modifier l'Événement" textFill="#2d6a4f">
+            <font>
+                <Font name="System Bold" size="24.0" />
+            </font>
+        </Label>
+
+        <GridPane hgap="15.0" vgap="15.0">
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="200.0" minWidth="10.0" prefWidth="150.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="300.0" />
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="35.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="35.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="35.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="35.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="100.0" vgrow="SOMETIMES" />
+            </rowConstraints>
+            <children>
+                <Label text="Titre de l'événement:" GridPane.rowIndex="0" />
+                <TextField fx:id="txtTitre" promptText="Entrez le titre" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                <Label text="Lieu / Adresse:" GridPane.rowIndex="1" />
+                <TextField fx:id="txtLieu" promptText="Sfax, Tunis..." GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                <Label text="Organisateur:" GridPane.rowIndex="2" />
+                <TextField fx:id="txtNomOrg" promptText="Nom de l'organisateur" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                <Label text="Date de l'action:" GridPane.rowIndex="3" />
+                <DatePicker fx:id="datePicker" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+                <Label text="Description:" GridPane.rowIndex="4" />
+                <TextArea fx:id="txtDesc" prefHeight="100.0" promptText="Détails de l'événement..." wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            </children>
+        </GridPane>
+
+        <HBox alignment="CENTER" spacing="20.0">
+            <children>
+                <Button fx:id="btnAnnuler" mnemonicParsing="false" onAction="#handleAnnuler" prefHeight="35.0" prefWidth="120.0" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold;" text="Annuler" />
+                <Button fx:id="btnModifier" mnemonicParsing="false" onAction="#handleModifier" prefHeight="35.0" prefWidth="150.0" style="-fx-background-color: #74c365; -fx-text-fill: white; -fx-font-weight: bold;" text="Enregistrer" />
+            </children>
+            <padding>
+                <Insets top="10.0" />
+            </padding>
+        </HBox>
+    </children>
+    <padding>
+        <Insets bottom="30.0" left="40.0" right="40.0" top="30.0" />
+    </padding>
+</VBox>

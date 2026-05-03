@@ -1,4 +1,4 @@
-package org.example.utils;
+package org.example.utils.user;
 
 import org.mindrot.jbcrypt.BCrypt;
 

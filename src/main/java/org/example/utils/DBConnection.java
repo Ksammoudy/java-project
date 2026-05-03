@@ -9,6 +9,7 @@ public class DBConnection {
     private static DBConnection instance;
     private Connection connection;
 
+
     private DBConnection() {
         connect();
     }

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="600.0" prefWidth="900.0" style="-fx-background-color: #f9f9f9;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.controllers.gestionevent.ParticipationsControllerFront">
+    <children>
+        <Label layoutX="40.0" layoutY="30.0" text="Mes Participations" textFill="#1b5e20">
+            <font>
+                <Font name="System Bold" size="28.0" />
+            </font>
+        </Label>
+
+        <HBox alignment="CENTER_LEFT" layoutX="40.0" layoutY="90.0" prefHeight="45.0" prefWidth="820.0" spacing="10.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 5;">
+            <children>
+                <TextField fx:id="searchField" prefHeight="35.0" prefWidth="680.0" promptText="Entrez votre nom pour voir vos participations..." style="-fx-background-radius: 5; -fx-border-color: #ddd; -fx-border-radius: 5;" />
+                <Button mnemonicParsing="false" onAction="#handleVerifier" prefHeight="35.0" prefWidth="120.0" style="-fx-background-color: #2e7d32; -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand;" text="Vérifier">
+                    <font>
+                        <Font name="System Bold" size="14.0" />
+                    </font>
+                </Button>
+            </children>
+        </HBox>
+
+        <!-- El TableView wallat invisible mel loul fx:visible="false" -->
+        <TableView fx:id="participationTable" layoutX="40.0" layoutY="160.0" prefHeight="380.0" prefWidth="820.0" visible="false" style="-fx-background-radius: 10; -fx-border-radius: 10;">
+            <columns>
+                <TableColumn fx:id="colEvenement" prefWidth="300.0" text="Événement" />
+                <TableColumn fx:id="colCitoyen" prefWidth="250.0" text="Votre Nom" />
+                <TableColumn fx:id="colDate" prefWidth="268.0" text="Date Inscription" />
+            </columns>
+        </TableView>
+
+        <Label fx:id="infoLabel" layoutX="320.0" layoutY="550.0" text="Saisissez votre nom pour afficher la liste de vos engagements." textFill="#777">
+            <font>
+                <Font name="System Italic" size="13.0" />
+            </font>
+        </Label>
+    </children>
+</AnchorPane>

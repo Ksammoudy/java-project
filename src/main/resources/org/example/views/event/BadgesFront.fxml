@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.text.Font?>
+
+<VBox alignment="CENTER" spacing="20.0" prefHeight="500.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.controllers.gestionevent.BadgesController">
+    <children>
+        <Label text="Vérifiez votre Statut" textFill="#2e7d32">
+            <font><Font name="System Bold" size="32.0" /></font>
+        </Label>
+
+        <HBox alignment="CENTER" spacing="10.0">
+            <TextField fx:id="nomCompletInput" prefWidth="350.0" promptText="Entrez votre nom complet..." style="-fx-background-radius: 20;" />
+            <Button onAction="#handleCalculerBadge" style="-fx-background-color: #2e7d32; -fx-text-fill: white; -fx-background-radius: 20;" text="Calculer" />
+        </HBox>
+
+        <Circle fx:id="badgeCircle" radius="50.0" fill="#f0f0f0" stroke="BLACK" strokeType="INSIDE" />
+
+        <Label fx:id="resultLabel" text="Entrez votre nom pour voir vos badges de mérite." textFill="#666">
+            <font><Font name="System Italic" size="14.0" /></font>
+        </Label>
+    </children>
+</VBox>

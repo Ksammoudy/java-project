@@ -12,7 +12,7 @@ import org.example.Main;
 import org.example.models.User;
 import org.example.services.SessionManager;
 import org.example.services.UserService;
-import org.example.utils.PasswordUtil;
+import org.example.utils.user.PasswordUtil;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -166,7 +166,7 @@ public class UserController {
     @FXML
     private void handleNewUser() {
         selectedUser = null;
-        openPage("/org/example/views/admin_user_form.fxml", "Créer utilisateur | WasteWise TN");
+        openPage("/org/example/views/usser/admin_user_form.fxml", "Créer utilisateur | WasteWise TN");
     }
 
     @FXML
@@ -175,7 +175,7 @@ public class UserController {
         if (user == null) return;
 
         selectedUser = user;
-        openPage("/org/example/views/admin_user_form.fxml", "Modifier utilisateur | WasteWise TN");
+        openPage("/org/example/views/usser/admin_user_form.fxml", "Modifier utilisateur | WasteWise TN");
     }
 
     @FXML
@@ -190,7 +190,7 @@ public class UserController {
         }
 
         selectedUser = user;
-        openPage("/org/example/views/admin_user_delete.fxml", "Supprimer utilisateur | WasteWise TN");
+        openPage("/org/example/views/usser/admin_user_delete.fxml", "Supprimer utilisateur | WasteWise TN");
     }
 
     @FXML
@@ -419,7 +419,7 @@ public class UserController {
             if (updated) {
                 showAlert(Alert.AlertType.INFORMATION, "Succès", "Utilisateur mis à jour avec succès.");
                 selectedUser = null;
-                openPage("/org/example/views/admin_users.fxml", "Utilisateurs | WasteWise TN");
+                openPage("/org/example/views/usser/admin_users.fxml", "Utilisateurs | WasteWise TN");
             } else {
                 setFormMessage("Erreur lors de la mise à jour.", false);
             }
@@ -457,7 +457,7 @@ public class UserController {
 
             if (created) {
                 showAlert(Alert.AlertType.INFORMATION, "Succès", "Utilisateur créé avec succès.");
-                openPage("/org/example/views/admin_users.fxml", "Utilisateurs | WasteWise TN");
+                openPage("/org/example/views/usser/admin_users.fxml", "Utilisateurs | WasteWise TN");
             } else {
                 setFormMessage("Erreur lors de la création de l'utilisateur.", false);
             }
@@ -467,7 +467,7 @@ public class UserController {
     @FXML
     private void handleCancelForm() {
         selectedUser = null;
-        openPage("/org/example/views/admin_users.fxml", "Utilisateurs | WasteWise TN");
+        openPage("/org/example/views/usser/admin_users.fxml", "Utilisateurs | WasteWise TN");
     }
 
     // =========================================================
@@ -515,7 +515,7 @@ public class UserController {
         if (deleted) {
             showAlert(Alert.AlertType.INFORMATION, "Succès", "Utilisateur supprimé avec succès.");
             selectedUser = null;
-            openPage("/org/example/views/admin_users.fxml", "Utilisateurs | WasteWise TN");
+            openPage("/org/example/views/usser/admin_users.fxml", "Utilisateurs | WasteWise TN");
         } else {
             setDeleteMessage("Erreur lors de la suppression.", false);
         }
@@ -524,7 +524,7 @@ public class UserController {
     @FXML
     private void handleCancelDelete() {
         selectedUser = null;
-        openPage("/org/example/views/admin_users.fxml", "Utilisateurs | WasteWise TN");
+        openPage("/org/example/views/usser/admin_users.fxml", "Utilisateurs | WasteWise TN");
     }
 
     // =========================================================

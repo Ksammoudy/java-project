@@ -1,0 +1,51 @@
+/* Nasta3mlou !important bech el CSS yeghleb el styles mta3 el FXML */
+
+.root {
+    -fx-background-color: #f4f7f6 !important; /* Lon dashboard */
+}
+
+/* El Title */
+.label {
+    -fx-font-family: "Segoe UI Bold", "Arial", sans-serif;
+}
+
+/* El Label mta3 planning (el 5adhra) */
+VBox > Label:first-child {
+    -fx-text-fill: #1b4332 !important; /* Akhdhar WasteWise */
+    -fx-font-size: 26px !important;
+}
+
+/* El Subtitle */
+VBox > Label:last-child {
+    -fx-text-fill: #64748b !important;
+    -fx-font-size: 14px !important;
+}
+
+/* El Container mta3 el Calendrier (calendarPane) */
+#calendarPane {
+    -fx-background-color: white !important;
+    -fx-background-radius: 15 !important;
+    -fx-border-radius: 15 !important;
+    -fx-border-color: #e2e8f0 !important;
+    -fx-border-width: 1 !important;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 15, 0, 0, 5) !important;
+    -fx-padding: 15 !important;
+}
+
+/* Ken testa3mel fi library (kima CalendarFX), na3tiwha style clean */
+.calendar-view {
+    -fx-background-color: transparent;
+}
+
+/* Style el boutons (ken fama) */
+.button {
+    -fx-background-color: #2d5a27 !important; /* Akhdhar ghome9 */
+    -fx-text-fill: white !important;
+    -fx-background-radius: 8 !important;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: #1b4332 !important;
+}

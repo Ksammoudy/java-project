@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox spacing="20.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.controllers.gestionevent.AjouterEvenementControllerFront">
+
+    <padding>
+        <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+    </padding>
+
+    <children>
+        <Label text="➕ Proposer une Nouvelle Action" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2D5A27;" />
+
+        <GridPane hgap="15.0" vgap="15.0">
+            <columnConstraints>
+                <ColumnConstraints prefWidth="150.0" />
+                <ColumnConstraints hgrow="ALWAYS" />
+            </columnConstraints>
+
+            <children>
+                <Label text="Titre de l'événement:" GridPane.rowIndex="0" />
+                <TextField fx:id="txtTitre" promptText="Ex: Nettoyage Plage Hammamet" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                <Label text="Lieu / Adresse:" GridPane.rowIndex="1" />
+                <TextField fx:id="txtLieu" promptText="Ex: Hammamet, Nabeul" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                <Label text="Date de l'action:" GridPane.rowIndex="2" />
+                <DatePicker fx:id="datePicker" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                <Label text="Organisateur:" GridPane.rowIndex="3" />
+                <TextField fx:id="txtOrganisateur" promptText="Votre nom ou association" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+                <Label text="Description détaillée:" GridPane.rowIndex="4" />
+                <TextArea fx:id="txtDescription" prefHeight="100.0" promptText="Expliquez l'objectif de l'événement..." GridPane.columnIndex="1" GridPane.rowIndex="4" wrapText="true" />
+            </children>
+        </GridPane>
+
+        <HBox alignment="CENTER_RIGHT" spacing="15.0">
+            <Button text="Annuler" style="-fx-cursor: hand;" />
+            <Button onAction="#handleSave" text="🚀 Publier l'Événement" style="-fx-background-color: #97D73F; -fx-text-fill: #1B3F18; -fx-font-weight: bold; -fx-padding: 10 25 10 25; -fx-background-radius: 10; -fx-cursor: hand;" />
+        </HBox>
+    </children>
+</VBox>

@@ -1,0 +1,73 @@
+/* Sidebar Setup */
+.sidebar {
+    -fx-background-color: #1a3a2a; /* El lon el a5dher el ghamiq mte3 WasteWise */
+}
+
+.sidebar-header {
+    -fx-padding: 30 20 30 20;
+}
+
+.brand-title {
+    -fx-text-fill: #8bd22f; /* El lon el a5dher el fate7 */
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+}
+
+.brand-subtitle {
+    -fx-text-fill: rgba(255,255,255,0.6);
+    -fx-font-size: 12px;
+}
+
+.sidebar-menu {
+    -fx-padding: 10 15 0 15;
+}
+
+.menu-label {
+    -fx-text-fill: rgba(255,255,255,0.4);
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 5 10;
+}
+
+/* Sidebar Buttons */
+.sidebar-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: rgba(255,255,255,0.8);
+    -fx-font-size: 14px;
+    -fx-font-weight: 500;
+    -fx-padding: 12 15;
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.sidebar-btn:hover {
+    -fx-background-color: rgba(139,210,47,0.15);
+    -fx-text-fill: #8bd22f;
+}
+
+/* Logout specific */
+.logout-btn {
+    -fx-text-fill: #ff6b6b;
+}
+
+.logout-btn:hover {
+    -fx-background-color: rgba(255,107,107,0.1);
+    -fx-text-fill: #ff5252;
+}
+
+/* Main Area */
+.main-area {
+    -fx-background-color: #f8fafc;
+}
+
+.page-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #1a3a2a;
+}
+
+.page-subtitle {
+    -fx-font-size: 14px;
+    -fx-text-fill: #64748b;
+}

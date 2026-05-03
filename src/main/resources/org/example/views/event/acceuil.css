@@ -1,0 +1,46 @@
+/* =========================================
+   WASTEWISE TN - ACCUEIL STYLE
+   ========================================= */
+
+/* 1. Container el kbir (AnchorPane) */
+.root {
+    -fx-background-color: linear-gradient(to bottom right, #ffffff, #f0f9f1); /* Gradient khfif bech ma t-jich fergha barcha */
+}
+
+/* 2. El VBox elli fih el Labels */
+.vbox {
+    -fx-padding: 50;
+    -fx-background-color: transparent;
+}
+
+/* 3. El Label el kbir (Bienvenue...) */
+/* Note: Fil FXML mte3ek mouch 7atélha class, tnajem tzid styleClass="welcome-title" */
+.label {
+    -fx-text-fill: #1a3a2a; /* El khdar el ghamaq mta3 el projet */
+    -fx-font-family: "Segoe UI Bold", "System Bold", sans-serif;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 5, 0, 0, 2);
+}
+
+/* 4. El Subtitle (WasteWiseTN : Gérer...) */
+/* Tnajem tzidou styleClass="welcome-subtitle" */
+.label.secondary {
+    -fx-text-fill: #666666;
+    -fx-font-style: italic;
+}
+
+/* 5. Ken t7eb tzid bouton "Commencer" ba3d el labels */
+.button {
+    -fx-background-color: #8bd22f;
+    -fx-text-fill: #1a3a2a;
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+    -fx-padding: 12 30;
+    -fx-background-radius: 25;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);
+}
+
+.button:hover {
+    -fx-background-color: #76c023;
+    -fx-translate-y: -2; /* Effect animation sghira */
+}
