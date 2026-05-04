@@ -249,31 +249,32 @@ public class Main extends Application {
     }
 
     public static void showDeclarationCitizenFormPage() {
-        navigateTo("/org/example/views/declaration_dechet_citizen_form.fxml", "Declarer un dechet", 1200, 750);
+        // Redirige vers la liste des déclarations (vue citoyen non implémentée)
+        navigateTo("/org/example/views/declaration_dechet_list.fxml", "Déclarer un déchet", 1200, 750);
     }
 
     public static void showCitizenMyDeclarationsPage() {
-        navigateTo("/org/example/views/citizen_my_declarations.fxml", "Mes declarations", 1200, 750);
+        navigateTo("/org/example/views/declaration_dechet_list.fxml", "Mes déclarations", 1200, 750);
     }
 
     public static void showCitizenStatisticsPage() {
-        navigateTo("/org/example/views/citizen_statistics.fxml", "Statistiques", 1200, 750);
+        navigateTo("/org/example/views/dashboard_citizen.fxml", "Statistiques", 1200, 750);
     }
 
     public static void showCitizenNewsPage() {
-        navigateTo("/org/example/views/citizen_news.fxml", "Nouveautes", 1200, 750);
+        navigateTo("/org/example/views/dashboard_citizen.fxml", "Nouveautés", 1200, 750);
     }
 
     public static void showCitizenAirQualityPage() {
-        navigateTo("/org/example/views/citizen_air_quality.fxml", "Air Quality", 1200, 750);
+        navigateTo("/org/example/views/dashboard_citizen.fxml", "Air Quality", 1200, 750);
     }
 
     public static void showCitizenWithdrawPage() {
-        navigateTo("/org/example/views/citizen_withdraw.fxml", "Withdraw", 1200, 750);
+        navigateTo("/org/example/views/dashboard_citizen.fxml", "Withdraw", 1200, 750);
     }
 
     public static void showCitizenSettingsPage() {
-        navigateTo("/org/example/views/citizen_settings.fxml", "Parametres", 1200, 750);
+        navigateTo("/org/example/views/usser/profile_view.fxml", "Paramètres", 1200, 750);
     }
 
     // =========================

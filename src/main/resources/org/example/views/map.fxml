@@ -7,22 +7,28 @@
 <?import javafx.scene.text.Text?>
 
 <BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.controllers.MapController"
+            styleClass="workspace-root"
             stylesheets="@../styles/style.css">
 
-    <!-- SIDEBAR -->
     <left>
-        <VBox styleClass="sidebar" prefWidth="280" style="-fx-background-color: #1a3a2a;">
-            <VBox styleClass="sidebar-header" spacing="10" alignment="CENTER" style="-fx-padding: 30 0 30 0;">
-                <Text text="🌱 WasteWise" style="-fx-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;"/>
+        <VBox prefWidth="276.0" spacing="10.0" styleClass="workspace-sidebar">
+            <padding>
+                <Insets top="24.0" right="16.0" bottom="16.0" left="16.0"/>
+            </padding>
+            <VBox spacing="4.0" styleClass="brand-shell">
+                <Label text="WasteWise" styleClass="brand-logo-text"/>
             </VBox>
-
-            <VBox styleClass="sidebar-menu" spacing="5" style="-fx-padding: 20 15 0 15;">
-                <Text style="-fx-fill: rgba(255,255,255,0.4); -fx-font-size: 11px; -fx-font-weight: bold;">MAIN</Text>
-                <Button text="📊 Dashboard" styleClass="sidebar-btn" onAction="#goToDashboard"/>
-                <Button text="📍 Zones Polluées" styleClass="sidebar-btn" onAction="#goToZones"/>
-                <Button text="📈 Indicateurs" styleClass="sidebar-btn" onAction="#goToIndicateurs"/>
-                <Button text="🗺️ Carte" styleClass="sidebar-btn active"/>
-                <Button text="📱 Scans QR" styleClass="sidebar-btn" onAction="#goToQRDashboard"/>
+            <Label text="Menu Principal" styleClass="sidebar-section"/>
+            <Button text="📈 Dashboard" onAction="#goToDashboard" maxWidth="Infinity" styleClass="sidebar-nav muted"/>
+            <Label text="Zones &amp; Impact" styleClass="sidebar-section"/>
+            <Button text="📍 Zones Polluées" onAction="#goToZones" maxWidth="Infinity" styleClass="sidebar-nav muted"/>
+            <Button text="📊 Indicateurs" onAction="#goToIndicateurs" maxWidth="Infinity" styleClass="sidebar-nav muted"/>
+            <Button text="🗺️ Carte" maxWidth="Infinity" styleClass="sidebar-nav active"/>
+            <Button text="📱 Scans QR" onAction="#goToQRDashboard" maxWidth="Infinity" styleClass="sidebar-nav muted"/>
+            <Region VBox.vgrow="ALWAYS"/>
+            <VBox spacing="2.0" styleClass="sidebar-footer">
+                <Label text="Admin" styleClass="user-meta-name"/>
+                <Label text="Administrateur" styleClass="user-meta-role"/>
             </VBox>
         </VBox>
     </left>

@@ -7,28 +7,43 @@
 <?import javafx.scene.text.Text?>
 
 <BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.controllers.AdvancedDashboardController"
+            styleClass="workspace-root"
             stylesheets="@../styles/style.css">
 
-    <!-- Top Header -->
-    <top>
-        <VBox style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;">
-            <HBox spacing="20" alignment="CENTER_LEFT" style="-fx-padding: 15 20;">
-                <Label text="📊" style="-fx-font-size: 28px;"/>
-                <VBox>
-                    <Label text="Tableau de Bord Avancé" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2e7d32;"/>
-                    <Label fx:id="lastUpdatedLabel" text="Dernière mise à jour: --" style="-fx-text-fill: #666; -fx-font-size: 11px;"/>
-                </VBox>
-                <Region HBox.hgrow="ALWAYS"/>
-
-                <Button text="🔄 Rafraîchir" onAction="#refreshDashboard"/>
-                <Button text="📥 Exporter" onAction="#exportFullReport"/>
-            </HBox>
+    <!-- Sidebar -->
+    <left>
+        <VBox prefWidth="276.0" spacing="10.0" styleClass="workspace-sidebar">
+            <padding>
+                <Insets top="24.0" right="16.0" bottom="16.0" left="16.0"/>
+            </padding>
+            <VBox spacing="4.0" styleClass="brand-shell">
+                <Label text="WasteWise" styleClass="brand-logo-text"/>
+            </VBox>
+            <Label text="Menu Principal" styleClass="sidebar-section"/>
+            <Button text="📈 Dashboard" onAction="#goToDashboard" maxWidth="Infinity" styleClass="sidebar-nav muted"/>
+            <Label text="Zones &amp; Impact" styleClass="sidebar-section"/>
+            <Button text="📍 Zones Polluées" onAction="#goToZones" maxWidth="Infinity" styleClass="sidebar-nav muted"/>
+            <Button text="🗺️ Carte" onAction="#goToMap" maxWidth="Infinity" styleClass="sidebar-nav muted"/>
+            <Button text="📊 Indicateurs" onAction="#goToIndicators" maxWidth="Infinity" styleClass="sidebar-nav muted"/>
+            <Button text="📊 Dashboard Avancé" maxWidth="Infinity" styleClass="sidebar-nav active"/>
+            <Button text="🤖 Assistant IA" onAction="#goToChatbot" maxWidth="Infinity" styleClass="sidebar-nav muted"/>
+            <Region VBox.vgrow="ALWAYS"/>
+            <VBox spacing="2.0" styleClass="sidebar-footer">
+                <Label text="Admin" styleClass="user-meta-name"/>
+                <Label text="Administrateur" styleClass="user-meta-role"/>
+            </VBox>
         </VBox>
-    </top>
-
-    <!-- Main Content -->
+    </left>
     <center>
-        <ScrollPane fitToWidth="true" style="-fx-background-color: #f5f5f5;">
+        <VBox styleClass="workspace-main">
+            <HBox spacing="12.0" alignment="CENTER_LEFT" styleClass="workspace-topbar">
+                <Label text="Dashboard Avancé" styleClass="workspace-title"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="🔄 Rafraîchir" onAction="#refreshDashboard" styleClass="outline-btn"/>
+                <Button text="📥 Exporter" onAction="#exportFullReport" styleClass="primary-btn"/>
+                <Label fx:id="lastUpdatedLabel" text="Dernière mise à jour: --" styleClass="workspace-subtitle-strong"/>
+            </HBox>
+            <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="content-scroll">
             <VBox spacing="20" style="-fx-padding: 20;">
 
                 <!-- Stats Cards Row -->
@@ -182,29 +197,7 @@
 
             </VBox>
         </ScrollPane>
-    </center>
-
-    <!-- Sidebar -->
-    <left>
-        <VBox prefWidth="250" style="-fx-background-color: #1a3a2a;">
-            <VBox spacing="10" alignment="CENTER" style="-fx-padding: 30 0 30 0;">
-                <Text text="🌱 WasteWise" style="-fx-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;"/>
-                <Text text="Analytics Pro" style="-fx-fill: rgba(255,255,255,0.6); -fx-font-size: 12px;"/>
-            </VBox>
-
-            <VBox spacing="5" style="-fx-padding: 20 15 0 15;">
-                <Text style="-fx-fill: rgba(255,255,255,0.4); -fx-font-size: 11px; -fx-font-weight: bold;">NAVIGATION</Text>
-                <Button text="📊 Dashboard Avancé" styleClass="sidebar-btn"/>
-                <Button text="📍 Zones Polluées" onAction="#goToZones"/>
-                <Button text="🗺️ Carte Interactive" onAction="#goToMap"/>
-                <Button text="📈 Indicateurs" onAction="#goToIndicators"/>
-                <Button text="🤖 Assistant IA" onAction="#goToChatbot"/>
-            </VBox>
-
-            <VBox spacing="10" alignment="BOTTOM_CENTER" style="-fx-padding: 30 15 20 15;">
-                <Text text="© 2024-2025 WasteWise TN" style="-fx-fill: rgba(255,255,255,0.3); -fx-font-size: 10px;"/>
-            </VBox>
         </VBox>
-    </left>
+    </center>
 
 </BorderPane>
