@@ -17,34 +17,11 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="org.example.controllers.DeclarationDechetListController"
-            styleClass="workspace-root">
-    <left>
-        <VBox prefWidth="276.0" spacing="10.0" styleClass="workspace-sidebar">
-            <padding>
-                <Insets top="24.0" right="16.0" bottom="16.0" left="16.0"/>
-            </padding>
-            <VBox spacing="4.0" styleClass="brand-shell">
-                <Label text="WasteWise" styleClass="brand-logo-text"/>
-            </VBox>
-            <Label text="Menu Principal" styleClass="sidebar-section"/>
-            <Button text="Tableau de bord" onAction="#openAdminDashboard" maxWidth="Infinity" styleClass="sidebar-nav muted"/>
-            <Label text="Gestion dechets" styleClass="sidebar-section"/>
-            <Button text="Types de dechets" onAction="#openTypeDechetWorkshop" maxWidth="Infinity" styleClass="sidebar-nav muted"/>
-            <Button text="Declarations" maxWidth="Infinity" styleClass="sidebar-nav active"/>
-            <Label text="Administration" styleClass="sidebar-section"/>
-            <Button text="Utilisateurs" onAction="#openUsers" maxWidth="Infinity" styleClass="sidebar-nav muted"/>
-            <Region VBox.vgrow="ALWAYS"/>
-            <VBox spacing="2.0" styleClass="sidebar-footer">
-                <Label text="Utilisateur Demo" styleClass="user-meta-name"/>
-                <Label text="Admin" styleClass="user-meta-role"/>
-            </VBox>
-        </VBox>
-    </left>
-    <center>
-        <VBox styleClass="workspace-main">
-            <HBox spacing="12.0" alignment="CENTER_LEFT" styleClass="workspace-topbar">
+            styleClass="workspace-main">
+    <VBox styleClass="workspace-main">
+        <HBox spacing="12.0" alignment="CENTER_LEFT" styleClass="workspace-topbar">
                 <Button text="Menu" styleClass="crumb-button"/>
                 <Label text="Home >" styleClass="crumb-text"/>
                 <Label text="Admin >" styleClass="crumb-text"/>
@@ -168,6 +145,5 @@
                     </VBox>
                 </content>
             </ScrollPane>
-        </VBox>
-    </center>
-</BorderPane>
+    </VBox>
+</VBox>

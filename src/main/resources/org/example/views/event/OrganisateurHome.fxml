@@ -3,65 +3,37 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
-<?import java.net.URL?>
 
-<BorderPane prefHeight="700.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.controllers.gestionevent.OrganisateurHomeController" >
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.example.controllers.gestionevent.OrganisateurHomeController"
+      VBox.vgrow="ALWAYS">
 
+    <StackPane fx:id="contentArea" styleClass="main-content" VBox.vgrow="ALWAYS">
+        <VBox fx:id="tableViewContainer" spacing="20.0">
+            <padding>
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+            </padding>
+            <Label style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1B5E20;"
+                   text="📑 Mes Actions Proposées"/>
 
-    <left>
-        <VBox prefWidth="250.0" spacing="10.0" styleClass="sidebar">
-            <children>
-                <Label styleClass="logo-text" text="WasteWise Pro">
-                    <VBox.margin>
-                        <Insets bottom="30.0" left="20.0" top="20.0" />
-                    </VBox.margin>
-                </Label>
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
+                <TextField fx:id="searchField" prefWidth="350.0"
+                           promptText="Entrez votre nom d'organisateur..."
+                           style="-fx-background-radius: 20;"/>
+                <Button onAction="#handleFilter"
+                        style="-fx-background-color: #2D6A4F; -fx-text-fill: white; -fx-background-radius: 10;"
+                        text="Filtrer"/>
+            </HBox>
 
-                <Button maxWidth="Infinity" onAction="#showMyEvents" prefHeight="45.0" styleClass="nav-button" text="📑 Mes Événements">
-                    <VBox.margin><Insets left="10.0" right="10.0" /></VBox.margin>
-                </Button>
-
-                <Button maxWidth="Infinity" onAction="#showAjouter" prefHeight="45.0" styleClass="nav-button" text="➕ Créer Événement">
-                    <VBox.margin><Insets left="10.0" right="10.0" /></VBox.margin>
-                </Button>
-
-                <Region VBox.vgrow="ALWAYS" />
-
-                <Button maxWidth="Infinity" onAction="#handleLogout" prefHeight="45.0" styleClass="nav-button" text="🚪 Déconnexion">
-                    <VBox.margin><Insets bottom="20.0" left="10.0" right="10.0" /></VBox.margin>
-                </Button>
-            </children>
+            <TableView fx:id="eventTable" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="colTitre" prefWidth="180" text="Titre"/>
+                    <TableColumn fx:id="colDate" prefWidth="150" text="Date &amp; Heure"/>
+                    <TableColumn fx:id="colOrg" prefWidth="150" text="Organisateur"/>
+                    <TableColumn fx:id="colGestion" prefWidth="300" text="Gestion"/>
+                </columns>
+            </TableView>
         </VBox>
-    </left>
+    </StackPane>
 
-    <center>
-        <StackPane fx:id="contentArea" styleClass="main-content">
-            <children>
-                <VBox fx:id="tableViewContainer" spacing="20.0">
-                    <padding>
-                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-                    </padding>
-                    <children>
-                        <Label style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1B5E20;" text="📑 Mes Actions Proposées" />
-
-                        <HBox alignment="CENTER_LEFT" spacing="10.0">
-                            <children>
-                                <TextField fx:id="searchField" prefWidth="350.0" promptText="Entrez votre nom d'organisateur..." style="-fx-background-radius: 20;" />
-                                <Button onAction="#handleFilter" style="-fx-background-color: #2D6A4F; -fx-text-fill: white; -fx-background-radius: 10;" text="Filtrer" />
-                            </children>
-                        </HBox>
-
-                        <TableView fx:id="eventTable" VBox.vgrow="ALWAYS">
-                            <columns>
-                                <TableColumn fx:id="colTitre" prefWidth="180" text="Titre" />
-                                <TableColumn fx:id="colDate" prefWidth="150" text="Date &amp; Heure" />
-                                <TableColumn fx:id="colOrg" prefWidth="150" text="Organisateur" />
-                                <TableColumn fx:id="colGestion" prefWidth="300" text="Gestion" />
-                            </columns>
-                        </TableView>
-                    </children>
-                </VBox>
-            </children>
-        </StackPane>
-    </center>
-</BorderPane>
+</VBox>
