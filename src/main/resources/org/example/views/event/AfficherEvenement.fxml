@@ -28,7 +28,7 @@
                     </items>
                 </ComboBox>
 
-                <Button text="+ Créer" onAction="#handleGoToAjouter"
+                <Button fx:id="btnCreer" text="+ Créer" onAction="#handleGoToAjouter"
                         style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 20; -fx-background-radius: 10; -fx-cursor: hand;"/>
             </children>
         </HBox>

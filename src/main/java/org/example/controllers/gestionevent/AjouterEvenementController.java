@@ -101,7 +101,7 @@ public class AjouterEvenementController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Parent root = loader.load();
 
-            AnchorPane contentArea = (AnchorPane) txtTitre.getScene().lookup("#contentArea");
+            javafx.scene.layout.StackPane contentArea = (javafx.scene.layout.StackPane) txtTitre.getScene().lookup("#contentArea");
             if (contentArea != null) {
                 contentArea.getChildren().clear();
                 contentArea.getChildren().add(root);

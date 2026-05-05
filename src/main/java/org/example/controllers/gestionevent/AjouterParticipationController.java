@@ -100,7 +100,7 @@ public class AjouterParticipationController implements Initializable {
     private void handleCancel() {
         try {
             Parent root = FXMLLoader.load(getClass().getResource("/org/example/views/event/AfficherParticipations.fxml"));
-            AnchorPane contentArea = (AnchorPane) txtNomCitoyen.getScene().lookup("#contentArea");
+            javafx.scene.layout.StackPane contentArea = (javafx.scene.layout.StackPane) txtNomCitoyen.getScene().lookup("#contentArea");
             if (contentArea != null) {
                 contentArea.getChildren().setAll(root);
             }

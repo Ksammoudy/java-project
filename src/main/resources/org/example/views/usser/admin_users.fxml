@@ -17,7 +17,7 @@
             fx:controller="org.example.controllers.UserController"
             prefWidth="1200.0" prefHeight="750.0"
             styleClass="dashboard-root"
-            stylesheets="@../styles/style.css">
+            stylesheets="/org/example/styles/style.css">
 
     <top>
         <VBox spacing="18.0" styleClass="main-area">

@@ -8,7 +8,7 @@
 
 <VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.controllers.AdvancedDashboardController"
             styleClass="workspace-root"
-            stylesheets="@../styles/style.css">
+            stylesheets="/org/example/styles/style.css">
 
     <VBox styleClass="workspace-main">
         <HBox spacing="12.0" alignment="CENTER_LEFT" styleClass="workspace-topbar">
@@ -175,3 +175,4 @@
     </VBox>
 
 </VBox>
+

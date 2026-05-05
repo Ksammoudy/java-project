@@ -569,10 +569,10 @@ public class ZonePollueeController {
             }
         }
 
+        // L'indicateur est désormais optionnel, on ne bloque plus l'enregistrement s'il est vide.
         if (indicateur == null) {
-            errorIndicateurLabel.setText("❌ Veuillez sélectionner un indicateur");
-            errorIndicateurLabel.setVisible(true);
-            isValid = false;
+            // Aucune erreur, l'indicateur sera juste enregistré comme NULL en base de données.
+            errorIndicateurLabel.setVisible(false);
         }
 
         if (isValid) {

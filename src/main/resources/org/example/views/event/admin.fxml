@@ -9,6 +9,27 @@
       stylesheets="@admin.css"
       VBox.vgrow="ALWAYS">
 
+    <!-- Barre de navigation horizontale en haut du contenu -->
+    <HBox spacing="8" style="-fx-background-color: #1a3a2a; -fx-padding: 10 16 10 16;">
+        <Button fx:id="btnDashboard"
+                text="📊 Dashboard"
+                onAction="#handleNavigationDashboard"
+                style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 13px; -fx-cursor: hand; -fx-background-radius: 8; -fx-padding: 8 14 8 14;"/>
+        <Button fx:id="btnParticipations"
+                text="🎟 Participations"
+                onAction="#handleNavigationParticipation"
+                style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 13px; -fx-cursor: hand; -fx-background-radius: 8; -fx-padding: 8 14 8 14;"/>
+        <Button fx:id="btnEvenements"
+                text="📅 Événements"
+                onAction="#handleNavigationEvent"
+                style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 13px; -fx-cursor: hand; -fx-background-radius: 8; -fx-padding: 8 14 8 14;"/>
+        <Button fx:id="btnCalendrier"
+                text="🗓 Calendrier"
+                onAction="#handleNavigationCalendrier"
+                style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 13px; -fx-cursor: hand; -fx-background-radius: 8; -fx-padding: 8 14 8 14;"/>
+    </HBox>
+
+    <!-- Zone de contenu dynamique -->
     <AnchorPane fx:id="contentArea" VBox.vgrow="ALWAYS"
                 style="-fx-background-color: #F4F7F6;"/>
 

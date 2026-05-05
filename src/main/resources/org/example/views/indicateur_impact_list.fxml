@@ -7,7 +7,7 @@
 
 <VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.controllers.IndicateurImpactController"
             styleClass="workspace-root"
-            stylesheets="@../styles/style.css">
+            stylesheets="/org/example/styles/style.css">
 
     <!-- MAIN CONTENT -->
     <VBox styleClass="main-content" spacing="20" style="-fx-padding: 20;">
@@ -64,3 +64,4 @@
         </VBox>
     </VBox>
 </VBox>
+

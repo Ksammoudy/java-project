@@ -33,6 +33,7 @@ public class AfficherEvenementsController implements Initializable {
 
     @FXML private TextField searchField;
     @FXML private ComboBox<String> sortComboBox;
+    @FXML private Button btnCreer;
 
     private final EvenementServices es = new EvenementServices();
     private ObservableList<Evenement> masterData = FXCollections.observableArrayList();
@@ -72,6 +73,20 @@ public class AfficherEvenementsController implements Initializable {
 
         setupActions();
         loadData();
+
+        // 🛡️ Gérer la visibilité du bouton Créer et de la colonne Actions selon le rôle
+        org.example.models.User user = org.example.services.SessionManager.getCurrentUser();
+        if (user != null) {
+            String role = user.getType() != null ? user.getType().trim().toUpperCase() : "";
+            if (role.equals("CITIZEN") || role.equals("CITOYEN") || role.equals("VALORIZER") || role.equals("VALORISATEUR")) {
+                if (btnCreer != null) {
+                    btnCreer.setVisible(false);
+                    btnCreer.setManaged(false);
+                }
+                // Si l'utilisateur est citoyen, on cache la colonne des actions Edit/Delete
+                colActions.setVisible(false);
+            }
+        }
 
         // Search Logic
         FilteredList<Evenement> filteredData = new FilteredList<>(masterData, e -> true);
@@ -136,7 +151,7 @@ public class AfficherEvenementsController implements Initializable {
             Parent root = loader.load();
             AjouterEvenementController controller = loader.getController();
             controller.initData(ev); // Thabbet el méthode hedhi mawjouda f-AjouterEvenementController
-            AnchorPane contentArea = (AnchorPane) eventTable.getScene().lookup("#contentArea");
+            javafx.scene.layout.StackPane contentArea = (javafx.scene.layout.StackPane) eventTable.getScene().lookup("#contentArea");
             contentArea.getChildren().setAll(root);
         } catch (Exception e) { e.printStackTrace(); }
     }
@@ -157,7 +172,7 @@ public class AfficherEvenementsController implements Initializable {
     private void handleGoToAjouter() {
         try {
             Parent root = FXMLLoader.load(getClass().getResource("/org/example/views/event/AjouterEvenement.fxml"));
-            AnchorPane contentArea = (AnchorPane) eventTable.getScene().lookup("#contentArea");
+            javafx.scene.layout.StackPane contentArea = (javafx.scene.layout.StackPane) eventTable.getScene().lookup("#contentArea");
             contentArea.getChildren().setAll(root);
         } catch (Exception e) { e.printStackTrace(); }
     }

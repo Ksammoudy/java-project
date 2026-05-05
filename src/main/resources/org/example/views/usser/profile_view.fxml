@@ -7,78 +7,94 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.StackPane?>
 
 <BorderPane fx:id="rootPane"
             xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="org.example.controllers.ProfileController"
-            prefWidth="1200.0" prefHeight="750.0"
-            styleClass="citizen-root"
-            stylesheets="@../styles/style.css">
+            styleClass="content-scroll"
+            stylesheets="/org/example/styles/style.css">
 
     <center>
-        <VBox spacing="20.0" styleClass="citizen-main">
-            <padding>
-                <Insets top="30.0" right="30.0" bottom="30.0" left="30.0"/>
-            </padding>
+        <VBox spacing="30.0" styleClass="workspace-content">
+            
+            <!-- En-tête de la page -->
+            <VBox spacing="8.0">
+                <HBox alignment="CENTER_LEFT" spacing="16.0">
+                    <Label text="👤 Mon Profil" styleClass="workspace-title"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button text="✏️ Modifier le profil" onAction="#handleEditProfilePage" styleClass="primary-btn"/>
+                </HBox>
+                <Label text="Consultez et mettez à jour vos informations personnelles." styleClass="workspace-subtitle-strong"/>
+            </VBox>
 
-            <HBox spacing="20.0" alignment="CENTER_LEFT">
-                <VBox spacing="5.0">
-                    <Label text="👤 Mon profil" styleClass="citizen-h1"/>
-                    <Label text="Consulte et mets à jour tes informations" styleClass="citizen-sub"/>
-                </VBox>
+            <!-- Carte principale contenant les infos -->
+            <VBox spacing="25.0" styleClass="panel-card" maxWidth="800">
+                <padding>
+                    <Insets top="30" right="40" bottom="30" left="40"/>
+                </padding>
+                
+                <!-- Section Avatar & Nom -->
+                <HBox spacing="24.0" alignment="CENTER_LEFT">
+                    <!-- Avatar stylisé avec fond -->
+                    <StackPane style="-fx-background-color: #eaf5ee; -fx-background-radius: 50; -fx-pref-width: 85; -fx-pref-height: 85; -fx-min-width: 85; -fx-min-height: 85; -fx-border-color: #c9e6d4; -fx-border-radius: 50; -fx-border-width: 2px;">
+                        <Label text="👤" style="-fx-font-size: 38px; -fx-text-fill: #2d7b4f;"/>
+                    </StackPane>
 
-                <Region HBox.hgrow="ALWAYS"/>
-
-                <Button text="✏ Modifier"
-                        onAction="#handleEditProfilePage"
-                        styleClass="citizen-top-btn primary"/>
-            </HBox>
-
-            <VBox spacing="15.0" styleClass="citizen-card2">
-                <Label text="Informations" styleClass="citizen-card-title"/>
-
-                <HBox spacing="16.0">
-                    <VBox spacing="4.0" HBox.hgrow="ALWAYS" styleClass="small-box">
-                        <Label text="Nom" styleClass="small-box-title"/>
-                        <Label fx:id="nomLabel" text="--" styleClass="small-box-text"/>
-                    </VBox>
-
-                    <VBox spacing="4.0" HBox.hgrow="ALWAYS" styleClass="small-box">
-                        <Label text="Prénom" styleClass="small-box-title"/>
-                        <Label fx:id="prenomLabel" text="--" styleClass="small-box-text"/>
+                    <VBox spacing="8.0" alignment="CENTER_LEFT">
+                        <Label fx:id="nameTitle" text="Chargement..." style="-fx-font-size: 26px; -fx-font-weight: 900; -fx-text-fill: #153626;"/>
+                        <Label fx:id="roleSubtitle" text="Chargement..." styleClass="risk-chip-low" style="-fx-font-size: 14px; -fx-padding: 6 16 6 16;"/>
                     </VBox>
                 </HBox>
+                
+                <!-- Séparateur horizontal -->
+                <Region style="-fx-background-color: #eef2f3; -fx-pref-height: 1px; -fx-min-height: 1px;"/>
 
-                <HBox spacing="16.0">
-                    <VBox spacing="4.0" HBox.hgrow="ALWAYS" styleClass="small-box">
-                        <Label text="Téléphone" styleClass="small-box-title"/>
-                        <Label fx:id="telephoneLabel" text="--" styleClass="small-box-text"/>
+                <!-- Grille d'informations -->
+                <GridPane hgap="60.0" vgap="30.0">
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="50.0" />
+                        <ColumnConstraints percentWidth="50.0" />
+                    </columnConstraints>
+
+                    <VBox spacing="8.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                        <Label text="Nom de famille" styleClass="stat-title"/>
+                        <Label fx:id="nomLabel" text="--" styleClass="stat-value"/>
                     </VBox>
 
-                    <VBox spacing="4.0" HBox.hgrow="ALWAYS" styleClass="small-box">
-                        <Label text="Email" styleClass="small-box-title"/>
-                        <Label fx:id="emailLabel" text="--" styleClass="small-box-text"/>
+                    <VBox spacing="8.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                        <Label text="Prénom" styleClass="stat-title"/>
+                        <Label fx:id="prenomLabel" text="--" styleClass="stat-value"/>
                     </VBox>
-                </HBox>
 
-                <HBox spacing="16.0">
-                    <VBox spacing="4.0" HBox.hgrow="ALWAYS" styleClass="small-box">
-                        <Label text="Type" styleClass="small-box-title"/>
-                        <Label fx:id="roleLabel" text="--" styleClass="small-box-text"/>
+                    <VBox spacing="8.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                        <Label text="Adresse Email" styleClass="stat-title"/>
+                        <Label fx:id="emailLabel" text="--" styleClass="stat-value" style="-fx-text-fill: #1a5c38;"/>
                     </VBox>
-                </HBox>
 
-                <HBox spacing="12.0">
-                    <Button text="✏ Modifier mon profil"
-                            onAction="#handleEditProfilePage"
-                            styleClass="citizen-action-btn"/>
-
-                    <Button text="↩ Retour au dashboard"
-                            onAction="#handleBackToDashboard"
-                            styleClass="citizen-action-btn"/>
+                    <VBox spacing="8.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                        <Label text="Téléphone" styleClass="stat-title"/>
+                        <Label fx:id="telephoneLabel" text="--" styleClass="stat-value"/>
+                    </VBox>
+                    
+                    <VBox spacing="8.0" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                        <Label text="Type de compte" styleClass="stat-title"/>
+                        <Label fx:id="roleLabel" text="--" styleClass="stat-value"/>
+                    </VBox>
+                </GridPane>
+                
+                <!-- Espacement avant les boutons d'action -->
+                <Region style="-fx-pref-height: 10px;"/>
+                
+                <!-- Actions du bas -->
+                <HBox spacing="15.0" alignment="CENTER_LEFT">
+                    <Button text="↩ Retour au dashboard" onAction="#handleBackToDashboard" styleClass="outline-btn" style="-fx-padding: 10 24;"/>
                 </HBox>
             </VBox>
+
         </VBox>
     </center>
 </BorderPane>

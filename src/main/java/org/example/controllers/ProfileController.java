@@ -29,6 +29,12 @@ public class ProfileController {
     private Label roleLabel;
 
     @FXML
+    private Label nameTitle;
+
+    @FXML
+    private Label roleSubtitle;
+
+    @FXML
     private TextField nomField;
 
     @FXML
@@ -82,6 +88,14 @@ public class ProfileController {
         }
         if (roleLabel != null) {
             roleLabel.setText(formatType(currentUser.getType()));
+        }
+        if (nameTitle != null) {
+            String fullName = (nullToEmpty(currentUser.getPrenom()) + " " + nullToEmpty(currentUser.getNom())).trim();
+            if (fullName.isEmpty()) fullName = currentUser.getEmail();
+            nameTitle.setText(fullName);
+        }
+        if (roleSubtitle != null) {
+            roleSubtitle.setText(formatType(currentUser.getType()));
         }
 
         if (nomField != null) {

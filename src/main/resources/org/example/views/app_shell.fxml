@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
@@ -12,122 +13,127 @@
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="org.example.controllers.AppShellController"
             styleClass="workspace-root"
-            stylesheets="@../styles/style.css">
+            stylesheets="/org/example/styles/style.css">
 
     <!-- ═══════════════════════════════════════════
          SIDEBAR GLOBALE — reste toujours visible
          ═══════════════════════════════════════════ -->
     <left>
-        <VBox fx:id="sidebar" prefWidth="276.0" spacing="6.0" styleClass="workspace-sidebar">
-            <padding>
-                <Insets top="24.0" right="16.0" bottom="16.0" left="16.0"/>
-            </padding>
+        <ScrollPane fitToWidth="true" fitToHeight="true" hbarPolicy="NEVER" styleClass="content-scroll">
+            <VBox fx:id="sidebar" prefWidth="276.0" spacing="6.0" styleClass="workspace-sidebar">
+                <padding>
+                    <Insets top="24.0" right="16.0" bottom="16.0" left="16.0"/>
+                </padding>
 
-            <!-- Brand -->
-            <VBox spacing="2.0" styleClass="brand-shell">
-                <Label text="WasteWise" styleClass="brand-logo-text"/>
-                <Label fx:id="brandSubtitle" text="" styleClass="brand-subtitle"/>
+                <!-- Brand -->
+                <VBox spacing="2.0" styleClass="brand-shell">
+                    <Label text="WasteWise" styleClass="brand-logo-text"/>
+                    <Label fx:id="brandSubtitle" text="" styleClass="brand-subtitle"/>
+                </VBox>
+
+                <!-- ══════════════════════════════
+                     SECTION CITOYEN
+                     Pages: profil, offres(accueil+réponses), events(participation+badge), zones, carte, IA
+                     ══════════════════════════════ -->
+                <VBox fx:id="sectionCitoyen" managed="false" visible="false" spacing="0">
+                    <Label text="Mon espace" styleClass="sidebar-section"/>
+                    <Button fx:id="cit_profil"        text="👤 Mon Profil"            onAction="#nav_cit_profil"        maxWidth="Infinity" styleClass="sidebar-nav"/>
+
+                    <Label text="Offres" styleClass="sidebar-section"/>
+                    <Button fx:id="cit_offres"         text="🏠 Accueil Offres"        onAction="#nav_cit_offres"         maxWidth="Infinity" styleClass="sidebar-nav"/>
+                    <Button fx:id="cit_reponses"       text="📋 Mes Réponses"          onAction="#nav_cit_reponses"       maxWidth="Infinity" styleClass="sidebar-nav"/>
+
+                    <Label text="Événements" styleClass="sidebar-section"/>
+                    <Button fx:id="cit_events"         text="📅 Tous les Événements"   onAction="#nav_cit_events"         maxWidth="Infinity" styleClass="sidebar-nav"/>
+                    <Button fx:id="cit_participations" text="🎟 Mes Participations"    onAction="#nav_cit_participations" maxWidth="Infinity" styleClass="sidebar-nav"/>
+                    <Button fx:id="cit_badges"         text="🏅 Mes Badges"            onAction="#nav_cit_badges"         maxWidth="Infinity" styleClass="sidebar-nav"/>
+
+                    <Label text="Zones polluées" styleClass="sidebar-section"/>
+                    <Button fx:id="cit_zones"          text="📍 Zones Polluées"        onAction="#nav_cit_zones"          maxWidth="Infinity" styleClass="sidebar-nav"/>
+                    <Button fx:id="cit_carte"          text="🗺️ Carte"                 onAction="#nav_cit_carte"          maxWidth="Infinity" styleClass="sidebar-nav"/>
+                    <Button fx:id="cit_ia"             text="🤖 Assistant IA"          onAction="#nav_cit_ia"             maxWidth="Infinity" styleClass="sidebar-nav"/>
+                </VBox>
+
+                <!-- ══════════════════════════════
+                     SECTION VALORISATEUR
+                     Pages: profil, offres(accueil+appels), zones, dashboard avancé
+                     ══════════════════════════════ -->
+                <VBox fx:id="sectionValorisateur" managed="false" visible="false" spacing="0">
+                    <Label text="Mon espace" styleClass="sidebar-section"/>
+                    <Button fx:id="val_profil"         text="👤 Mon Profil"            onAction="#nav_val_profil"         maxWidth="Infinity" styleClass="sidebar-nav"/>
+
+                    <Label text="Offres" styleClass="sidebar-section"/>
+                    <Button fx:id="val_offres"         text="🏠 Accueil Offres"        onAction="#nav_val_offres"         maxWidth="Infinity" styleClass="sidebar-nav"/>
+                    <Button fx:id="val_appels"         text="📢 Appels d'Offre"        onAction="#nav_val_appels"         maxWidth="Infinity" styleClass="sidebar-nav"/>
+
+                    <Label text="Zones polluées" styleClass="sidebar-section"/>
+                    <Button fx:id="val_zones"          text="📍 Zones Polluées"        onAction="#nav_val_zones"          maxWidth="Infinity" styleClass="sidebar-nav"/>
+                    <Button fx:id="val_advanced"       text="📊 Dashboard Avancé"      onAction="#nav_val_advanced"       maxWidth="Infinity" styleClass="sidebar-nav"/>
+                </VBox>
+
+                <!-- ══════════════════════════════
+                     SECTION ADMIN
+                     Pages: profil, modération offres, events+participations, indicateurs, zones, QR, dashboard avancé, utilisateurs
+                     ══════════════════════════════ -->
+                <VBox fx:id="sectionAdmin" managed="false" visible="false" spacing="0">
+                    <Label text="Mon espace" styleClass="sidebar-section"/>
+                    <Button fx:id="adm_profil"         text="👤 Mon Profil"            onAction="#nav_adm_profil"         maxWidth="Infinity" styleClass="sidebar-nav"/>
+
+                    <Label text="Offres" styleClass="sidebar-section"/>
+                    <Button fx:id="adm_offres_mod"     text="🛡 Modération Offres"     onAction="#nav_adm_offres_mod"     maxWidth="Infinity" styleClass="sidebar-nav"/>
+
+                    <Label text="Gestion Événements" styleClass="sidebar-section"/>
+                    <Button fx:id="adm_event_dashboard" text="📊 Dashboard"          onAction="#nav_adm_event_dashboard" maxWidth="Infinity" styleClass="sidebar-nav"/>
+                    <Button fx:id="adm_event_list"      text="📅 Événements"         onAction="#nav_adm_event_list"      maxWidth="Infinity" styleClass="sidebar-nav"/>
+                    <Button fx:id="adm_participations"  text="🎟 Participations"     onAction="#nav_adm_participations"  maxWidth="Infinity" styleClass="sidebar-nav"/>
+                    <Button fx:id="adm_event_calendar"  text="🗓 Calendrier"         onAction="#nav_adm_event_calendar"  maxWidth="Infinity" styleClass="sidebar-nav"/>
+
+                    <Label text="Zones polluées" styleClass="sidebar-section"/>
+                    <Button fx:id="adm_zones"          text="📍 Zones Polluées"        onAction="#nav_adm_zones"          maxWidth="Infinity" styleClass="sidebar-nav"/>
+                    <Button fx:id="adm_indicateurs"    text="📊 Indicateurs Impact"    onAction="#nav_adm_indicateurs"    maxWidth="Infinity" styleClass="sidebar-nav"/>
+                    <Button fx:id="adm_qr"             text="📱 Scans QR"              onAction="#nav_adm_qr"             maxWidth="Infinity" styleClass="sidebar-nav"/>
+                    <Button fx:id="adm_advanced"       text="📊 Dashboard Avancé"      onAction="#nav_adm_advanced"       maxWidth="Infinity" styleClass="sidebar-nav"/>
+
+                    <Label text="Administration" styleClass="sidebar-section"/>
+                    <Button fx:id="adm_users"          text="👥 Utilisateurs"          onAction="#nav_adm_users"          maxWidth="Infinity" styleClass="sidebar-nav"/>
+                </VBox>
+
+                <!-- ══════════════════════════════
+                     SECTION ORGANISATEUR
+                     Pages: profil, CRUD events, superviser son event
+                     ══════════════════════════════ -->
+                <VBox fx:id="sectionOrganisateur" managed="false" visible="false" spacing="0">
+                    <Label text="Mon espace" styleClass="sidebar-section"/>
+                    <Button fx:id="org_profil"         text="👤 Mon Profil"            onAction="#nav_org_profil"         maxWidth="Infinity" styleClass="sidebar-nav"/>
+
+                    <Label text="Événements" styleClass="sidebar-section"/>
+                    <Button fx:id="org_events"         text="📅 Mes Événements"        onAction="#nav_org_events"         maxWidth="Infinity" styleClass="sidebar-nav"/>
+                    <Button fx:id="org_ajouter"        text="➕ Créer un Événement"    onAction="#nav_org_ajouter"        maxWidth="Infinity" styleClass="sidebar-nav"/>
+                    <Button fx:id="org_participations" text="🎟 Participations"        onAction="#nav_org_participations" maxWidth="Infinity" styleClass="sidebar-nav"/>
+                </VBox>
+
+                <!-- ══════════════════════════════
+                     SECTION PARTENAIRE
+                     Pages: modifier profil uniquement
+                     ══════════════════════════════ -->
+                <VBox fx:id="sectionPartenaire" managed="false" visible="false" spacing="0">
+                    <Label text="Mon espace" styleClass="sidebar-section"/>
+                    <Button fx:id="par_profil"         text="👤 Mon Profil"            onAction="#nav_par_profil"         maxWidth="Infinity" styleClass="sidebar-nav"/>
+                </VBox>
+
+                <Region VBox.vgrow="ALWAYS"/>
+
+                <!-- Footer utilisateur -->
+                <VBox spacing="4.0" styleClass="sidebar-footer">
+                    <Label fx:id="footerName" text="Utilisateur" styleClass="user-meta-name"/>
+                    <Label fx:id="footerRole" text="Rôle"        styleClass="user-meta-role"/>
+                    <Button text="🚪 Déconnexion" onAction="#handleLogout"
+                            maxWidth="Infinity"
+                            style="-fx-background-color: transparent; -fx-text-fill: #ef4b5a;
+                                   -fx-font-size: 13px; -fx-cursor: hand; -fx-alignment: CENTER-LEFT;"/>
+                </VBox>
             </VBox>
-
-            <!-- ══════════════════════════════
-                 SECTION CITOYEN
-                 Pages: profil, offres(accueil+réponses), events(participation+badge), zones, carte, IA
-                 ══════════════════════════════ -->
-            <VBox fx:id="sectionCitoyen" managed="false" visible="false" spacing="0">
-                <Label text="Mon espace" styleClass="sidebar-section"/>
-                <Button fx:id="cit_profil"        text="👤 Mon Profil"            onAction="#nav_cit_profil"        maxWidth="Infinity" styleClass="sidebar-nav"/>
-
-                <Label text="Offres" styleClass="sidebar-section"/>
-                <Button fx:id="cit_offres"         text="🏠 Accueil Offres"        onAction="#nav_cit_offres"         maxWidth="Infinity" styleClass="sidebar-nav"/>
-                <Button fx:id="cit_reponses"       text="📋 Mes Réponses"          onAction="#nav_cit_reponses"       maxWidth="Infinity" styleClass="sidebar-nav"/>
-
-                <Label text="Événements" styleClass="sidebar-section"/>
-                <Button fx:id="cit_participations" text="🎟 Mes Participations"    onAction="#nav_cit_participations" maxWidth="Infinity" styleClass="sidebar-nav"/>
-                <Button fx:id="cit_badges"         text="🏅 Mes Badges"            onAction="#nav_cit_badges"         maxWidth="Infinity" styleClass="sidebar-nav"/>
-
-                <Label text="Zones polluées" styleClass="sidebar-section"/>
-                <Button fx:id="cit_zones"          text="📍 Zones Polluées"        onAction="#nav_cit_zones"          maxWidth="Infinity" styleClass="sidebar-nav"/>
-                <Button fx:id="cit_carte"          text="🗺️ Carte"                 onAction="#nav_cit_carte"          maxWidth="Infinity" styleClass="sidebar-nav"/>
-                <Button fx:id="cit_ia"             text="🤖 Assistant IA"          onAction="#nav_cit_ia"             maxWidth="Infinity" styleClass="sidebar-nav"/>
-            </VBox>
-
-            <!-- ══════════════════════════════
-                 SECTION VALORISATEUR
-                 Pages: profil, offres(accueil+appels), zones, dashboard avancé
-                 ══════════════════════════════ -->
-            <VBox fx:id="sectionValorisateur" managed="false" visible="false" spacing="0">
-                <Label text="Mon espace" styleClass="sidebar-section"/>
-                <Button fx:id="val_profil"         text="👤 Mon Profil"            onAction="#nav_val_profil"         maxWidth="Infinity" styleClass="sidebar-nav"/>
-
-                <Label text="Offres" styleClass="sidebar-section"/>
-                <Button fx:id="val_offres"         text="🏠 Accueil Offres"        onAction="#nav_val_offres"         maxWidth="Infinity" styleClass="sidebar-nav"/>
-                <Button fx:id="val_appels"         text="📢 Appels d'Offre"        onAction="#nav_val_appels"         maxWidth="Infinity" styleClass="sidebar-nav"/>
-
-                <Label text="Zones polluées" styleClass="sidebar-section"/>
-                <Button fx:id="val_zones"          text="📍 Zones Polluées"        onAction="#nav_val_zones"          maxWidth="Infinity" styleClass="sidebar-nav"/>
-                <Button fx:id="val_advanced"       text="📊 Dashboard Avancé"      onAction="#nav_val_advanced"       maxWidth="Infinity" styleClass="sidebar-nav"/>
-            </VBox>
-
-            <!-- ══════════════════════════════
-                 SECTION ADMIN
-                 Pages: profil, modération offres, events+participations, indicateurs, zones, QR, dashboard avancé, utilisateurs
-                 ══════════════════════════════ -->
-            <VBox fx:id="sectionAdmin" managed="false" visible="false" spacing="0">
-                <Label text="Mon espace" styleClass="sidebar-section"/>
-                <Button fx:id="adm_profil"         text="👤 Mon Profil"            onAction="#nav_adm_profil"         maxWidth="Infinity" styleClass="sidebar-nav"/>
-
-                <Label text="Offres" styleClass="sidebar-section"/>
-                <Button fx:id="adm_offres_mod"     text="🛡 Modération Offres"     onAction="#nav_adm_offres_mod"     maxWidth="Infinity" styleClass="sidebar-nav"/>
-
-                <Label text="Événements" styleClass="sidebar-section"/>
-                <Button fx:id="adm_events"         text="📅 Gestion Événements"    onAction="#nav_adm_events"         maxWidth="Infinity" styleClass="sidebar-nav"/>
-                <Button fx:id="adm_participations" text="🎟 Participations"        onAction="#nav_adm_participations" maxWidth="Infinity" styleClass="sidebar-nav"/>
-
-                <Label text="Zones polluées" styleClass="sidebar-section"/>
-                <Button fx:id="adm_zones"          text="📍 Zones Polluées"        onAction="#nav_adm_zones"          maxWidth="Infinity" styleClass="sidebar-nav"/>
-                <Button fx:id="adm_indicateurs"    text="📊 Indicateurs Impact"    onAction="#nav_adm_indicateurs"    maxWidth="Infinity" styleClass="sidebar-nav"/>
-                <Button fx:id="adm_qr"             text="📱 Scans QR"              onAction="#nav_adm_qr"             maxWidth="Infinity" styleClass="sidebar-nav"/>
-                <Button fx:id="adm_advanced"       text="📊 Dashboard Avancé"      onAction="#nav_adm_advanced"       maxWidth="Infinity" styleClass="sidebar-nav"/>
-
-                <Label text="Administration" styleClass="sidebar-section"/>
-                <Button fx:id="adm_users"          text="👥 Utilisateurs"          onAction="#nav_adm_users"          maxWidth="Infinity" styleClass="sidebar-nav"/>
-            </VBox>
-
-            <!-- ══════════════════════════════
-                 SECTION ORGANISATEUR
-                 Pages: profil, CRUD events, superviser son event
-                 ══════════════════════════════ -->
-            <VBox fx:id="sectionOrganisateur" managed="false" visible="false" spacing="0">
-                <Label text="Mon espace" styleClass="sidebar-section"/>
-                <Button fx:id="org_profil"         text="👤 Mon Profil"            onAction="#nav_org_profil"         maxWidth="Infinity" styleClass="sidebar-nav"/>
-
-                <Label text="Événements" styleClass="sidebar-section"/>
-                <Button fx:id="org_events"         text="📅 Mes Événements"        onAction="#nav_org_events"         maxWidth="Infinity" styleClass="sidebar-nav"/>
-                <Button fx:id="org_ajouter"        text="➕ Créer un Événement"    onAction="#nav_org_ajouter"        maxWidth="Infinity" styleClass="sidebar-nav"/>
-                <Button fx:id="org_participations" text="🎟 Participations"        onAction="#nav_org_participations" maxWidth="Infinity" styleClass="sidebar-nav"/>
-            </VBox>
-
-            <!-- ══════════════════════════════
-                 SECTION PARTENAIRE
-                 Pages: modifier profil uniquement
-                 ══════════════════════════════ -->
-            <VBox fx:id="sectionPartenaire" managed="false" visible="false" spacing="0">
-                <Label text="Mon espace" styleClass="sidebar-section"/>
-                <Button fx:id="par_profil"         text="👤 Mon Profil"            onAction="#nav_par_profil"         maxWidth="Infinity" styleClass="sidebar-nav"/>
-            </VBox>
-
-            <Region VBox.vgrow="ALWAYS"/>
-
-            <!-- Footer utilisateur -->
-            <VBox spacing="4.0" styleClass="sidebar-footer">
-                <Label fx:id="footerName" text="Utilisateur" styleClass="user-meta-name"/>
-                <Label fx:id="footerRole" text="Rôle"        styleClass="user-meta-role"/>
-                <Button text="🚪 Déconnexion" onAction="#handleLogout"
-                        maxWidth="Infinity"
-                        style="-fx-background-color: transparent; -fx-text-fill: #ef4b5a;
-                               -fx-font-size: 13px; -fx-cursor: hand; -fx-alignment: CENTER-LEFT;"/>
-            </VBox>
-        </VBox>
+        </ScrollPane>
     </left>
 
     <!-- ═══════════════════════════════════════════
@@ -138,3 +144,4 @@
     </center>
 
 </BorderPane>
+
