@@ -4,30 +4,27 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import org.example.controllers.AppShellController;
 import org.example.controllers.TwoFactorVerifyController;
 import org.example.controllers.UserController;
 import org.example.controllers.ZonePollueeController;
 import org.example.models.User;
+import org.example.services.SessionManager;
+
 import java.io.IOException;
 import java.net.URL;
 import java.util.function.Consumer;
 
 /**
- * Point d'entrée : lanceur dev (accès direct aux dashboards) + navigation centralisée
- * pour toutes les vues FXML (auth conservée, non bloquante au démarrage).
+ * Point d'entrée principal — AppShell avec sidebar fixe.
+ * Les pages auth (login, register...) s'affichent en plein écran sans sidebar.
+ * Toutes les pages internes chargent leur contenu dans la zone centrale de l'AppShell.
  */
 public class Main extends Application {
 
     private static Stage primaryStage;
 
-    /**
-     * Stage principal (lanceur + navigation). Expose pour les ecrans qui chargent du FXML hors {@link #navigateTo}.
-     */
     public static Stage getPrimaryStage() {
         return primaryStage;
     }
@@ -35,87 +32,248 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) {
         primaryStage = stage;
-        showDevLauncher();
+        primaryStage.setMinWidth(900);
+        primaryStage.setMinHeight(600);
+        showLoginPage();
     }
 
-    private void showDevLauncher() {
-        // ── Titre ──
-        Text title = new Text("WasteWise TN — Dev Launcher");
-        title.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-fill: #2d3748;");
+    // ═══════════════════════════════════════════════════════
+    // CHARGEMENT DE L'APP SHELL (sidebar fixe)
+    // ═══════════════════════════════════════════════════════
 
-        Text subtitle = new Text("Choisissez un module a ouvrir directement");
-        subtitle.setStyle("-fx-font-size: 14px; -fx-fill: #718096;");
+    /**
+     * Charge l'AppShell pour un utilisateur connecté.
+     * Configure la sidebar selon le rôle et charge le contenu initial.
+     */
+    public static void showAppShell(User user, String initialFragmentPath) {
+        try {
+            URL url = Main.class.getResource("/org/example/views/app_shell.fxml");
+            if (url == null) throw new IOException("app_shell.fxml introuvable");
 
-        // ── Ligne 1 : Dashboards utilisateurs ──
-        Button btnAdmin = createBtn("Dashboard Admin", "#6c63ff");
-        btnAdmin.setOnAction(e -> showDashboardAdmin());
+            FXMLLoader loader = new FXMLLoader(url);
+            Parent root = loader.load();
 
-        Button btnCitoyen = createBtn("Dashboard Citoyen", "#48bb78");
-        btnCitoyen.setOnAction(e -> showDashboardCitizen());
+            AppShellController shell = loader.getController();
+            shell.configureForUser(user);
+            shell.loadContent(initialFragmentPath);
 
-        Button btnValorizer = createBtn("Dashboard Valorisateur", "#ed8936");
-        btnValorizer.setOnAction(e -> showDashboardValorizer());
+            Scene scene = new Scene(root, 1280, 800);
+            applyGlobalStylesheet(scene);
 
-        // ── Ligne 2 : Modules métier ──
-        Button btnEvenements = createBtn("Gestion Événements", "#e53e3e");
-        btnEvenements.setOnAction(e -> navigateTo("/org/example/views/event/RoleSelection.fxml", "Événements", 1200, 750));
+            primaryStage.setTitle("WasteWise TN");
+            primaryStage.setScene(scene);
+            primaryStage.centerOnScreen();
+            primaryStage.show();
 
-        Button btnZones = createBtn("Zones Polluées", "#2b6cb0");
-        btnZones.setOnAction(e -> showZonePollueeListPage());
-
-        Button btnOffres = createBtn("Appels d'Offres (N/A)", "#b7791f");
-        btnOffres.setDisable(true);
-        btnOffres.setStyle(btnOffres.getStyle() + "-fx-opacity: 0.5;");
-
-        // ── Ligne 3 : Autres ──
-        Button btnDeclarations = createBtn("Déclarations Déchets", "#276749");
-        btnDeclarations.setOnAction(e -> showDeclarationListPage());
-
-        Button btnMap = createBtn("Carte Interactive", "#553c9a");
-        btnMap.setOnAction(e -> showMapPage());
-
-        Button btnChatbot = createBtn("Chatbot IA", "#2c7a7b");
-        btnChatbot.setOnAction(e -> showChatbot());
-
-        // ── Login ──
-        Button btnLogin = new Button("→ Aller au Login (auth normale)");
-        btnLogin.setStyle(
-                "-fx-background-color: transparent; -fx-text-fill: #a0aec0; "
-                        + "-fx-font-size: 12px; -fx-border-color: #e2e8f0; "
-                        + "-fx-border-radius: 6; -fx-background-radius: 6; -fx-cursor: hand;"
-        );
-        btnLogin.setOnAction(e -> showLoginPage());
-
-        // ── Layout ──
-        HBox row1 = new HBox(12, btnAdmin, btnCitoyen, btnValorizer);
-        row1.setStyle("-fx-alignment: center;");
-
-        HBox row2 = new HBox(12, btnEvenements, btnZones, btnOffres);
-        row2.setStyle("-fx-alignment: center;");
-
-        HBox row3 = new HBox(12, btnDeclarations, btnMap, btnChatbot);
-        row3.setStyle("-fx-alignment: center;");
-
-        VBox root = new VBox(16, title, subtitle, row1, row2, row3, btnLogin);
-        root.setStyle("-fx-alignment: center; -fx-padding: 40; -fx-background-color: #f7fafc;");
-
-        Scene scene = new Scene(root, 900, 420);
-        applyGlobalStylesheet(scene);
-        primaryStage.setTitle("PiDev JavaFX — Dev Launcher");
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        } catch (IOException e) {
+            System.err.println("Erreur chargement AppShell : " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
-    private Button createBtn(String label, String color) {
-        Button btn = new Button(label);
-        btn.setPrefWidth(200);
-        btn.setPrefHeight(44);
-        btn.setStyle(
-                "-fx-background-color: " + color + "; -fx-text-fill: white; "
-                        + "-fx-font-size: 13px; -fx-font-weight: bold; "
-                        + "-fx-background-radius: 8; -fx-cursor: hand;"
-        );
-        return btn;
+    // ═══════════════════════════════════════════════════════
+    // REDIRECTION PAR RÔLE
+    // ═══════════════════════════════════════════════════════
+
+    public static void redirectByUserType(User user) {
+        if (user == null) { showLoginPage(); return; }
+        String type = user.getType() != null ? user.getType().trim().toUpperCase() : "";
+        switch (type) {
+            case "ADMIN"                    -> showDashboardAdmin();
+            case "VALORIZER", "VALORISATEUR" -> showDashboardValorizer();
+            default                          -> showDashboardCitizen();
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // DASHBOARDS — chargent l'AppShell avec le bon fragment
+    // ═══════════════════════════════════════════════════════
+
+    public static void showDashboardAdmin() {
+        User user = SessionManager.getCurrentUser();
+        if (user == null) { showLoginPage(); return; }
+        showAppShell(user, "/org/example/views/fragments/dashboard_admin_content.fxml");
+    }
+
+    public static void showDashboardCitizen() {
+        User user = SessionManager.getCurrentUser();
+        if (user == null) { showLoginPage(); return; }
+        showAppShell(user, "/org/example/views/fragments/citizen_dashboard_content.fxml");
+    }
+
+    public static void showDashboardValorizer() {
+        User user = SessionManager.getCurrentUser();
+        if (user == null) { showLoginPage(); return; }
+        showAppShell(user, "/org/example/views/fragments/valorizer_dashboard_content.fxml");
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // NAVIGATION INTERNE — charge un fragment dans l'AppShell
+    // ═══════════════════════════════════════════════════════
+
+    public static void showDeclarationListPage() {
+        loadFragment("/org/example/views/fragments/declarations_content.fxml");
+    }
+
+    public static void showTypeDechetWorkshopPage() {
+        loadFragment("/org/example/views/fragments/type_dechet_content.fxml");
+    }
+
+    public static void showAdminUsersPage() {
+        loadFragment("/org/example/views/fragments/users_content.fxml");
+    }
+
+    public static void showZonePollueeListPage() {
+        loadFragment("/org/example/views/fragments/zones_content.fxml");
+    }
+
+    public static void showIndicateurImpactListPage() {
+        loadFragment("/org/example/views/fragments/indicateurs_content.fxml");
+    }
+
+    public static void showMapPage() {
+        loadFragment("/org/example/views/fragments/map_content.fxml");
+    }
+
+    public static void showQRDashboardPage() {
+        loadFragment("/org/example/views/fragments/qr_content.fxml");
+    }
+
+    public static void showAdvancedDashboard() {
+        loadFragment("/org/example/views/fragments/advanced_content.fxml");
+    }
+
+    public static void showProfileViewPage() {
+        loadFragment("/org/example/views/fragments/profile_content.fxml");
+    }
+
+    public static void showProfileEditPage() {
+        loadFragment("/org/example/views/fragments/profile_content.fxml");
+    }
+
+    // Déclarations citoyen — redirige vers la liste
+    public static void showDeclarationCitizenFormPage()  { loadFragment("/org/example/views/fragments/declarations_content.fxml"); }
+    public static void showCitizenMyDeclarationsPage()   { loadFragment("/org/example/views/fragments/declarations_content.fxml"); }
+    public static void showCitizenStatisticsPage()       { loadFragment("/org/example/views/fragments/citizen_dashboard_content.fxml"); }
+    public static void showCitizenNewsPage()             { loadFragment("/org/example/views/fragments/citizen_dashboard_content.fxml"); }
+    public static void showCitizenAirQualityPage()       { loadFragment("/org/example/views/fragments/citizen_dashboard_content.fxml"); }
+    public static void showCitizenWithdrawPage()         { loadFragment("/org/example/views/fragments/citizen_dashboard_content.fxml"); }
+    public static void showCitizenSettingsPage()         { loadFragment("/org/example/views/fragments/profile_content.fxml"); }
+
+    // Admin pages
+    public static void showDeclarationListPage(String s) { showDeclarationListPage(); }
+    public static void showTypeDechetFormPage()          { loadFragment("/org/example/views/fragments/type_dechet_content.fxml"); }
+    public static void showTypeDechetDetailPage()        { loadFragment("/org/example/views/fragments/type_dechet_content.fxml"); }
+    public static void showDeclarationDetailPage()       { loadFragment("/org/example/views/fragments/declarations_content.fxml"); }
+
+    public static void showAdminUserEditPage(User user) {
+        AppShellController shell = AppShellController.getInstance();
+        if (shell != null) {
+            shell.loadContent("/org/example/views/fragments/users_content.fxml");
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // PAGES AUTH — plein écran sans sidebar
+    // ═══════════════════════════════════════════════════════
+
+    public static void showLoginPage() {
+        loadFullScreen("/org/example/views/usser/login.fxml", "Connexion | WasteWise TN", 1180, 760);
+    }
+
+    public static void showRegisterPage() {
+        loadFullScreen("/org/example/views/usser/register.fxml", "Inscription | WasteWise TN", 1200, 750);
+    }
+
+    public static void showForgotPasswordPage() {
+        loadFullScreen("/org/example/views/usser/forgot_password.fxml", "Mot de passe oublié | WasteWise TN", 900, 600);
+    }
+
+    public static void showResetPasswordPage() {
+        loadFullScreen("/org/example/views/usser/reset_password.fxml", "Réinitialisation | WasteWise TN", 900, 600);
+    }
+
+    public static void showTwoFactorVerifyPage(User user) {
+        loadFullScreen("/org/example/views/two_factor_verify.fxml", "Vérification 2FA | WasteWise TN", 450, 320);
+    }
+
+    public static void showTwoFactorSetupPage() {
+        loadFullScreen("/org/example/views/two_factor_setup.fxml", "Activation 2FA | WasteWise TN", 650, 620);
+    }
+
+    public static void showFaceLoginPage() {
+        loadFullScreen("/org/example/views/face_login.fxml", "Connexion par visage | WasteWise TN", 900, 600);
+    }
+
+    public static void showFaceEnrollPage() {
+        loadFullScreen("/org/example/views/face_enroll.fxml", "Enregistrement visage | WasteWise TN", 900, 550);
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // CHATBOT — fenêtre séparée
+    // ═══════════════════════════════════════════════════════
+
+    public static void showChatbot() {
+        try {
+            URL url = Main.class.getResource("/org/example/views/chatbot.fxml");
+            if (url == null) return;
+            FXMLLoader loader = new FXMLLoader(url);
+            javafx.scene.Scene scene = new javafx.scene.Scene(loader.load(), 500, 700);
+            applyGlobalStylesheet(scene);
+            javafx.stage.Stage chatbotStage = new javafx.stage.Stage();
+            chatbotStage.setTitle("WasteWise Assistant IA");
+            chatbotStage.setScene(scene);
+            chatbotStage.setMinWidth(450);
+            chatbotStage.setMinHeight(600);
+            chatbotStage.show();
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // HELPERS PRIVÉS
+    // ═══════════════════════════════════════════════════════
+
+    /**
+     * Charge un fragment dans la zone centrale de l'AppShell existant.
+     * Si l'AppShell n'est pas actif, redirige vers le dashboard approprié.
+     */
+    private static void loadFragment(String fragmentPath) {
+        AppShellController shell = AppShellController.getInstance();
+        if (shell != null) {
+            shell.loadContent(fragmentPath);
+        } else {
+            // AppShell pas encore chargé — charger avec l'utilisateur courant
+            User user = SessionManager.getCurrentUser();
+            if (user != null) {
+                showAppShell(user, fragmentPath);
+            } else {
+                showLoginPage();
+            }
+        }
+    }
+
+    /**
+     * Charge une page en plein écran (sans sidebar) — pour auth.
+     */
+    private static void loadFullScreen(String fxmlPath, String title, int width, int height) {
+        try {
+            URL url = Main.class.getResource(fxmlPath);
+            if (url == null) {
+                System.err.println("FXML introuvable : " + fxmlPath);
+                return;
+            }
+            FXMLLoader loader = new FXMLLoader(url);
+            Parent root = loader.load();
+            Scene scene = new Scene(root, width, height);
+            applyGlobalStylesheet(scene);
+            primaryStage.setTitle(title);
+            primaryStage.setScene(scene);
+            primaryStage.centerOnScreen();
+            primaryStage.show();
+        } catch (Exception e) {
+            System.err.println("Erreur chargement page : " + fxmlPath);
+            e.printStackTrace();
+        }
     }
 
     private static void applyGlobalStylesheet(Scene scene) {
@@ -128,212 +286,13 @@ public class Main extends Application {
         }
     }
 
-    /**
-     * Remplace la scene du stage principal (une seule fenetre, navigation coherente).
-     */
+    // Méthodes conservées pour compatibilité avec les controllers existants
     public static void navigateTo(String fxmlPath, String title, double width, double height) {
-        if (primaryStage == null) {
-            System.err.println("Main.navigateTo: primaryStage non initialise.");
-            return;
-        }
-        try {
-            URL resource = Main.class.getResource(fxmlPath);
-            if (resource == null) {
-                throw new IOException("FXML introuvable: " + fxmlPath);
-            }
-            FXMLLoader loader = new FXMLLoader(resource);
-            Parent root = loader.load();
-            Scene scene = new Scene(root, width, height);
-            applyGlobalStylesheet(scene);
-            primaryStage.setTitle(title);
-            primaryStage.setScene(scene);
-            primaryStage.centerOnScreen();
-            primaryStage.show();
-        } catch (Exception e) {
-            System.err.println("Navigation impossible vers : " + fxmlPath);
-            e.printStackTrace();
-        }
-    }
-
-    public static void showLoginPage() {
-        navigateTo("/org/example/views/usser/login.fxml", "Connexion", 1100, 700);
-    }
-
-    public static void showRegisterPage() {
-        navigateTo("/org/example/views/usser/register.fxml", "Inscription", 1100, 750);
-    }
-
-    public static void showForgotPasswordPage() {
-        navigateTo("/org/example/views/usser/forgot_password.fxml", "Mot de passe oublie", 900, 600);
-    }
-
-    public static void showResetPasswordPage() {
-        navigateTo("/org/example/views/usser/reset_password.fxml", "Reinitialisation", 900, 600);
-    }
-
-    public static void showDashboardAdmin() {
-        navigateTo("/org/example/views/usser/dashboard_admin.fxml", "Dashboard Admin", 1200, 750);
-    }
-
-    public static void showDashboardCitizen() {
-        navigateTo("/org/example/views/dashboard_citizen.fxml", "Dashboard Citoyen", 1200, 750);
-    }
-
-    public static void showDashboardValorizer() {
-        navigateTo("/org/example/views/usser/dashboard_valorizer.fxml", "Dashboard Valorisateur", 1200, 750);
-    }
-
-    public static void showAdminUsersPage() {
-        navigateTo("/org/example/views/usser/admin_users.fxml", "Utilisateurs", 1200, 750);
-    }
-
-    public static void showAdminUserEditPage(User user) {
-        navigateTo("/org/example/views/usser/admin_user_form.fxml", "Modifier utilisateur", 950, 650);
-    }
-
-    // =========================
-    // AUTH AVANCÉE (2FA, Face)
-    // =========================
-    public static void showTwoFactorVerifyPage(User user) {
-        navigateTo("/org/example/views/two_factor_verify.fxml", "Vérification 2FA", 450, 320);
-    }
-
-    public static void showTwoFactorSetupPage() {
-        navigateTo("/org/example/views/two_factor_setup.fxml", "Activation Google Authenticator", 650, 620);
-    }
-
-    public static void showFaceLoginPage() {
-        navigateTo("/org/example/views/face_login.fxml", "Connexion par visage", 900, 600);
-    }
-
-    public static void showFaceEnrollPage() {
-        navigateTo("/org/example/views/face_enroll.fxml", "Enregistrement du visage", 900, 550);
-    }
-
-    public static void redirectByUserType(User user) {
-        if (user == null) { showLoginPage(); return; }
-        String type = user.getType() != null ? user.getType().trim().toUpperCase() : "";
-        switch (type) {
-            case "ADMIN" -> showDashboardAdmin();
-            case "VALORIZER", "VALORISATEUR" -> showDashboardValorizer();
-            default -> showDashboardCitizen();
-        }
-    }
-
-    public static void showDeclarationListPage() {
-        navigateTo("/org/example/views/declaration_dechet_list.fxml", "Declarations", 1200, 750);
-    }
-
-    public static void showTypeDechetWorkshopPage() {
-        navigateTo("/org/example/views/type_dechet_workshop.fxml", "Types de dechets", 1200, 750);
-    }
-
-    public static void showTypeDechetFormPage() {
-        navigateTo("/org/example/views/type_dechet_form.fxml", "Type de dechet", 1000, 700);
-    }
-
-    public static void showTypeDechetDetailPage() {
-        navigateTo("/org/example/views/type_dechet_detail.fxml", "Detail type de dechet", 1000, 700);
-    }
-
-    public static void showDeclarationDetailPage() {
-        navigateTo("/org/example/views/declaration_dechet_detail.fxml", "Detail declaration", 1000, 700);
-    }
-
-    public static void showProfileViewPage() {
-        navigateTo("/org/example/views/usser/profile_view.fxml", "Profil", 1000, 700);
-    }
-
-    public static void showProfileEditPage() {
-        navigateTo("/org/example/views/usser/profile_edit.fxml", "Modifier le profil", 1000, 700);
-    }
-
-    public static void showDeclarationCitizenFormPage() {
-        // Redirige vers la liste des déclarations (vue citoyen non implémentée)
-        navigateTo("/org/example/views/declaration_dechet_list.fxml", "Déclarer un déchet", 1200, 750);
-    }
-
-    public static void showCitizenMyDeclarationsPage() {
-        navigateTo("/org/example/views/declaration_dechet_list.fxml", "Mes déclarations", 1200, 750);
-    }
-
-    public static void showCitizenStatisticsPage() {
-        navigateTo("/org/example/views/dashboard_citizen.fxml", "Statistiques", 1200, 750);
-    }
-
-    public static void showCitizenNewsPage() {
-        navigateTo("/org/example/views/dashboard_citizen.fxml", "Nouveautés", 1200, 750);
-    }
-
-    public static void showCitizenAirQualityPage() {
-        navigateTo("/org/example/views/dashboard_citizen.fxml", "Air Quality", 1200, 750);
-    }
-
-    public static void showCitizenWithdrawPage() {
-        navigateTo("/org/example/views/dashboard_citizen.fxml", "Withdraw", 1200, 750);
-    }
-
-    public static void showCitizenSettingsPage() {
-        navigateTo("/org/example/views/usser/profile_view.fxml", "Paramètres", 1200, 750);
-    }
-
-    // =========================
-    // ZONES POLLUÉES
-    // =========================
-    private static org.example.controllers.ZonePollueeController zonePollueeController;
-
-    public static void showZonePollueeListPage() {
-        try {
-            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(Main.class.getResource("/org/example/views/zone_polluee_list.fxml"));
-            javafx.scene.Scene scene = new javafx.scene.Scene(loader.load(), 1200, 700);
-            zonePollueeController = loader.getController();
-            applyGlobalStylesheet(scene);
-            primaryStage.setTitle("Gestion des Zones Polluées | WasteWise TN");
-            primaryStage.setScene(scene);
-            primaryStage.centerOnScreen();
-        } catch (Exception e) { e.printStackTrace(); }
-    }
-
-    public static void showIndicateurImpactListPage() {
-        try {
-            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(Main.class.getResource("/org/example/views/indicateur_impact_list.fxml"));
-            javafx.scene.Scene scene = new javafx.scene.Scene(loader.load(), 1200, 750);
-            org.example.controllers.IndicateurImpactController controller = loader.getController();
-            controller.setZoneRefreshCallback(() -> { if (zonePollueeController != null) zonePollueeController.loadZones(); });
-            applyGlobalStylesheet(scene);
-            primaryStage.setTitle("Indicateurs d'Impact | WasteWise TN");
-            primaryStage.setScene(scene);
-            primaryStage.centerOnScreen();
-        } catch (Exception e) { e.printStackTrace(); }
-    }
-
-    public static void showQRDashboardPage() {
-        navigateTo("/org/example/views/qr_dashboard.fxml", "Dashboard Scans QR | WasteWise TN", 1200, 750);
-    }
-
-    public static void showMapPage() {
-        navigateTo("/org/example/views/map.fxml", "Carte interactive | WasteWise TN", 1200, 750);
-    }
-
-    public static void showAdvancedDashboard() {
-        navigateTo("/org/example/views/advanced_dashboard.fxml", "Dashboard Avancé | WasteWise TN", 1400, 850);
-    }
-
-    public static void showChatbot() {
-        try {
-            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(Main.class.getResource("/org/example/views/chatbot.fxml"));
-            javafx.scene.Scene scene = new javafx.scene.Scene(loader.load(), 500, 700);
-            applyGlobalStylesheet(scene);
-            javafx.stage.Stage chatbotStage = new javafx.stage.Stage();
-            chatbotStage.setTitle("WasteWise Assistant IA");
-            chatbotStage.setScene(scene);
-            chatbotStage.setMinWidth(450);
-            chatbotStage.setMinHeight(600);
-            chatbotStage.show();
-        } catch (Exception e) { e.printStackTrace(); }
+        loadFullScreen(fxmlPath, title, (int) width, (int) height);
     }
 
     public static void main(String[] args) {
         launch(args);
     }
 }
+

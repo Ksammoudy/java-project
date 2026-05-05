@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.web.WebView?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.example.controllers.MapController"
+      styleClass="workspace-main">
+
+    <HBox spacing="12.0" alignment="CENTER_LEFT" styleClass="workspace-topbar">
+        <Label text="Carte Interactive" styleClass="workspace-title"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="📍 Rafraîchir" styleClass="primary-btn" onAction="#refreshMap"/>
+    </HBox>
+
+    <VBox spacing="10" VBox.vgrow="ALWAYS" style="-fx-padding: 16;">
+        <VBox styleClass="hero-panel" spacing="10">
+            <Label text="🗺️ Carte interactive des zones polluées" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+            <Label text="Visualisez toutes les zones polluées avec leurs niveaux de risque" style="-fx-text-fill: rgba(255,255,255,0.85);"/>
+        </VBox>
+
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <Button text="📍 Rafraîchir" styleClass="primary-btn" onAction="#refreshMap"/>
+            <Button text="🎯 Centrer" styleClass="outline-btn" onAction="#centerMap"/>
+            <Button text="🔥 Heatmap" styleClass="outline-btn" onAction="#toggleHeatmap"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="🔴 Haut risque" styleClass="outline-btn" onAction="#filterHighRisk"/>
+            <Button text="🟡 Moyen" styleClass="outline-btn" onAction="#filterMediumRisk"/>
+            <Button text="🟢 Faible" styleClass="outline-btn" onAction="#filterLowRisk"/>
+            <Button text="👁️ Toutes" styleClass="primary-btn" onAction="#showAllZones"/>
+        </HBox>
+
+        <WebView fx:id="mapWebView" VBox.vgrow="ALWAYS" prefHeight="550"/>
+    </VBox>
+</VBox>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.example.controllers.IndicateurImpactController"
+      styleClass="workspace-main">
+
+    <HBox spacing="12.0" alignment="CENTER_LEFT" styleClass="workspace-topbar">
+        <Label text="Indicateurs d'Impact" styleClass="workspace-title"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="➕ Ajouter" styleClass="primary-btn" onAction="#addIndicateur"/>
+    </HBox>
+
+    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" VBox.vgrow="ALWAYS" styleClass="content-scroll">
+        <content>
+            <VBox spacing="18.0" styleClass="workspace-content">
+                <VBox styleClass="hero-panel" spacing="10">
+                    <Label text="Indicateurs d'Impact" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                    <Label text="Suivez l'impact environnemental de vos actions" style="-fx-text-fill: rgba(255,255,255,0.85);"/>
+                </VBox>
+
+                <HBox spacing="20">
+                    <VBox styleClass="stat-card" spacing="10" HBox.hgrow="ALWAYS">
+                        <Text text="📊" style="-fx-font-size: 28px;"/>
+                        <Text fx:id="totalIndicateursText" style="-fx-font-size: 28px; -fx-font-weight: bold;">0</Text>
+                        <Text text="Total Indicateurs" style="-fx-fill: #6c757d;"/>
+                    </VBox>
+                    <VBox styleClass="stat-card" spacing="10" HBox.hgrow="ALWAYS">
+                        <Text text="🗑️" style="-fx-font-size: 28px;"/>
+                        <Text fx:id="totalDechetsText" style="-fx-font-size: 28px; -fx-font-weight: bold;">0 kg</Text>
+                        <Text text="Déchets collectés" style="-fx-fill: #6c757d;"/>
+                    </VBox>
+                    <VBox styleClass="stat-card" spacing="10" HBox.hgrow="ALWAYS">
+                        <Text text="🌿" style="-fx-font-size: 28px;"/>
+                        <Text fx:id="totalCo2Text" style="-fx-font-size: 28px; -fx-font-weight: bold;">0 kg</Text>
+                        <Text text="CO₂ évité" style="-fx-fill: #6c757d;"/>
+                    </VBox>
+                </HBox>
+
+                <VBox styleClass="table-card" spacing="15">
+                    <TableView fx:id="indicateurTable" prefHeight="400">
+                        <columns>
+                            <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
+                            <TableColumn fx:id="colTotalKg" text="Déchets (kg)" prefWidth="150"/>
+                            <TableColumn fx:id="colCo2" text="CO₂ évité (kg)" prefWidth="150"/>
+                            <TableColumn fx:id="colDate" text="Date" prefWidth="200"/>
+                            <TableColumn fx:id="colActions" text="Actions" prefWidth="100"/>
+                        </columns>
+                    </TableView>
+                </VBox>
+            </VBox>
+        </content>
+    </ScrollPane>
+</VBox>
