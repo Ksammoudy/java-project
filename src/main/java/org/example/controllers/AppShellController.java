@@ -13,17 +13,27 @@ import org.example.services.SessionManager;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.function.Consumer;
 
 /**
  * Contrôleur de la coquille principale (AppShell).
  * La sidebar reste fixe ; seul le contenu central change.
+ *
+ * Accès par rôle (selon spécification) :
+ *  CITOYEN      : profil, offres(accueil+réponses), participations+badges, zones+carte+IA
+ *  VALORISATEUR : profil, offres(accueil+appels), zones+dashboard avancé
+ *  ADMIN        : profil, modération offres, events+participations, zones+indicateurs+QR+advanced, utilisateurs
+ *  ORGANISATEUR : profil, mes events, créer event, participations
+ *  PARTENAIRE   : profil uniquement
  */
 public class AppShellController {
 
-    // ── Sidebar sections ──
-    @FXML private VBox sectionAdmin;
+    // ── Sections sidebar ──
     @FXML private VBox sectionCitoyen;
     @FXML private VBox sectionValorisateur;
+    @FXML private VBox sectionAdmin;
+    @FXML private VBox sectionOrganisateur;
+    @FXML private VBox sectionPartenaire;
 
     // ── Footer ──
     @FXML private Label footerName;
@@ -33,32 +43,46 @@ public class AppShellController {
     // ── Zone centrale ──
     @FXML private StackPane contentArea;
 
-    // ── Boutons actifs (pour highlight) ──
-    @FXML private Button btnAdminDashboard;
-    @FXML private Button btnTypeDechet;
-    @FXML private Button btnDeclarations;
-    @FXML private Button btnUsers;
-    @FXML private Button btnZones;
-    @FXML private Button btnIndicateurs;
-    @FXML private Button btnCarte;
-    @FXML private Button btnQR;
-    @FXML private Button btnAdvanced;
-    @FXML private Button btnChatbot;
+    // ── Boutons citoyen ──
+    @FXML private Button cit_profil;
+    @FXML private Button cit_offres;
+    @FXML private Button cit_reponses;
+    @FXML private Button cit_participations;
+    @FXML private Button cit_badges;
+    @FXML private Button cit_zones;
+    @FXML private Button cit_carte;
+    @FXML private Button cit_ia;
 
-    @FXML private Button btnCitoyenDashboard;
-    @FXML private Button btnDeclarer;
-    @FXML private Button btnMesDeclarations;
-    @FXML private Button btnStatistiques;
-    @FXML private Button btnProfil;
+    // ── Boutons valorisateur ──
+    @FXML private Button val_profil;
+    @FXML private Button val_offres;
+    @FXML private Button val_appels;
+    @FXML private Button val_zones;
+    @FXML private Button val_advanced;
 
-    @FXML private Button btnValoDashboard;
-    @FXML private Button btnDechetsRecus;
-    @FXML private Button btnValorisation;
-    @FXML private Button btnValoStats;
-    @FXML private Button btnValoProfile;
+    // ── Boutons admin ──
+    @FXML private Button adm_profil;
+    @FXML private Button adm_offres_mod;
+    @FXML private Button adm_events;
+    @FXML private Button adm_participations;
+    @FXML private Button adm_zones;
+    @FXML private Button adm_indicateurs;
+    @FXML private Button adm_qr;
+    @FXML private Button adm_advanced;
+    @FXML private Button adm_users;
 
-    // ── Référence statique pour accès depuis Main ──
+    // ── Boutons organisateur ──
+    @FXML private Button org_profil;
+    @FXML private Button org_events;
+    @FXML private Button org_ajouter;
+    @FXML private Button org_participations;
+
+    // ── Boutons partenaire ──
+    @FXML private Button par_profil;
+
+    // ── Référence statique ──
     private static AppShellController instance;
+    private Button currentActive;
 
     @FXML
     public void initialize() {
@@ -70,29 +94,27 @@ public class AppShellController {
     }
 
     // ═══════════════════════════════════════════════════════
-    // CONFIGURATION DE LA SIDEBAR SELON LE RÔLE
+    // CONFIGURATION SIDEBAR SELON RÔLE
     // ═══════════════════════════════════════════════════════
 
     public void configureForUser(User user) {
         if (user == null) return;
 
-        String type = user.getType() != null ? user.getType().toUpperCase() : "";
-        String name = ((user.getPrenom() != null ? user.getPrenom() : "") + " "
-                + (user.getNom() != null ? user.getNom() : "")).trim();
+        String type = user.getType() != null ? user.getType().trim().toUpperCase() : "";
+        String prenom = user.getPrenom() != null ? user.getPrenom() : "";
+        String nom    = user.getNom()    != null ? user.getNom()    : "";
+        String name   = (prenom + " " + nom).trim();
 
-        footerName.setText(name.isEmpty() ? user.getEmail() : name);
+        footerName.setText(name.isEmpty() ? (user.getEmail() != null ? user.getEmail() : "Utilisateur") : name);
 
         // Masquer toutes les sections
-        hide(sectionAdmin);
         hide(sectionCitoyen);
         hide(sectionValorisateur);
+        hide(sectionAdmin);
+        hide(sectionOrganisateur);
+        hide(sectionPartenaire);
 
         switch (type) {
-            case "ADMIN" -> {
-                show(sectionAdmin);
-                footerRole.setText("Administrateur");
-                brandSubtitle.setText("Espace Admin");
-            }
             case "CITIZEN", "CITOYEN" -> {
                 show(sectionCitoyen);
                 footerRole.setText("Citoyen");
@@ -103,9 +125,25 @@ public class AppShellController {
                 footerRole.setText("Valorisateur");
                 brandSubtitle.setText("Espace Valorisateur");
             }
-            default -> {
+            case "ADMIN" -> {
                 show(sectionAdmin);
-                footerRole.setText(type);
+                footerRole.setText("Administrateur");
+                brandSubtitle.setText("Espace Admin");
+            }
+            case "ORGANISATEUR", "ORGANIZER" -> {
+                show(sectionOrganisateur);
+                footerRole.setText("Organisateur");
+                brandSubtitle.setText("Espace Organisateur");
+            }
+            case "PARTENAIRE", "PARTNER" -> {
+                show(sectionPartenaire);
+                footerRole.setText("Partenaire");
+                brandSubtitle.setText("Espace Partenaire");
+            }
+            default -> {
+                // Rôle inconnu → afficher section citoyen par défaut
+                show(sectionCitoyen);
+                footerRole.setText(type.isEmpty() ? "Utilisateur" : type);
                 brandSubtitle.setText("WasteWise TN");
             }
         }
@@ -119,19 +157,19 @@ public class AppShellController {
         loadContent(fxmlPath, null);
     }
 
-    public <T> void loadContent(String fxmlPath, java.util.function.Consumer<T> controllerInit) {
+    public <T> void loadContent(String fxmlPath, Consumer<T> controllerInit) {
         try {
             URL url = getClass().getResource(fxmlPath);
             if (url == null) {
-                System.err.println("Fragment FXML introuvable : " + fxmlPath);
+                System.err.println("Fragment introuvable : " + fxmlPath);
                 return;
             }
             FXMLLoader loader = new FXMLLoader(url);
             Node content = loader.load();
 
             if (controllerInit != null) {
-                T controller = loader.getController();
-                if (controller != null) controllerInit.accept(controller);
+                T ctrl = loader.getController();
+                if (ctrl != null) controllerInit.accept(ctrl);
             }
 
             contentArea.getChildren().setAll(content);
@@ -143,39 +181,186 @@ public class AppShellController {
     }
 
     // ═══════════════════════════════════════════════════════
-    // NAVIGATION — ADMIN
-    // ═══════════════════════════════════════════════════════
-
-    @FXML public void navAdminDashboard()  { setActive(btnAdminDashboard);  loadContent("/org/example/views/fragments/dashboard_admin_content.fxml"); }
-    @FXML public void navTypeDechet()      { setActive(btnTypeDechet);       loadContent("/org/example/views/fragments/type_dechet_content.fxml"); }
-    @FXML public void navDeclarations()    { setActive(btnDeclarations);     loadContent("/org/example/views/fragments/declarations_content.fxml"); }
-    @FXML public void navUsers()           { setActive(btnUsers);            loadContent("/org/example/views/fragments/users_content.fxml"); }
-    @FXML public void navZones()           { setActive(btnZones);            loadContent("/org/example/views/fragments/zones_content.fxml"); }
-    @FXML public void navIndicateurs()     { setActive(btnIndicateurs);      loadContent("/org/example/views/fragments/indicateurs_content.fxml"); }
-    @FXML public void navCarte()           { setActive(btnCarte);            loadContent("/org/example/views/fragments/map_content.fxml"); }
-    @FXML public void navQR()              { setActive(btnQR);               loadContent("/org/example/views/fragments/qr_content.fxml"); }
-    @FXML public void navAdvanced()        { setActive(btnAdvanced);         loadContent("/org/example/views/fragments/advanced_content.fxml"); }
-    @FXML public void navChatbot()         { Main.showChatbot(); }
-
-    // ═══════════════════════════════════════════════════════
     // NAVIGATION — CITOYEN
+    // Profil, Offres(accueil+réponses), Participations+Badges, Zones+Carte+IA
     // ═══════════════════════════════════════════════════════
 
-    @FXML public void navCitoyenDashboard() { setActive(btnCitoyenDashboard); loadContent("/org/example/views/fragments/citizen_dashboard_content.fxml"); }
-    @FXML public void navDeclarer()         { setActive(btnDeclarer);          loadContent("/org/example/views/fragments/declarations_content.fxml"); }
-    @FXML public void navMesDeclarations()  { setActive(btnMesDeclarations);   loadContent("/org/example/views/fragments/declarations_content.fxml"); }
-    @FXML public void navStatistiques()     { setActive(btnStatistiques);      loadContent("/org/example/views/fragments/citizen_dashboard_content.fxml"); }
-    @FXML public void navProfil()           { setActive(btnProfil);            loadContent("/org/example/views/fragments/profile_content.fxml"); }
+    @FXML public void nav_cit_profil() {
+        setActive(cit_profil);
+        loadContent("/org/example/views/usser/profile_view.fxml");
+    }
+
+    @FXML public void nav_cit_offres() {
+        // Dashboard des offres (Accueil) — page existante branche offres
+        setActive(cit_offres);
+        loadContent("/fxml/Dashboard.fxml");
+    }
+
+    @FXML public void nav_cit_reponses() {
+        // Liste des réponses d'offres
+        setActive(cit_reponses);
+        loadContent("/fxml/reponseoffre/ReponseOffreList.fxml");
+    }
+
+    @FXML public void nav_cit_participations() {
+        // Gestion des participations citoyen
+        setActive(cit_participations);
+        loadContent("/org/example/views/event/AfficherParticipations.fxml");
+    }
+
+    @FXML public void nav_cit_badges() {
+        // Badges citoyen
+        setActive(cit_badges);
+        loadContent("/org/example/views/event/BadgesFront.fxml");
+    }
+
+    @FXML public void nav_cit_zones() {
+        // Zones polluées (CRUD citoyen)
+        setActive(cit_zones);
+        loadContent("/org/example/views/zone_polluee_list.fxml");
+    }
+
+    @FXML public void nav_cit_carte() {
+        // Carte interactive
+        setActive(cit_carte);
+        loadContent("/org/example/views/map.fxml");
+    }
+
+    @FXML public void nav_cit_ia() {
+        // Assistant IA — fenêtre séparée
+        Main.showChatbot();
+    }
 
     // ═══════════════════════════════════════════════════════
     // NAVIGATION — VALORISATEUR
+    // Profil, Offres(accueil+appels), Zones+Dashboard avancé
     // ═══════════════════════════════════════════════════════
 
-    @FXML public void navValoDashboard()  { setActive(btnValoDashboard);  loadContent("/org/example/views/fragments/valorizer_dashboard_content.fxml"); }
-    @FXML public void navDechetsRecus()   { setActive(btnDechetsRecus);   loadContent("/org/example/views/fragments/declarations_content.fxml"); }
-    @FXML public void navValorisation()   { setActive(btnValorisation);   loadContent("/org/example/views/fragments/valorizer_dashboard_content.fxml"); }
-    @FXML public void navValoStats()      { setActive(btnValoStats);      loadContent("/org/example/views/fragments/valorizer_dashboard_content.fxml"); }
-    @FXML public void navValoProfile()    { setActive(btnValoProfile);    loadContent("/org/example/views/fragments/profile_content.fxml"); }
+    @FXML public void nav_val_profil() {
+        setActive(val_profil);
+        loadContent("/org/example/views/usser/profile_view.fxml");
+    }
+
+    @FXML public void nav_val_offres() {
+        // Dashboard des offres (Accueil)
+        setActive(val_offres);
+        loadContent("/fxml/Dashboard.fxml");
+    }
+
+    @FXML public void nav_val_appels() {
+        // Liste des appels d'offre (valorisateur crée des appels)
+        setActive(val_appels);
+        loadContent("/fxml/appeloffre/AppelOffreList.fxml");
+    }
+
+    @FXML public void nav_val_zones() {
+        // Zones polluées (CRUD valorisateur)
+        setActive(val_zones);
+        loadContent("/org/example/views/zone_polluee_list.fxml");
+    }
+
+    @FXML public void nav_val_advanced() {
+        // Dashboard avancé
+        setActive(val_advanced);
+        loadContent("/org/example/views/advanced_dashboard.fxml");
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // NAVIGATION — ADMIN
+    // Profil, Modération offres, Events+Participations,
+    // Zones+Indicateurs+QR+Advanced, Utilisateurs
+    // ═══════════════════════════════════════════════════════
+
+    @FXML public void nav_adm_profil() {
+        setActive(adm_profil);
+        loadContent("/org/example/views/usser/profile_view.fxml");
+    }
+
+    @FXML public void nav_adm_offres_mod() {
+        // Modération des appels et réponses d'offres (backoffice admin)
+        setActive(adm_offres_mod);
+        loadContent("/fxml/admin/AdminDashboard.fxml");
+    }
+
+    @FXML public void nav_adm_events() {
+        // CRUD events + supervision
+        setActive(adm_events);
+        loadContent("/org/example/views/event/admin.fxml");
+    }
+
+    @FXML public void nav_adm_participations() {
+        // Supervision participations
+        setActive(adm_participations);
+        loadContent("/org/example/views/event/AfficherParticipations.fxml");
+    }
+
+    @FXML public void nav_adm_zones() {
+        // Zones polluées
+        setActive(adm_zones);
+        loadContent("/org/example/views/zone_polluee_list.fxml");
+    }
+
+    @FXML public void nav_adm_indicateurs() {
+        // Indicateurs d'impact
+        setActive(adm_indicateurs);
+        loadContent("/org/example/views/indicateur_impact_list.fxml");
+    }
+
+    @FXML public void nav_adm_qr() {
+        // Dashboard scans QR
+        setActive(adm_qr);
+        loadContent("/org/example/views/qr_dashboard.fxml");
+    }
+
+    @FXML public void nav_adm_advanced() {
+        // Dashboard avancé
+        setActive(adm_advanced);
+        loadContent("/org/example/views/advanced_dashboard.fxml");
+    }
+
+    @FXML public void nav_adm_users() {
+        // Gestion utilisateurs (désactiver/activer)
+        setActive(adm_users);
+        loadContent("/org/example/views/usser/admin_users.fxml");
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // NAVIGATION — ORGANISATEUR
+    // Profil, Mes events, Créer event, Participations
+    // ═══════════════════════════════════════════════════════
+
+    @FXML public void nav_org_profil() {
+        setActive(org_profil);
+        loadContent("/org/example/views/usser/profile_view.fxml");
+    }
+
+    @FXML public void nav_org_events() {
+        // Ses événements (OrganisateurHome)
+        setActive(org_events);
+        loadContent("/org/example/views/event/OrganisateurHome.fxml");
+    }
+
+    @FXML public void nav_org_ajouter() {
+        // Créer un événement
+        setActive(org_ajouter);
+        loadContent("/org/example/views/event/AjouterEvenement.fxml");
+    }
+
+    @FXML public void nav_org_participations() {
+        // Superviser les participations de son event
+        setActive(org_participations);
+        loadContent("/org/example/views/event/AfficherParticipations.fxml");
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // NAVIGATION — PARTENAIRE
+    // Profil uniquement
+    // ═══════════════════════════════════════════════════════
+
+    @FXML public void nav_par_profil() {
+        setActive(par_profil);
+        loadContent("/org/example/views/usser/profile_view.fxml");
+    }
 
     // ═══════════════════════════════════════════════════════
     // DÉCONNEXION
@@ -192,27 +377,19 @@ public class AppShellController {
     // HELPERS
     // ═══════════════════════════════════════════════════════
 
-    private void setActive(Button active) {
-        // Retirer active de tous les boutons
-        for (Button btn : allNavButtons()) {
-            btn.getStyleClass().removeAll("active");
-            if (!btn.getStyleClass().contains("sidebar-nav")) {
-                btn.getStyleClass().add("sidebar-nav");
+    private void setActive(Button btn) {
+        // Retirer active du bouton précédent
+        if (currentActive != null) {
+            currentActive.getStyleClass().removeAll("active");
+            if (!currentActive.getStyleClass().contains("sidebar-nav")) {
+                currentActive.getStyleClass().add("sidebar-nav");
             }
         }
-        if (active != null) {
-            active.getStyleClass().removeAll("muted");
-            active.getStyleClass().add("active");
+        if (btn != null) {
+            btn.getStyleClass().removeAll("muted");
+            btn.getStyleClass().add("active");
+            currentActive = btn;
         }
-    }
-
-    private Button[] allNavButtons() {
-        return new Button[]{
-            btnAdminDashboard, btnTypeDechet, btnDeclarations, btnUsers,
-            btnZones, btnIndicateurs, btnCarte, btnQR, btnAdvanced, btnChatbot,
-            btnCitoyenDashboard, btnDeclarer, btnMesDeclarations, btnStatistiques, btnProfil,
-            btnValoDashboard, btnDechetsRecus, btnValorisation, btnValoStats, btnValoProfile
-        };
     }
 
     private void show(VBox section) {

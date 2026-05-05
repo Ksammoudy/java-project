@@ -79,9 +79,11 @@ public class Main extends Application {
         if (user == null) { showLoginPage(); return; }
         String type = user.getType() != null ? user.getType().trim().toUpperCase() : "";
         switch (type) {
-            case "ADMIN"                    -> showDashboardAdmin();
-            case "VALORIZER", "VALORISATEUR" -> showDashboardValorizer();
-            default                          -> showDashboardCitizen();
+            case "ADMIN"                         -> showDashboardAdmin();
+            case "VALORIZER", "VALORISATEUR"     -> showDashboardValorizer();
+            case "ORGANISATEUR", "ORGANIZER"     -> showAppShell(user, "/org/example/views/event/OrganisateurHome.fxml");
+            case "PARTENAIRE", "PARTNER"         -> showAppShell(user, "/org/example/views/usser/profile_view.fxml");
+            default                              -> showDashboardCitizen(); // CITIZEN par défaut
         }
     }
 
@@ -92,19 +94,22 @@ public class Main extends Application {
     public static void showDashboardAdmin() {
         User user = SessionManager.getCurrentUser();
         if (user == null) { showLoginPage(); return; }
-        showAppShell(user, "/org/example/views/fragments/dashboard_admin_content.fxml");
+        // Admin : page initiale = modération offres (backoffice)
+        showAppShell(user, "/fxml/admin/AdminDashboard.fxml");
     }
 
     public static void showDashboardCitizen() {
         User user = SessionManager.getCurrentUser();
         if (user == null) { showLoginPage(); return; }
-        showAppShell(user, "/org/example/views/fragments/citizen_dashboard_content.fxml");
+        // Citoyen : page initiale = dashboard offres (accueil)
+        showAppShell(user, "/fxml/Dashboard.fxml");
     }
 
     public static void showDashboardValorizer() {
         User user = SessionManager.getCurrentUser();
         if (user == null) { showLoginPage(); return; }
-        showAppShell(user, "/org/example/views/fragments/valorizer_dashboard_content.fxml");
+        // Valorisateur : page initiale = dashboard offres (accueil)
+        showAppShell(user, "/fxml/Dashboard.fxml");
     }
 
     // ═══════════════════════════════════════════════════════
