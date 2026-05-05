@@ -6,198 +6,172 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Text?>
 
-<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.controllers.AdvancedDashboardController"
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.controllers.AdvancedDashboardController"
             styleClass="workspace-root"
             stylesheets="@../styles/style.css">
 
-    <!-- Sidebar -->
-    <left>
-        <VBox prefWidth="276.0" spacing="10.0" styleClass="workspace-sidebar">
-            <padding>
-                <Insets top="24.0" right="16.0" bottom="16.0" left="16.0"/>
-            </padding>
-            <VBox spacing="4.0" styleClass="brand-shell">
-                <Label text="WasteWise" styleClass="brand-logo-text"/>
-            </VBox>
-            <Label text="Menu Principal" styleClass="sidebar-section"/>
-            <Button text="📈 Dashboard" onAction="#goToDashboard" maxWidth="Infinity" styleClass="sidebar-nav muted"/>
-            <Label text="Zones &amp; Impact" styleClass="sidebar-section"/>
-            <Button text="📍 Zones Polluées" onAction="#goToZones" maxWidth="Infinity" styleClass="sidebar-nav muted"/>
-            <Button text="🗺️ Carte" onAction="#goToMap" maxWidth="Infinity" styleClass="sidebar-nav muted"/>
-            <Button text="📊 Indicateurs" onAction="#goToIndicators" maxWidth="Infinity" styleClass="sidebar-nav muted"/>
-            <Button text="📊 Dashboard Avancé" maxWidth="Infinity" styleClass="sidebar-nav active"/>
-            <Button text="🤖 Assistant IA" onAction="#goToChatbot" maxWidth="Infinity" styleClass="sidebar-nav muted"/>
-            <Region VBox.vgrow="ALWAYS"/>
-            <VBox spacing="2.0" styleClass="sidebar-footer">
-                <Label text="Admin" styleClass="user-meta-name"/>
-                <Label text="Administrateur" styleClass="user-meta-role"/>
-            </VBox>
-        </VBox>
-    </left>
-    <center>
-        <VBox styleClass="workspace-main">
-            <HBox spacing="12.0" alignment="CENTER_LEFT" styleClass="workspace-topbar">
-                <Label text="Dashboard Avancé" styleClass="workspace-title"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <Button text="🔄 Rafraîchir" onAction="#refreshDashboard" styleClass="outline-btn"/>
-                <Button text="📥 Exporter" onAction="#exportFullReport" styleClass="primary-btn"/>
-                <Label fx:id="lastUpdatedLabel" text="Dernière mise à jour: --" styleClass="workspace-subtitle-strong"/>
-            </HBox>
-            <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="content-scroll">
-            <VBox spacing="20" style="-fx-padding: 20;">
+    <VBox styleClass="workspace-main">
+        <HBox spacing="12.0" alignment="CENTER_LEFT" styleClass="workspace-topbar">
+            <Label text="Dashboard Avancé" styleClass="workspace-title"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="🔄 Rafraîchir" onAction="#refreshDashboard" styleClass="outline-btn"/>
+            <Button text="📥 Exporter" onAction="#exportFullReport" styleClass="primary-btn"/>
+            <Label fx:id="lastUpdatedLabel" text="Dernière mise à jour: --" styleClass="workspace-subtitle-strong"/>
+        </HBox>
+        <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="content-scroll">
+        <VBox spacing="20" style="-fx-padding: 20;">
 
-                <!-- Stats Cards Row -->
-                <GridPane fx:id="statsGrid" hgap="20" vgap="20" alignment="CENTER">
-                    <columnConstraints>
-                        <ColumnConstraints percentWidth="20"/>
-                        <ColumnConstraints percentWidth="20"/>
-                        <ColumnConstraints percentWidth="20"/>
-                        <ColumnConstraints percentWidth="20"/>
-                        <ColumnConstraints percentWidth="20"/>
-                    </columnConstraints>
+            <!-- Stats Cards Row -->
+            <GridPane fx:id="statsGrid" hgap="20" vgap="20" alignment="CENTER">
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="20"/>
+                    <ColumnConstraints percentWidth="20"/>
+                    <ColumnConstraints percentWidth="20"/>
+                    <ColumnConstraints percentWidth="20"/>
+                    <ColumnConstraints percentWidth="20"/>
+                </columnConstraints>
 
-                    <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10;" GridPane.columnIndex="0">
-                        <Label text="📍" style="-fx-font-size: 32px;"/>
-                        <Label text="Total Zones" style="-fx-text-fill: #666; -fx-font-size: 12px;"/>
-                        <Label fx:id="totalZonesLabel" text="0" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #2196f3;"/>
-                    </VBox>
-
-                    <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10;" GridPane.columnIndex="1">
-                        <Label text="📊" style="-fx-font-size: 32px;"/>
-                        <Label text="Niveau Moyen" style="-fx-text-fill: #666; -fx-font-size: 12px;"/>
-                        <Label fx:id="avgPollutionLabel" text="0/10" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #ff9800;"/>
-                    </VBox>
-
-                    <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10;" GridPane.columnIndex="2">
-                        <Label text="🔴" style="-fx-font-size: 32px;"/>
-                        <Label text="Critique" style="-fx-text-fill: #666; -fx-font-size: 12px;"/>
-                        <Label fx:id="criticalZonesLabel" text="0" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #dc3545;"/>
-                    </VBox>
-
-                    <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10;" GridPane.columnIndex="3">
-                        <Label text="🟡" style="-fx-font-size: 32px;"/>
-                        <Label text="Risque Moyen" style="-fx-text-fill: #666; -fx-font-size: 12px;"/>
-                        <Label fx:id="mediumZonesLabel" text="0" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #ffc107;"/>
-                    </VBox>
-
-                    <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10;" GridPane.columnIndex="4">
-                        <Label text="🟢" style="-fx-font-size: 32px;"/>
-                        <Label text="Risque Faible" style="-fx-text-fill: #666; -fx-font-size: 12px;"/>
-                        <Label fx:id="lowZonesLabel" text="0" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #28a745;"/>
-                    </VBox>
-                </GridPane>
-
-                <!-- Advanced Metrics Row -->
-                <GridPane hgap="20" vgap="20">
-                    <VBox spacing="10" style="-fx-background-color: #667eea; -fx-padding: 20; -fx-background-radius: 10;" GridPane.columnIndex="0" GridPane.hgrow="ALWAYS">
-                        <Label text="📈 Indice de Risque" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
-                        <Label fx:id="riskIndexLabel" text="0" style="-fx-text-fill: white; -fx-font-size: 28px; -fx-font-weight: bold;"/>
-                        <ProgressBar fx:id="healthProgressBar" prefWidth="Infinity" progress="0.5"/>
-                    </VBox>
-
-                    <VBox spacing="10" style="-fx-background-color: #f093fb; -fx-padding: 20; -fx-background-radius: 10;" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS">
-                        <Label text="📉 Tendance" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
-                        <Label fx:id="improvementLabel" text="0%" style="-fx-text-fill: white; -fx-font-size: 28px; -fx-font-weight: bold;"/>
-                        <Label text="vs mois dernier" style="-fx-text-fill: rgba(255,255,255,0.8); -fx-font-size: 11px;"/>
-                    </VBox>
-
-                    <VBox spacing="10" style="-fx-background-color: #4facfe; -fx-padding: 20; -fx-background-radius: 10;" GridPane.columnIndex="2" GridPane.hgrow="ALWAYS">
-                        <Label text="🎯 Zones Critiques" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
-                        <Label fx:id="criticalPercentageLabel" text="0%" style="-fx-text-fill: white; -fx-font-size: 28px; -fx-font-weight: bold;"/>
-                        <Label text="du total" style="-fx-text-fill: rgba(255,255,255,0.8); -fx-font-size: 11px;"/>
-                    </VBox>
-
-                    <VBox spacing="10" style="-fx-background-color: #43e97b; -fx-padding: 20; -fx-background-radius: 10;" GridPane.columnIndex="3" GridPane.hgrow="ALWAYS">
-                        <Label text="💚 Score Santé" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
-                        <Label fx:id="healthScoreLabel" text="0/100" style="-fx-text-fill: white; -fx-font-size: 28px; -fx-font-weight: bold;"/>
-                        <Label text="environnemental" style="-fx-text-fill: rgba(255,255,255,0.8); -fx-font-size: 11px;"/>
-                    </VBox>
-                </GridPane>
-
-                <!-- Charts Row -->
-                <GridPane hgap="20" vgap="20">
-                    <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10;" GridPane.columnIndex="0" GridPane.hgrow="ALWAYS">
-                        <Label text="Distribution des Risques" style="-fx-font-weight: bold;"/>
-                        <PieChart fx:id="riskPieChart" prefHeight="300" prefWidth="300"/>
-                    </VBox>
-
-                    <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10;" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS">
-                        <Label text="Niveaux de Pollution" style="-fx-font-weight: bold;"/>
-                        <BarChart fx:id="pollutionBarChart" prefHeight="300" prefWidth="500">
-                            <xAxis>
-                                <CategoryAxis label="Zones"/>
-                            </xAxis>
-                            <yAxis>
-                                <NumberAxis label="Niveau" lowerBound="0" upperBound="10"/>
-                            </yAxis>
-                        </BarChart>
-                    </VBox>
-                </GridPane>
-
-                <!-- Charts Row 2 -->
-                <GridPane hgap="20" vgap="20">
-                    <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10;" GridPane.columnIndex="0" GridPane.hgrow="ALWAYS">
-                        <Label text="Tendance (6 mois)" style="-fx-font-weight: bold;"/>
-                        <LineChart fx:id="trendLineChart" prefHeight="300" prefWidth="400">
-                            <xAxis>
-                                <CategoryAxis label="Mois"/>
-                            </xAxis>
-                            <yAxis>
-                                <NumberAxis label="Niveau" lowerBound="0" upperBound="10"/>
-                            </yAxis>
-                        </LineChart>
-                    </VBox>
-
-                    <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10;" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS">
-                        <Label text="Analyse Comparative" style="-fx-font-weight: bold;"/>
-                        <StackedBarChart fx:id="comparisonChart" prefHeight="300" prefWidth="400">
-                            <xAxis>
-                                <CategoryAxis label="Zones"/>
-                            </xAxis>
-                            <yAxis>
-                                <NumberAxis label="Score"/>
-                            </yAxis>
-                        </StackedBarChart>
-                    </VBox>
-                </GridPane>
-
-                <!-- Health Status -->
-                <GridPane hgap="20" vgap="20">
-                    <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10;" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.hgrow="ALWAYS">
-                        <Label text="🏥 État de Santé" style="-fx-font-weight: bold;"/>
-                        <Label fx:id="healthStatusLabel" text="Analyse en cours..." style="-fx-font-weight: bold;"/>
-                    </VBox>
-                </GridPane>
-
-                <!-- Recommendations & Alerts -->
-                <GridPane hgap="20" vgap="20">
-                    <VBox spacing="10" style="-fx-background-color: #f8f9fa; -fx-padding: 20; -fx-background-radius: 10;" GridPane.columnIndex="0" GridPane.hgrow="ALWAYS">
-                        <Label text="💡 Recommandations" style="-fx-font-weight: bold;"/>
-                        <Text fx:id="recommendationText" wrappingWidth="400"/>
-                    </VBox>
-
-                    <VBox spacing="10" style="-fx-background-color: #fff3e0; -fx-padding: 20; -fx-background-radius: 10;" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS">
-                        <Label text="🚨 Alertes" style="-fx-font-weight: bold;"/>
-                        <VBox fx:id="alertBox" spacing="8"/>
-                    </VBox>
-                </GridPane>
-
-                <!-- Zones Table -->
-                <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10;">
-                    <Label text="📋 Liste des Zones Polluées" style="-fx-font-weight: bold;"/>
-                    <TableView fx:id="zonesTableView" prefHeight="300">
-                        <columns>
-                            <TableColumn fx:id="nameColumn" text="Nom de la Zone" prefWidth="200"/>
-                            <TableColumn fx:id="levelColumn" text="Niveau" prefWidth="80"/>
-                            <TableColumn fx:id="riskColumn" text="Risque" prefWidth="120"/>
-                            <TableColumn fx:id="gpsColumn" text="Coordonnées GPS" prefWidth="250"/>
-                        </columns>
-                    </TableView>
+                <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10;" GridPane.columnIndex="0">
+                    <Label text="📍" style="-fx-font-size: 32px;"/>
+                    <Label text="Total Zones" style="-fx-text-fill: #666; -fx-font-size: 12px;"/>
+                    <Label fx:id="totalZonesLabel" text="0" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #2196f3;"/>
                 </VBox>
 
-            </VBox>
-        </ScrollPane>
-        </VBox>
-    </center>
+                <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10;" GridPane.columnIndex="1">
+                    <Label text="📊" style="-fx-font-size: 32px;"/>
+                    <Label text="Niveau Moyen" style="-fx-text-fill: #666; -fx-font-size: 12px;"/>
+                    <Label fx:id="avgPollutionLabel" text="0/10" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #ff9800;"/>
+                </VBox>
 
-</BorderPane>
+                <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10;" GridPane.columnIndex="2">
+                    <Label text="🔴" style="-fx-font-size: 32px;"/>
+                    <Label text="Critique" style="-fx-text-fill: #666; -fx-font-size: 12px;"/>
+                    <Label fx:id="criticalZonesLabel" text="0" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #dc3545;"/>
+                </VBox>
+
+                <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10;" GridPane.columnIndex="3">
+                    <Label text="🟡" style="-fx-font-size: 32px;"/>
+                    <Label text="Risque Moyen" style="-fx-text-fill: #666; -fx-font-size: 12px;"/>
+                    <Label fx:id="mediumZonesLabel" text="0" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #ffc107;"/>
+                </VBox>
+
+                <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10;" GridPane.columnIndex="4">
+                    <Label text="🟢" style="-fx-font-size: 32px;"/>
+                    <Label text="Risque Faible" style="-fx-text-fill: #666; -fx-font-size: 12px;"/>
+                    <Label fx:id="lowZonesLabel" text="0" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #28a745;"/>
+                </VBox>
+            </GridPane>
+
+            <!-- Advanced Metrics Row -->
+            <GridPane hgap="20" vgap="20">
+                <VBox spacing="10" style="-fx-background-color: #667eea; -fx-padding: 20; -fx-background-radius: 10;" GridPane.columnIndex="0" GridPane.hgrow="ALWAYS">
+                    <Label text="📈 Indice de Risque" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
+                    <Label fx:id="riskIndexLabel" text="0" style="-fx-text-fill: white; -fx-font-size: 28px; -fx-font-weight: bold;"/>
+                    <ProgressBar fx:id="healthProgressBar" prefWidth="Infinity" progress="0.5"/>
+                </VBox>
+
+                <VBox spacing="10" style="-fx-background-color: #f093fb; -fx-padding: 20; -fx-background-radius: 10;" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS">
+                    <Label text="📉 Tendance" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
+                    <Label fx:id="improvementLabel" text="0%" style="-fx-text-fill: white; -fx-font-size: 28px; -fx-font-weight: bold;"/>
+                    <Label text="vs mois dernier" style="-fx-text-fill: rgba(255,255,255,0.8); -fx-font-size: 11px;"/>
+                </VBox>
+
+                <VBox spacing="10" style="-fx-background-color: #4facfe; -fx-padding: 20; -fx-background-radius: 10;" GridPane.columnIndex="2" GridPane.hgrow="ALWAYS">
+                    <Label text="🎯 Zones Critiques" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
+                    <Label fx:id="criticalPercentageLabel" text="0%" style="-fx-text-fill: white; -fx-font-size: 28px; -fx-font-weight: bold;"/>
+                    <Label text="du total" style="-fx-text-fill: rgba(255,255,255,0.8); -fx-font-size: 11px;"/>
+                </VBox>
+
+                <VBox spacing="10" style="-fx-background-color: #43e97b; -fx-padding: 20; -fx-background-radius: 10;" GridPane.columnIndex="3" GridPane.hgrow="ALWAYS">
+                    <Label text="💚 Score Santé" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
+                    <Label fx:id="healthScoreLabel" text="0/100" style="-fx-text-fill: white; -fx-font-size: 28px; -fx-font-weight: bold;"/>
+                    <Label text="environnemental" style="-fx-text-fill: rgba(255,255,255,0.8); -fx-font-size: 11px;"/>
+                </VBox>
+            </GridPane>
+
+            <!-- Charts Row -->
+            <GridPane hgap="20" vgap="20">
+                <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10;" GridPane.columnIndex="0" GridPane.hgrow="ALWAYS">
+                    <Label text="Distribution des Risques" style="-fx-font-weight: bold;"/>
+                    <PieChart fx:id="riskPieChart" prefHeight="300" prefWidth="300"/>
+                </VBox>
+
+                <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10;" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS">
+                    <Label text="Niveaux de Pollution" style="-fx-font-weight: bold;"/>
+                    <BarChart fx:id="pollutionBarChart" prefHeight="300" prefWidth="500">
+                        <xAxis>
+                            <CategoryAxis label="Zones"/>
+                        </xAxis>
+                        <yAxis>
+                            <NumberAxis label="Niveau" lowerBound="0" upperBound="10"/>
+                        </yAxis>
+                    </BarChart>
+                </VBox>
+            </GridPane>
+
+            <!-- Charts Row 2 -->
+            <GridPane hgap="20" vgap="20">
+                <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10;" GridPane.columnIndex="0" GridPane.hgrow="ALWAYS">
+                    <Label text="Tendance (6 mois)" style="-fx-font-weight: bold;"/>
+                    <LineChart fx:id="trendLineChart" prefHeight="300" prefWidth="400">
+                        <xAxis>
+                            <CategoryAxis label="Mois"/>
+                        </xAxis>
+                        <yAxis>
+                            <NumberAxis label="Niveau" lowerBound="0" upperBound="10"/>
+                        </yAxis>
+                    </LineChart>
+                </VBox>
+
+                <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10;" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS">
+                    <Label text="Analyse Comparative" style="-fx-font-weight: bold;"/>
+                    <StackedBarChart fx:id="comparisonChart" prefHeight="300" prefWidth="400">
+                        <xAxis>
+                            <CategoryAxis label="Zones"/>
+                        </xAxis>
+                        <yAxis>
+                            <NumberAxis label="Score"/>
+                        </yAxis>
+                    </StackedBarChart>
+                </VBox>
+            </GridPane>
+
+            <!-- Health Status -->
+            <GridPane hgap="20" vgap="20">
+                <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10;" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.hgrow="ALWAYS">
+                    <Label text="🏥 État de Santé" style="-fx-font-weight: bold;"/>
+                    <Label fx:id="healthStatusLabel" text="Analyse en cours..." style="-fx-font-weight: bold;"/>
+                </VBox>
+            </GridPane>
+
+            <!-- Recommendations & Alerts -->
+            <GridPane hgap="20" vgap="20">
+                <VBox spacing="10" style="-fx-background-color: #f8f9fa; -fx-padding: 20; -fx-background-radius: 10;" GridPane.columnIndex="0" GridPane.hgrow="ALWAYS">
+                    <Label text="💡 Recommandations" style="-fx-font-weight: bold;"/>
+                    <Text fx:id="recommendationText" wrappingWidth="400"/>
+                </VBox>
+
+                <VBox spacing="10" style="-fx-background-color: #fff3e0; -fx-padding: 20; -fx-background-radius: 10;" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS">
+                    <Label text="🚨 Alertes" style="-fx-font-weight: bold;"/>
+                    <VBox fx:id="alertBox" spacing="8"/>
+                </VBox>
+            </GridPane>
+
+            <!-- Zones Table -->
+            <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10;">
+                <Label text="📋 Liste des Zones Polluées" style="-fx-font-weight: bold;"/>
+                <TableView fx:id="zonesTableView" prefHeight="300">
+                    <columns>
+                        <TableColumn fx:id="nameColumn" text="Nom de la Zone" prefWidth="200"/>
+                        <TableColumn fx:id="levelColumn" text="Niveau" prefWidth="80"/>
+                        <TableColumn fx:id="riskColumn" text="Risque" prefWidth="120"/>
+                        <TableColumn fx:id="gpsColumn" text="Coordonnées GPS" prefWidth="250"/>
+                    </columns>
+                </TableView>
+            </VBox>
+
+        </VBox>
+    </ScrollPane>
+    </VBox>
+
+</VBox>
