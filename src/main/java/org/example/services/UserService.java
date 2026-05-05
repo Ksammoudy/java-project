@@ -12,10 +12,9 @@ import java.util.List;
 public class UserService implements CRUD<User> {
 
     private static UserService instance;
-    private final Connection cnx;
 
     private UserService() {
-        cnx = DBConnection.getInstance().getConnection();
+        // Connexion lazy — pas de connexion au constructeur
     }
 
     public static synchronized UserService getInstance() {
@@ -23,6 +22,11 @@ public class UserService implements CRUD<User> {
             instance = new UserService();
         }
         return instance;
+    }
+
+    /** Obtient une connexion fraîche à chaque appel. */
+    private Connection getConnection() {
+        return DBConnection.getInstance().getConnection();
     }
 
     @Override
