@@ -333,7 +333,7 @@ public class AdvancedDashboardController {
 
     private void refreshData() {
         loadData();
-        showNotification("Dashboard actualisé", "Les données ont été mises à jour avec succès.");
+        // Pas de popup — refresh silencieux
     }
 
     // ==================== EXPORT METHODS ====================
