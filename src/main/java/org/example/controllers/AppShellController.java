@@ -191,15 +191,14 @@ public class AppShellController {
     }
 
     @FXML public void nav_cit_offres() {
-        // Dashboard des offres (Accueil) — page existante branche offres
+        // Dashboard des offres — ouvre en plein écran (navigation interne ViewNavigator)
         setActive(cit_offres);
-        loadContent("/fxml/Dashboard.fxml");
+        Main.navigateTo("/fxml/Dashboard.fxml", "WasteWise - Offres", 1200, 750);
     }
 
     @FXML public void nav_cit_reponses() {
-        // Liste des réponses d'offres
         setActive(cit_reponses);
-        loadContent("/fxml/reponseoffre/ReponseOffreList.fxml");
+        Main.navigateTo("/fxml/reponseoffre/ReponseOffreList.fxml", "WasteWise - Mes Réponses", 1200, 750);
     }
 
     @FXML public void nav_cit_participations() {
@@ -242,15 +241,13 @@ public class AppShellController {
     }
 
     @FXML public void nav_val_offres() {
-        // Dashboard des offres (Accueil)
         setActive(val_offres);
-        loadContent("/fxml/Dashboard.fxml");
+        Main.navigateTo("/fxml/Dashboard.fxml", "WasteWise - Offres", 1200, 750);
     }
 
     @FXML public void nav_val_appels() {
-        // Liste des appels d'offre (valorisateur crée des appels)
         setActive(val_appels);
-        loadContent("/fxml/appeloffre/AppelOffreList.fxml");
+        Main.navigateTo("/fxml/appeloffre/AppelOffreList.fxml", "WasteWise - Appels d'Offre", 1200, 750);
     }
 
     @FXML public void nav_val_zones() {
@@ -277,9 +274,8 @@ public class AppShellController {
     }
 
     @FXML public void nav_adm_offres_mod() {
-        // Modération des appels et réponses d'offres (backoffice admin)
         setActive(adm_offres_mod);
-        loadContent("/fxml/admin/AdminDashboard.fxml");
+        Main.navigateTo("/fxml/admin/AdminDashboard.fxml", "WasteWise - Modération Offres", 1200, 750);
     }
 
     @FXML public void nav_adm_events() {

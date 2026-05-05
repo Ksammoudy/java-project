@@ -94,22 +94,19 @@ public class Main extends Application {
     public static void showDashboardAdmin() {
         User user = SessionManager.getCurrentUser();
         if (user == null) { showLoginPage(); return; }
-        // Admin : page initiale = modération offres (backoffice)
-        showAppShell(user, "/fxml/admin/AdminDashboard.fxml");
+        showAppShell(user, "/org/example/views/usser/dashboard_admin.fxml");
     }
 
     public static void showDashboardCitizen() {
         User user = SessionManager.getCurrentUser();
         if (user == null) { showLoginPage(); return; }
-        // Citoyen : page initiale = dashboard offres (accueil)
-        showAppShell(user, "/fxml/Dashboard.fxml");
+        showAppShell(user, "/org/example/views/dashboard_citizen.fxml");
     }
 
     public static void showDashboardValorizer() {
         User user = SessionManager.getCurrentUser();
         if (user == null) { showLoginPage(); return; }
-        // Valorisateur : page initiale = dashboard offres (accueil)
-        showAppShell(user, "/fxml/Dashboard.fxml");
+        showAppShell(user, "/org/example/views/usser/dashboard_valorizer.fxml");
     }
 
     // ═══════════════════════════════════════════════════════

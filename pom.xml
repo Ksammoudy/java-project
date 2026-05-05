@@ -246,15 +246,6 @@
                 <version>${maven.compiler.plugin.version}</version>
                 <configuration>
                     <release>${maven.compiler.release}</release>
-                    <excludes>
-                        <exclude>controllers/**</exclude>
-                        <exclude>entities/**</exclude>
-                        <exclude>services/**</exclude>
-                        <exclude>utils/MyConnection.java</exclude>
-                        <exclude>utils/SchemaManager.java</exclude>
-                        <exclude>utils/ExportDocumentService.java</exclude>
-                        <exclude>main/**</exclude>
-                    </excludes>
                 </configuration>
             </plugin>
 

@@ -74,7 +74,7 @@ public class UserService implements CRUD<User> {
                 "(email, roles, password, nom, prenom, telephone, type, created_at, is_active, face_embedding, face_updated_at, last_seen_at, google_authenticator_secret, is_two_factor_enabled, is_verified) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setString(1, email);
             ps.setString(2, user.getRoles() == null || user.getRoles().isBlank() ? "[]" : user.getRoles());
             ps.setString(3, PasswordUtil.hashPassword(password));
@@ -102,7 +102,7 @@ public class UserService implements CRUD<User> {
         List<User> users = new ArrayList<>();
         String sql = "SELECT * FROM `user` ORDER BY id ASC";
 
-        try (Statement st = cnx.createStatement();
+        try (Statement st = getConnection().createStatement();
              ResultSet rs = st.executeQuery(sql)) {
 
             while (rs.next()) {
@@ -159,7 +159,7 @@ public class UserService implements CRUD<User> {
                 "google_authenticator_secret=?, is_two_factor_enabled=?, is_verified=? " +
                 "WHERE id=?";
 
-        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setString(1, email);
             ps.setString(2, user.getRoles() == null || user.getRoles().isBlank() ? "[]" : user.getRoles());
             ps.setString(3, nom);
@@ -187,7 +187,7 @@ public class UserService implements CRUD<User> {
 
         String sql = "DELETE FROM `user` WHERE id = ?";
 
-        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setInt(1, id);
             ps.executeUpdate();
         }
@@ -295,7 +295,7 @@ public class UserService implements CRUD<User> {
     public User getUserById(int id) {
         String sql = "SELECT * FROM `user` WHERE id = ?";
 
-        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setInt(1, id);
 
             try (ResultSet rs = ps.executeQuery()) {
@@ -317,7 +317,7 @@ public class UserService implements CRUD<User> {
 
         String sql = "SELECT * FROM `user` WHERE email = ?";
 
-        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setString(1, email.trim().toLowerCase());
 
             try (ResultSet rs = ps.executeQuery()) {
@@ -384,7 +384,7 @@ public class UserService implements CRUD<User> {
 
         String sql = "UPDATE `user` SET nom = ?, prenom = ?, email = ?, telephone = ? WHERE id = ?";
 
-        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setString(1, nom);
             ps.setString(2, prenom);
             ps.setString(3, email);
@@ -443,7 +443,7 @@ public class UserService implements CRUD<User> {
 
         String sql = "UPDATE `user` SET email = ?, nom = ?, prenom = ?, telephone = ?, type = ?, is_active = ? WHERE id = ?";
 
-        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setString(1, email);
             ps.setString(2, nom);
             ps.setString(3, prenom);
@@ -467,7 +467,7 @@ public class UserService implements CRUD<User> {
 
         String sql = "UPDATE `user` SET face_embedding = ?, face_updated_at = ? WHERE id = ?";
 
-        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setString(1, user.getFaceEmbedding());
             ps.setTimestamp(2, user.getFaceUpdatedAt() != null
                     ? Timestamp.valueOf(user.getFaceUpdatedAt())
@@ -488,7 +488,7 @@ public class UserService implements CRUD<User> {
 
         String sql = "UPDATE `user` SET face_embedding = NULL, face_updated_at = NULL WHERE id = ?";
 
-        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setInt(1, userId);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -505,7 +505,7 @@ public class UserService implements CRUD<User> {
 
         String sql = "UPDATE `user` SET google_authenticator_secret = ?, is_two_factor_enabled = ? WHERE id = ?";
 
-        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setString(1, user.getGoogleAuthenticatorSecret());
             ps.setBoolean(2, user.isTwoFactorEnabled());
             ps.setInt(3, user.getId());
@@ -524,7 +524,7 @@ public class UserService implements CRUD<User> {
 
         String sql = "SELECT id FROM `user` WHERE email = ? AND id <> ?";
 
-        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setString(1, email.trim().toLowerCase());
             ps.setInt(2, currentUserId);
 
@@ -551,7 +551,7 @@ public class UserService implements CRUD<User> {
 
         String sql = "UPDATE `user` SET password = ? WHERE id = ?";
 
-        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setString(1, PasswordUtil.hashPassword(newPlainPassword));
             ps.setInt(2, id);
 
@@ -576,7 +576,7 @@ public class UserService implements CRUD<User> {
     public boolean toggleActive(int id) {
         String sql = "UPDATE `user` SET is_active = NOT is_active WHERE id = ?";
 
-        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setInt(1, id);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -616,7 +616,7 @@ public class UserService implements CRUD<User> {
 
         String sql = "UPDATE `user` SET is_active = ? WHERE id = ?";
 
-        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setBoolean(1, active);
             ps.setInt(2, targetUserId);
             return ps.executeUpdate() > 0;
@@ -630,7 +630,7 @@ public class UserService implements CRUD<User> {
     public boolean updateLastSeen(int id) {
         String sql = "UPDATE `user` SET last_seen_at = ? WHERE id = ?";
 
-        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
             ps.setInt(2, id);
             return ps.executeUpdate() > 0;
