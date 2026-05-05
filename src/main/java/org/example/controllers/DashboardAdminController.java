@@ -45,14 +45,15 @@ public class DashboardAdminController {
     @FXML
     public void initialize() {
         User user = resolveAdminUser();
-        adminNameLabel.setText(fullName(user));
-        adminHeaderNameLabel.setText(fullName(user));
-        weatherValueLabel.setText("16C");
-        weatherMetaLabel.setText("Vent: 2.5 km/h | Code meteo: 0 | Maj: 2026-02-26T09:30");
-        declarationsCountLabel.setText("19");
-        pendingCountLabel.setText("7");
-        typesCountLabel.setText("3");
-        topTypeLabel.setText("Plastique (14)");
+        String name = fullName(user);
+        if (adminNameLabel != null)       adminNameLabel.setText(name);
+        if (adminHeaderNameLabel != null) adminHeaderNameLabel.setText(name);
+        if (weatherValueLabel != null)    weatherValueLabel.setText("16C");
+        if (weatherMetaLabel != null)     weatherMetaLabel.setText("Vent: 2.5 km/h | Code meteo: 0 | Maj: 2026-02-26T09:30");
+        if (declarationsCountLabel != null) declarationsCountLabel.setText("19");
+        if (pendingCountLabel != null)    pendingCountLabel.setText("7");
+        if (typesCountLabel != null)      typesCountLabel.setText("3");
+        if (topTypeLabel != null)         topTypeLabel.setText("Plastique (14)");
         populateCharts();
     }
 
