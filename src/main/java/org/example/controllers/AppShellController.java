@@ -59,6 +59,7 @@ public class AppShellController {
     @FXML private Button val_appels;
     @FXML private Button val_zones;
     @FXML private Button val_advanced;
+    // ── Boutons admin ──
 
     // ── Boutons admin ──
     @FXML private Button adm_profil;
