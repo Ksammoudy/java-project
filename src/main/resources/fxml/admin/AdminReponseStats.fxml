@@ -6,7 +6,6 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
@@ -14,172 +13,155 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="860.0"
-            prefWidth="1400.0"
-            fx:id="root"
-            style="-fx-background-color: linear-gradient(to right, #D8F0E5, #C9ECE8);"
-            xmlns="http://javafx.com/javafx/21"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="controllers.admin.AdminReponseStatsController">
+<VBox prefHeight="860.0"
+      prefWidth="1400.0"
+      fx:id="root"
+      style="-fx-background-color: linear-gradient(to right, #D8F0E5, #C9ECE8);"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controllers.admin.AdminReponseStatsController">
 
-    <top>
-        <HBox alignment="CENTER_LEFT"
-              spacing="14.0"
-              style="-fx-background-color: #E7F7EE; -fx-border-color: #BDE0CE; -fx-border-width: 0 0 1 0; -fx-padding: 14 20 14 20;">
-            <Label text="WasteWise" style="-fx-text-fill: #007A47; -fx-font-size: 16px; -fx-font-weight: bold;"/>
-            <Label text="BACK OFFICE" style="-fx-text-fill: #0B5740; -fx-font-size: 12px; -fx-font-weight: bold;"/>
-            <Region HBox.hgrow="ALWAYS"/>
-            <Button fx:id="btnExporterPdf" mnemonicParsing="false" onAction="#onExporterPdf" text="Exporter PDF"
-                    style="-fx-background-color: #128B57; -fx-text-fill: #FFFFFF; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 9 16 9 16;"/>
-            <Button mnemonicParsing="false" onAction="#onOpenModeration" text="Retour moderation"
-                    style="-fx-background-color: #F8FFFB; -fx-text-fill: #007A47; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 9 16 9 16; -fx-border-color: #C8E8D6; -fx-border-radius: 10;"/>
-            <Button mnemonicParsing="false" onAction="#onOpenAdminDashboard" text="Dashboard admin"
-                    style="-fx-background-color: #F8FFFB; -fx-text-fill: #007A47; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 9 16 9 16; -fx-border-color: #C8E8D6; -fx-border-radius: 10;"/>
-        </HBox>
-    </top>
+    <ScrollPane fitToWidth="true"
+                hbarPolicy="NEVER"
+                VBox.vgrow="ALWAYS"
+                style="-fx-background: transparent; -fx-background-color: transparent;">
+        <content>
+            <StackPane>
+                <padding>
+                    <Insets top="20.0" right="24.0" bottom="24.0" left="24.0"/>
+                </padding>
 
-    <center>
-        <ScrollPane fitToWidth="true"
-                    hbarPolicy="NEVER"
-                    style="-fx-background: transparent; -fx-background-color: transparent;">
-            <content>
-                <StackPane>
-                    <padding>
-                        <Insets top="20.0" right="24.0" bottom="24.0" left="24.0"/>
-                    </padding>
+                <VBox maxWidth="1020.0"
+                      spacing="14.0"
+                      style="-fx-background-color: rgba(255,255,255,0.72); -fx-background-radius: 16; -fx-padding: 16 16 16 16; -fx-effect: dropshadow(gaussian, rgba(12,71,50,0.14), 28, 0, 0, 9);">
+                    <GridPane hgap="14.0" vgap="14.0">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="50.0" hgrow="ALWAYS"/>
+                            <ColumnConstraints percentWidth="50.0" hgrow="ALWAYS"/>
+                        </columnConstraints>
 
-                    <VBox maxWidth="1020.0"
-                          spacing="14.0"
-                          style="-fx-background-color: rgba(255,255,255,0.72); -fx-background-radius: 16; -fx-padding: 16 16 16 16; -fx-effect: dropshadow(gaussian, rgba(12,71,50,0.14), 28, 0, 0, 9);">
-                        <GridPane hgap="14.0" vgap="14.0">
-                            <columnConstraints>
-                                <ColumnConstraints percentWidth="50.0" hgrow="ALWAYS"/>
-                                <ColumnConstraints percentWidth="50.0" hgrow="ALWAYS"/>
-                            </columnConstraints>
-
-                            <VBox spacing="14.0"
-                                  GridPane.columnIndex="0"
-                                  GridPane.rowIndex="0"
-                                  style="-fx-background-color: #FFFFFF; -fx-border-color: #CBE6D8; -fx-border-radius: 13; -fx-background-radius: 13; -fx-padding: 14 14 16 14;">
-                                <Label text="Statistiques des reponses d'offre"
-                                       style="-fx-text-fill: #062D28; -fx-font-size: 24px; -fx-font-weight: bold;"/>
-                                <VBox spacing="12.0"
-                                      style="-fx-background-color: #FAFFFC; -fx-border-color: #CBE6D8; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 12 12 14 12;">
-                                    <Label text="Periode d'analyse"
-                                           style="-fx-text-fill: #0B5740; -fx-font-size: 15px; -fx-font-weight: bold;"/>
-                                    <HBox spacing="12.0">
-                                        <VBox spacing="4.0">
-                                            <Label text="Du" style="-fx-text-fill: #3F6D5D; -fx-font-size: 12px;"/>
-                                            <DatePicker fx:id="dateDebut"
-                                                        prefWidth="150.0"
-                                                        style="-fx-background-color: #FAFFFC; -fx-border-color: #BFE3CF; -fx-border-radius: 9; -fx-background-radius: 9;"/>
-                                        </VBox>
-                                        <VBox spacing="4.0">
-                                            <Label text="Au" style="-fx-text-fill: #3F6D5D; -fx-font-size: 12px;"/>
-                                            <DatePicker fx:id="dateFin"
-                                                        prefWidth="150.0"
-                                                        style="-fx-background-color: #FAFFFC; -fx-border-color: #BFE3CF; -fx-border-radius: 9; -fx-background-radius: 9;"/>
-                                        </VBox>
-                                    </HBox>
-                                    <HBox spacing="8.0">
-                                        <Button mnemonicParsing="false" onAction="#onActualiser" text="Actualiser"
-                                                prefHeight="40.0"
-                                                style="-fx-background-color: #128B57; -fx-text-fill: #FFFFFF; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 8 15 8 15;"/>
-                                        <Button mnemonicParsing="false" onAction="#onReinitialiser" text="Reinitialiser"
-                                                prefHeight="40.0"
-                                                style="-fx-background-color: #E9F7EF; -fx-text-fill: #007A47; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 8 15 8 15; -fx-border-color: #BFE3CF; -fx-border-radius: 10;"/>
-                                    </HBox>
-                                </VBox>
-                            </VBox>
-
+                        <VBox spacing="14.0"
+                              GridPane.columnIndex="0"
+                              GridPane.rowIndex="0"
+                              style="-fx-background-color: #FFFFFF; -fx-border-color: #CBE6D8; -fx-border-radius: 13; -fx-background-radius: 13; -fx-padding: 14 14 16 14;">
+                            <Label text="Statistiques des reponses d'offre"
+                                   style="-fx-text-fill: #062D28; -fx-font-size: 24px; -fx-font-weight: bold;"/>
                             <VBox spacing="12.0"
-                                  GridPane.columnIndex="1"
-                                  GridPane.rowIndex="0"
-                                  style="-fx-background-color: #FFFFFF; -fx-border-color: #CBE6D8; -fx-border-radius: 13; -fx-background-radius: 13; -fx-padding: 14 14 14 14;">
-                                <Label text="Indicateurs cles"
-                                       style="-fx-text-fill: #062D28; -fx-font-size: 18px; -fx-font-weight: bold;"/>
-                                <HBox spacing="10.0">
-                                    <VBox spacing="8.0" prefWidth="112.0"
-                                          style="-fx-background-color: #EAF4FF; -fx-border-color: #BCD6F5; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 14 12 14 12;">
-                                        <Label text="Reponses sur la periode" wrapText="true" style="-fx-text-fill: #5A768C; -fx-font-size: 12px;"/>
-                                        <Label fx:id="lblTotalReponses" text="0" style="-fx-text-fill: #062D28; -fx-font-size: 27px; -fx-font-weight: bold;"/>
+                                  style="-fx-background-color: #FAFFFC; -fx-border-color: #CBE6D8; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 12 12 14 12;">
+                                <Label text="Periode d'analyse"
+                                       style="-fx-text-fill: #0B5740; -fx-font-size: 15px; -fx-font-weight: bold;"/>
+                                <HBox spacing="12.0">
+                                    <VBox spacing="4.0">
+                                        <Label text="Du" style="-fx-text-fill: #3F6D5D; -fx-font-size: 12px;"/>
+                                        <DatePicker fx:id="dateDebut"
+                                                    prefWidth="150.0"
+                                                    style="-fx-background-color: #FAFFFC; -fx-border-color: #BFE3CF; -fx-border-radius: 9; -fx-background-radius: 9;"/>
                                     </VBox>
-                                    <VBox spacing="8.0" prefWidth="112.0"
-                                          style="-fx-background-color: #E9F8EE; -fx-border-color: #BFE3CF; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 14 12 14 12;">
-                                        <Label text="Taux d'acceptation" wrapText="true" style="-fx-text-fill: #597B67; -fx-font-size: 12px;"/>
-                                        <Label fx:id="lblTauxAcceptation" text="0%" style="-fx-text-fill: #062D28; -fx-font-size: 27px; -fx-font-weight: bold;"/>
-                                    </VBox>
-                                    <VBox spacing="8.0" prefWidth="112.0"
-                                          style="-fx-background-color: #F0E9FF; -fx-border-color: #D6C7F8; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 14 12 14 12;">
-                                        <Label text="Quantite totale" wrapText="true" style="-fx-text-fill: #6A5A86; -fx-font-size: 12px;"/>
-                                        <Label fx:id="lblQuantiteTotale" text="0 kg" wrapText="true" style="-fx-text-fill: #062D28; -fx-font-size: 24px; -fx-font-weight: bold;"/>
-                                    </VBox>
-                                    <VBox spacing="8.0" prefWidth="112.0"
-                                          style="-fx-background-color: #FFF4E4; -fx-border-color: #F4D7A8; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 14 12 14 12;">
-                                        <Label text="Moyenne par reponse" wrapText="true" style="-fx-text-fill: #8A6A3A; -fx-font-size: 12px;"/>
-                                        <Label fx:id="lblMoyenneReponse" text="0 kg" wrapText="true" style="-fx-text-fill: #062D28; -fx-font-size: 24px; -fx-font-weight: bold;"/>
+                                    <VBox spacing="4.0">
+                                        <Label text="Au" style="-fx-text-fill: #3F6D5D; -fx-font-size: 12px;"/>
+                                        <DatePicker fx:id="dateFin"
+                                                    prefWidth="150.0"
+                                                    style="-fx-background-color: #FAFFFC; -fx-border-color: #BFE3CF; -fx-border-radius: 9; -fx-background-radius: 9;"/>
                                     </VBox>
                                 </HBox>
+                                <HBox spacing="8.0">
+                                    <Button mnemonicParsing="false" onAction="#onActualiser" text="Actualiser"
+                                            prefHeight="40.0"
+                                            style="-fx-background-color: #128B57; -fx-text-fill: #FFFFFF; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 8 15 8 15;"/>
+                                    <Button mnemonicParsing="false" onAction="#onReinitialiser" text="Reinitialiser"
+                                            prefHeight="40.0"
+                                            style="-fx-background-color: #E9F7EF; -fx-text-fill: #007A47; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 8 15 8 15; -fx-border-color: #BFE3CF; -fx-border-radius: 10;"/>
+                                </HBox>
                             </VBox>
-                        </GridPane>
+                        </VBox>
 
-                        <GridPane hgap="14.0" vgap="14.0">
-                            <columnConstraints>
-                                <ColumnConstraints percentWidth="50.0" hgrow="ALWAYS"/>
-                                <ColumnConstraints percentWidth="25.0" hgrow="ALWAYS"/>
-                                <ColumnConstraints percentWidth="25.0" hgrow="ALWAYS"/>
-                            </columnConstraints>
+                        <VBox spacing="12.0"
+                              GridPane.columnIndex="1"
+                              GridPane.rowIndex="0"
+                              style="-fx-background-color: #FFFFFF; -fx-border-color: #CBE6D8; -fx-border-radius: 13; -fx-background-radius: 13; -fx-padding: 14 14 14 14;">
+                            <Label text="Indicateurs cles"
+                                   style="-fx-text-fill: #062D28; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+                            <HBox spacing="10.0">
+                                <VBox spacing="8.0" prefWidth="112.0"
+                                      style="-fx-background-color: #EAF4FF; -fx-border-color: #BCD6F5; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 14 12 14 12;">
+                                    <Label text="Reponses sur la periode" wrapText="true" style="-fx-text-fill: #5A768C; -fx-font-size: 12px;"/>
+                                    <Label fx:id="lblTotalReponses" text="0" style="-fx-text-fill: #062D28; -fx-font-size: 27px; -fx-font-weight: bold;"/>
+                                </VBox>
+                                <VBox spacing="8.0" prefWidth="112.0"
+                                      style="-fx-background-color: #E9F8EE; -fx-border-color: #BFE3CF; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 14 12 14 12;">
+                                    <Label text="Taux d'acceptation" wrapText="true" style="-fx-text-fill: #597B67; -fx-font-size: 12px;"/>
+                                    <Label fx:id="lblTauxAcceptation" text="0%" style="-fx-text-fill: #062D28; -fx-font-size: 27px; -fx-font-weight: bold;"/>
+                                </VBox>
+                                <VBox spacing="8.0" prefWidth="112.0"
+                                      style="-fx-background-color: #F0E9FF; -fx-border-color: #D6C7F8; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 14 12 14 12;">
+                                    <Label text="Quantite totale" wrapText="true" style="-fx-text-fill: #6A5A86; -fx-font-size: 12px;"/>
+                                    <Label fx:id="lblQuantiteTotale" text="0 kg" wrapText="true" style="-fx-text-fill: #062D28; -fx-font-size: 24px; -fx-font-weight: bold;"/>
+                                </VBox>
+                                <VBox spacing="8.0" prefWidth="112.0"
+                                      style="-fx-background-color: #FFF4E4; -fx-border-color: #F4D7A8; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 14 12 14 12;">
+                                    <Label text="Moyenne par reponse" wrapText="true" style="-fx-text-fill: #8A6A3A; -fx-font-size: 12px;"/>
+                                    <Label fx:id="lblMoyenneReponse" text="0 kg" wrapText="true" style="-fx-text-fill: #062D28; -fx-font-size: 24px; -fx-font-weight: bold;"/>
+                                </VBox>
+                            </HBox>
+                        </VBox>
+                    </GridPane>
 
-                            <VBox spacing="8.0"
-                                  GridPane.columnIndex="0"
-                                  GridPane.rowIndex="0"
-                                  style="-fx-background-color: #FFFFFF; -fx-border-color: #CBE6D8; -fx-border-radius: 13; -fx-background-radius: 13; -fx-padding: 12 12 12 12;">
-                                <Label text="Evolution des reponses - API QuickChart"
-                                       style="-fx-text-fill: #062D28; -fx-font-size: 17px; -fx-font-weight: bold;"/>
-                                <ImageView fx:id="imgEvolution"
-                                           fitWidth="470.0"
-                                           fitHeight="300.0"
-                                           preserveRatio="true"
-                                           smooth="true"/>
-                            </VBox>
+                    <GridPane hgap="14.0" vgap="14.0">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="50.0" hgrow="ALWAYS"/>
+                            <ColumnConstraints percentWidth="25.0" hgrow="ALWAYS"/>
+                            <ColumnConstraints percentWidth="25.0" hgrow="ALWAYS"/>
+                        </columnConstraints>
 
-                            <VBox spacing="8.0"
-                                  GridPane.columnIndex="1"
-                                  GridPane.rowIndex="0"
-                                  style="-fx-background-color: #FFFFFF; -fx-border-color: #CBE6D8; -fx-border-radius: 13; -fx-background-radius: 13; -fx-padding: 12 12 12 12;">
-                                <Label text="Top appels les plus repondus"
-                                       wrapText="true"
-                                       style="-fx-text-fill: #062D28; -fx-font-size: 17px; -fx-font-weight: bold;"/>
-                                <ImageView fx:id="imgTopAppels"
-                                           fitWidth="230.0"
-                                           fitHeight="280.0"
-                                           preserveRatio="true"
-                                           smooth="true"/>
-                            </VBox>
+                        <VBox spacing="8.0"
+                              GridPane.columnIndex="0"
+                              GridPane.rowIndex="0"
+                              style="-fx-background-color: #FFFFFF; -fx-border-color: #CBE6D8; -fx-border-radius: 13; -fx-background-radius: 13; -fx-padding: 12 12 12 12;">
+                            <Label text="Evolution des reponses - API QuickChart"
+                                   style="-fx-text-fill: #062D28; -fx-font-size: 17px; -fx-font-weight: bold;"/>
+                            <ImageView fx:id="imgEvolution"
+                                       fitWidth="470.0"
+                                       fitHeight="300.0"
+                                       preserveRatio="true"
+                                       smooth="true"/>
+                        </VBox>
 
-                            <VBox spacing="8.0"
-                                  GridPane.columnIndex="2"
-                                  GridPane.rowIndex="0"
-                                  style="-fx-background-color: #FFFFFF; -fx-border-color: #CBE6D8; -fx-border-radius: 13; -fx-background-radius: 13; -fx-padding: 12 12 12 12;">
-                                <Label text="Repartition par statut"
-                                       wrapText="true"
-                                       style="-fx-text-fill: #062D28; -fx-font-size: 17px; -fx-font-weight: bold;"/>
-                                <ImageView fx:id="imgStatuts"
-                                           fitWidth="230.0"
-                                           fitHeight="280.0"
-                                           preserveRatio="true"
-                                           smooth="true"/>
-                            </VBox>
-                        </GridPane>
+                        <VBox spacing="8.0"
+                              GridPane.columnIndex="1"
+                              GridPane.rowIndex="0"
+                              style="-fx-background-color: #FFFFFF; -fx-border-color: #CBE6D8; -fx-border-radius: 13; -fx-background-radius: 13; -fx-padding: 12 12 12 12;">
+                            <Label text="Top appels les plus repondus"
+                                   wrapText="true"
+                                   style="-fx-text-fill: #062D28; -fx-font-size: 17px; -fx-font-weight: bold;"/>
+                            <ImageView fx:id="imgTopAppels"
+                                       fitWidth="230.0"
+                                       fitHeight="280.0"
+                                       preserveRatio="true"
+                                       smooth="true"/>
+                        </VBox>
 
-                        <HBox alignment="CENTER_LEFT">
-                            <Label fx:id="lblInfo"
-                                   text="Chargement..."
-                                   style="-fx-background-color: #E9F7EF; -fx-text-fill: #0B5740; -fx-font-size: 12px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 9 12 9 12;"/>
-                        </HBox>
-                    </VBox>
-                </StackPane>
-            </content>
-        </ScrollPane>
-    </center>
-</BorderPane>
+                        <VBox spacing="8.0"
+                              GridPane.columnIndex="2"
+                              GridPane.rowIndex="0"
+                              style="-fx-background-color: #FFFFFF; -fx-border-color: #CBE6D8; -fx-border-radius: 13; -fx-background-radius: 13; -fx-padding: 12 12 12 12;">
+                            <Label text="Repartition par statut"
+                                   wrapText="true"
+                                   style="-fx-text-fill: #062D28; -fx-font-size: 17px; -fx-font-weight: bold;"/>
+                            <ImageView fx:id="imgStatuts"
+                                       fitWidth="230.0"
+                                       fitHeight="280.0"
+                                       preserveRatio="true"
+                                       smooth="true"/>
+                        </VBox>
+                    </GridPane>
+
+                    <HBox alignment="CENTER_LEFT">
+                        <Label fx:id="lblInfo"
+                               text="Chargement..."
+                               style="-fx-background-color: #E9F7EF; -fx-text-fill: #0B5740; -fx-font-size: 12px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 9 12 9 12;"/>
+                    </HBox>
+                </VBox>
+            </StackPane>
+        </content>
+    </ScrollPane>
+</VBox>
