@@ -36,20 +36,24 @@
                      Pages: profil, offres(accueil+réponses), events(participation+badge), zones, carte, IA
                      ══════════════════════════════ -->
                 <VBox fx:id="sectionCitoyen" managed="false" visible="false" spacing="0">
-                    <Label text="Mon espace" styleClass="sidebar-section"/>
-                    <Button fx:id="cit_profil"        text="👤 Mon Profil"            onAction="#nav_cit_profil"        maxWidth="Infinity" styleClass="sidebar-nav"/>
+                    <Label text="Declarations" styleClass="sidebar-section"/>
+                    <Button fx:id="cit_home"           text="🏠 Accueil"                onAction="#nav_cit_home"           maxWidth="Infinity" styleClass="sidebar-nav"/>
+                    <Button fx:id="cit_declare"        text="♻ Declarer un dechet"      onAction="#nav_cit_declare"        maxWidth="Infinity" styleClass="sidebar-nav"/>
+                    <Button fx:id="cit_myDeclarations" text="📋 Mes declarations"       onAction="#nav_cit_myDeclarations" maxWidth="Infinity" styleClass="sidebar-nav"/>
+                    <Button fx:id="cit_statistics"     text="📊 Statistiques"            onAction="#nav_cit_statistics"     maxWidth="Infinity" styleClass="sidebar-nav"/>
+                    <Button fx:id="cit_news"           text="📰 Nouveautes"              onAction="#nav_cit_news"           maxWidth="Infinity" styleClass="sidebar-nav"/>
+                    <Button fx:id="cit_airQuality"     text="🌬 Air Quality"            onAction="#nav_cit_airQuality"     maxWidth="Infinity" styleClass="sidebar-nav"/>
+                    <Button fx:id="cit_withdraw"       text="💳 Withdraw"               onAction="#nav_cit_withdraw"       maxWidth="Infinity" styleClass="sidebar-nav"/>
+                    <Button fx:id="cit_settings"       text="⚙ Parametres"             onAction="#nav_cit_settings"       maxWidth="Infinity" styleClass="sidebar-nav"/>
 
-                    <Label text="Offres" styleClass="sidebar-section"/>
+                    <Label text="Fonctionnalites Main" styleClass="sidebar-section"/>
+                    <Button fx:id="cit_profil"         text="👤 Mon Profil"            onAction="#nav_cit_profil"         maxWidth="Infinity" styleClass="sidebar-nav"/>
                     <Button fx:id="cit_offres"         text="🏠 Accueil Offres"        onAction="#nav_cit_offres"         maxWidth="Infinity" styleClass="sidebar-nav"/>
-                    <Button fx:id="cit_reponses"       text="📋 Mes Réponses"          onAction="#nav_cit_reponses"       maxWidth="Infinity" styleClass="sidebar-nav"/>
-
-                    <Label text="Événements" styleClass="sidebar-section"/>
-                    <Button fx:id="cit_events"         text="📅 Tous les Événements"   onAction="#nav_cit_events"         maxWidth="Infinity" styleClass="sidebar-nav"/>
+                    <Button fx:id="cit_reponses"       text="📋 Mes Reponses"          onAction="#nav_cit_reponses"       maxWidth="Infinity" styleClass="sidebar-nav"/>
+                    <Button fx:id="cit_events"         text="📅 Tous les Evenements"   onAction="#nav_cit_events"         maxWidth="Infinity" styleClass="sidebar-nav"/>
                     <Button fx:id="cit_participations" text="🎟 Mes Participations"    onAction="#nav_cit_participations" maxWidth="Infinity" styleClass="sidebar-nav"/>
                     <Button fx:id="cit_badges"         text="🏅 Mes Badges"            onAction="#nav_cit_badges"         maxWidth="Infinity" styleClass="sidebar-nav"/>
-
-                    <Label text="Zones polluées" styleClass="sidebar-section"/>
-                    <Button fx:id="cit_zones"          text="📍 Zones Polluées"        onAction="#nav_cit_zones"          maxWidth="Infinity" styleClass="sidebar-nav"/>
+                    <Button fx:id="cit_zones"          text="📍 Zones Polluees"        onAction="#nav_cit_zones"          maxWidth="Infinity" styleClass="sidebar-nav"/>
                     <Button fx:id="cit_carte"          text="🗺️ Carte"                 onAction="#nav_cit_carte"          maxWidth="Infinity" styleClass="sidebar-nav"/>
                     <Button fx:id="cit_ia"             text="🤖 Assistant IA"          onAction="#nav_cit_ia"             maxWidth="Infinity" styleClass="sidebar-nav"/>
                 </VBox>

@@ -184,4 +184,22 @@ public class DeclarationDechet {
     public void setDeletedAt(LocalDateTime deletedAt) {
         this.deletedAt = deletedAt;
     }
+
+    @Override
+    public String toString() {
+        return "DeclarationDechet{" +
+                "id=" + id +
+                ", description='" + description + '\'' +
+                ", statut='" + statut + '\'' +
+                ", typeDechetId=" + typeDechetId +
+                ", photo='" + photo + '\'' +
+                ", latitude=" + latitude +
+                ", longitude=" + longitude +
+                ", quantite=" + quantite +
+                ", unite='" + unite + '\'' +
+                ", createdAt=" + createdAt +
+                ", scoreIa=" + scoreIa +
+                ", citoyenId=" + citoyenId +
+                '}';
+    }
 }

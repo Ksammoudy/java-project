@@ -3,8 +3,10 @@ package org.example.controllers;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import org.example.Main;
@@ -44,6 +46,14 @@ public class AppShellController {
     @FXML private StackPane contentArea;
 
     // ── Boutons citoyen ──
+    @FXML private Button cit_home;
+    @FXML private Button cit_declare;
+    @FXML private Button cit_myDeclarations;
+    @FXML private Button cit_statistics;
+    @FXML private Button cit_news;
+    @FXML private Button cit_airQuality;
+    @FXML private Button cit_withdraw;
+    @FXML private Button cit_settings;
     @FXML private Button cit_profil;
     @FXML private Button cit_offres;
     @FXML private Button cit_reponses;
@@ -123,7 +133,7 @@ public class AppShellController {
                 show(sectionCitoyen);
                 footerRole.setText("Citoyen");
                 brandSubtitle.setText("Espace Citoyen");
-                nav_cit_profil();
+                nav_cit_home();
             }
             case "VALORIZER", "VALORISATEUR" -> {
                 show(sectionValorisateur);
@@ -154,7 +164,7 @@ public class AppShellController {
                 show(sectionCitoyen);
                 footerRole.setText(type.isEmpty() ? "Utilisateur" : type);
                 brandSubtitle.setText("WasteWise TN");
-                nav_cit_profil();
+                nav_cit_home();
             }
         }
     }
@@ -175,7 +185,8 @@ public class AppShellController {
                 return;
             }
             FXMLLoader loader = new FXMLLoader(url);
-            Node content = loader.load();
+            Parent root = loader.load();
+            Node content = extractContentNode(root);
 
             if (controllerInit != null) {
                 T ctrl = loader.getController();
@@ -195,6 +206,61 @@ public class AppShellController {
     // Profil, Offres(accueil+réponses), Participations+Badges, Zones+Carte+IA
     // ═══════════════════════════════════════════════════════
 
+    @FXML public void nav_cit_home() {
+        setActive(cit_home);
+        loadContent("/org/example/views/dashboard_citizen.fxml");
+    }
+
+    /**
+     * Evite la double sidebar quand on charge une vue complete (BorderPane)
+     * dans l'AppShell: on ne garde que la zone center.
+     */
+    private Node extractContentNode(Parent root) {
+        if (root instanceof BorderPane borderPane) {
+            Node center = borderPane.getCenter();
+            if (center != null) {
+                borderPane.setCenter(null);
+                return center;
+            }
+        }
+        return root;
+    }
+
+    @FXML public void nav_cit_declare() {
+        setActive(cit_declare);
+        loadContent("/org/example/views/declaration_dechet_citizen_form.fxml");
+    }
+
+    @FXML public void nav_cit_myDeclarations() {
+        setActive(cit_myDeclarations);
+        loadContent("/org/example/views/citizen_my_declarations.fxml");
+    }
+
+    @FXML public void nav_cit_statistics() {
+        setActive(cit_statistics);
+        loadContent("/org/example/views/citizen_statistics.fxml");
+    }
+
+    @FXML public void nav_cit_news() {
+        setActive(cit_news);
+        loadContent("/org/example/views/citizen_news.fxml");
+    }
+
+    @FXML public void nav_cit_airQuality() {
+        setActive(cit_airQuality);
+        loadContent("/org/example/views/citizen_air_quality.fxml");
+    }
+
+    @FXML public void nav_cit_withdraw() {
+        setActive(cit_withdraw);
+        loadContent("/org/example/views/citizen_withdraw.fxml");
+    }
+
+    @FXML public void nav_cit_settings() {
+        setActive(cit_settings);
+        loadContent("/org/example/views/citizen_settings.fxml");
+    }
+
     @FXML public void nav_cit_profil() {
         setActive(cit_profil);
         loadContent("/org/example/views/usser/profile_view.fxml");
@@ -211,37 +277,32 @@ public class AppShellController {
     }
 
     @FXML public void nav_cit_events() {
-        // Liste de tous les événements
         setActive(cit_events);
         loadContent("/org/example/views/event/AfficherEvenement.fxml");
     }
 
     @FXML public void nav_cit_participations() {
-        // Gestion des participations citoyen
         setActive(cit_participations);
         loadContent("/org/example/views/event/AfficherParticipations.fxml");
     }
 
     @FXML public void nav_cit_badges() {
-        // Badges citoyen
         setActive(cit_badges);
         loadContent("/org/example/views/event/BadgesFront.fxml");
     }
 
     @FXML public void nav_cit_zones() {
-        // Zones polluées (CRUD citoyen)
         setActive(cit_zones);
         loadContent("/org/example/views/zone_polluee_list.fxml");
     }
 
     @FXML public void nav_cit_carte() {
-        // Carte interactive
         setActive(cit_carte);
         loadContent("/org/example/views/map.fxml");
     }
 
     @FXML public void nav_cit_ia() {
-        // Assistant IA — fenêtre séparée
+        setActive(cit_ia);
         Main.showChatbot();
     }
 

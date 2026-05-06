@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.example.controllers.ValorizerValidateQRController"
+            styleClass="workspace-root">
+    <left>
+        <VBox prefWidth="276.0" spacing="10.0" styleClass="workspace-sidebar">
+            <padding>
+                <Insets top="24.0" right="16.0" bottom="16.0" left="16.0"/>
+            </padding>
+            <VBox spacing="4.0" styleClass="brand-shell">
+                <Label text="WasteWise" styleClass="brand-logo-text"/>
+            </VBox>
+            <Label text="Menu Principal" styleClass="sidebar-section"/>
+            <Button fx:id="navHome" text="Accueil" onAction="#handleDashboard" maxWidth="Infinity" styleClass="sidebar-nav muted"/>
+            <Button fx:id="navWasteReceived" text="Dechets recus" onAction="#handleWasteReceived" maxWidth="Infinity" styleClass="sidebar-nav muted"/>
+            <Button fx:id="navValorization" text="Valorisation" onAction="#handleValorization" maxWidth="Infinity" styleClass="sidebar-nav muted"/>
+            <Button fx:id="navStatistics" text="Statistiques" onAction="#handleStatistics" maxWidth="Infinity" styleClass="sidebar-nav muted"/>
+            <Button fx:id="navSettings" text="Parametres" onAction="#handleSettings" maxWidth="Infinity" styleClass="sidebar-nav muted"/>
+            <Region VBox.vgrow="ALWAYS"/>
+            <VBox spacing="2.0" styleClass="sidebar-footer">
+                <Label fx:id="valorizerNameLabel" text="Utilisateur Demo" styleClass="user-meta-name"/>
+                <Label text="Valorisateur" styleClass="user-meta-role"/>
+            </VBox>
+        </VBox>
+    </left>
+    <center>
+        <VBox styleClass="workspace-main">
+            <HBox spacing="12.0" alignment="CENTER_LEFT" styleClass="workspace-topbar">
+                <Button text="Menu" styleClass="crumb-button"/>
+                <Label text="Valorisateur &gt;" styleClass="crumb-text"/>
+                <Label text="Validation" styleClass="crumb-text"/>
+                <Label text="QR Code" styleClass="crumb-current"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <VBox alignment="CENTER_RIGHT" spacing="3.0">
+                    <Label fx:id="headerEmailLabel" text="—" styleClass="workspace-title"/>
+                    <Label text="Valorisateur" styleClass="workspace-subtitle-strong"/>
+                </VBox>
+            </HBox>
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="content-scroll">
+                <content>
+                    <VBox spacing="18.0" styleClass="workspace-content">
+                        <VBox spacing="10.0" styleClass="hero-panel">
+                            <Label text="Validation QR Code" styleClass="hero-title"/>
+                            <Label text="Scannez un QR code ou entrez un ID de declaration pour la valider." styleClass="hero-subtitle"/>
+                        </VBox>
+
+                        <VBox spacing="14.0" styleClass="panel-card">
+                            <Label text="Scanner QR Code" styleClass="panel-heading"/>
+                            <VBox spacing="8.0">
+                                <Label text="Code QR ou ID Declaration" styleClass="input-label"/>
+                                <TextField fx:id="qrCodeField" promptText="Scanner ou entrer un ID..." styleClass="input-field"/>
+                                <Label fx:id="scanResultLabel" text="" wrapText="true" styleClass="input-label"/>
+                            </VBox>
+                        </VBox>
+
+                        <VBox spacing="14.0" styleClass="panel-card">
+                            <Label text="Details de la declaration" styleClass="panel-heading"/>
+                            <HBox spacing="16.0">
+                                <VBox HBox.hgrow="ALWAYS" spacing="8.0">
+                                    <VBox spacing="4.0">
+                                        <Label text="ID Declaration" styleClass="metric-label"/>
+                                        <Label fx:id="declarationIdLabel" text="—" styleClass="metric-value"/>
+                                    </VBox>
+                                    <VBox spacing="4.0">
+                                        <Label text="Type" styleClass="metric-label"/>
+                                        <Label fx:id="typeLabel" text="—" styleClass="metric-value"/>
+                                    </VBox>
+                                </VBox>
+                                <VBox HBox.hgrow="ALWAYS" spacing="8.0">
+                                    <VBox spacing="4.0">
+                                        <Label text="Quantite" styleClass="metric-label"/>
+                                        <Label fx:id="quantityLabel" text="—" styleClass="metric-value"/>
+                                    </VBox>
+                                    <VBox spacing="4.0">
+                                        <Label text="Citoyen" styleClass="metric-label"/>
+                                        <Label fx:id="citizenLabel" text="—" styleClass="metric-value"/>
+                                    </VBox>
+                                </VBox>
+                            </HBox>
+
+                            <VBox spacing="6.0">
+                                <Label text="Description" styleClass="input-label"/>
+                                <TextArea fx:id="descriptionArea" prefRowCount="4" wrapText="true" editable="false" styleClass="input-field"/>
+                            </VBox>
+                        </VBox>
+
+                        <HBox spacing="12.0" alignment="CENTER_LEFT">
+                            <Button text="✓ Approuver" onAction="#handleValidate" styleClass="primary-btn"/>
+                            <Button text="✗ Rejeter" styleClass="danger-btn"/>
+                            <Button text="Effacer" onAction="#handleClear" styleClass="outline-btn"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                        </HBox>
+                    </VBox>
+                </content>
+            </ScrollPane>
+        </VBox>
+    </center>
+</BorderPane>

@@ -1,12 +1,24 @@
 package org.example.utils;
 
 /**
- * État UI partagé pour les vues citoyen.
+ * Etat UI partage pour les vues citoyen.
  */
-public class CitizenUiState {
+public final class CitizenUiState {
 
+    private static String placeholderTitle = "Section";
     private static Integer selectedDeclarationId;
-    private static boolean returnFromDetailToMyDeclarations = false;
+    private static boolean returnFromDetailToMyDeclarations;
+
+    private CitizenUiState() {
+    }
+
+    public static void setPlaceholderTitle(String title) {
+        placeholderTitle = title != null && !title.isBlank() ? title : "Section";
+    }
+
+    public static String getPlaceholderTitle() {
+        return placeholderTitle;
+    }
 
     public static Integer getSelectedDeclarationId() {
         return selectedDeclarationId;
@@ -21,12 +33,13 @@ public class CitizenUiState {
     }
 
     public static boolean consumeReturnFromDetailToMyDeclarations() {
-        boolean val = returnFromDetailToMyDeclarations;
+        boolean value = returnFromDetailToMyDeclarations;
         returnFromDetailToMyDeclarations = false;
-        return val;
+        return value;
     }
 
     public static void clear() {
+        placeholderTitle = "Section";
         selectedDeclarationId = null;
         returnFromDetailToMyDeclarations = false;
     }

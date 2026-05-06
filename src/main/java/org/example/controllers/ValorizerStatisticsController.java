@@ -7,18 +7,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import org.example.Main;
 import org.example.models.User;
+import org.example.services.DeclarationDechetJdbcService;
 import org.example.services.SessionManager;
 
-public class DashboardValorizerController {
+import java.sql.SQLException;
 
-    @FXML
-    private Label valorizerNameLabel;
+public class ValorizerStatisticsController {
 
-    @FXML
-    private Label valorizerHeaderNameLabel;
-
-    @FXML
-    private BarChart<String, Number> valorisationChart;
+    private final DeclarationDechetJdbcService declarationService = new DeclarationDechetJdbcService();
 
     @FXML
     private Button navHome;
@@ -32,13 +28,61 @@ public class DashboardValorizerController {
     private Button navSettings;
 
     @FXML
+    private Label valorizerNameLabel;
+    @FXML
+    private Label headerEmailLabel;
+
+    @FXML
+    private Label totalReceivedLabel;
+    @FXML
+    private Label totalValorizedLabel;
+    @FXML
+    private Label totalPointsLabel;
+    @FXML
+    private Label pendingLabel;
+
+    @FXML
+    private BarChart<String, Number> estadisticsChart;
+
+    @FXML
     public void initialize() {
         User user = resolveValorizerUser();
-        String name = fullName(user);
-        valorizerNameLabel.setText(name);
-        valorizerHeaderNameLabel.setText(name);
+        valorizerNameLabel.setText(fullName(user));
+        headerEmailLabel.setText(user.getEmail() != null ? user.getEmail() : "—");
+
+        updateNavigation("statistics");
+
+        loadStatistics();
         populateChart();
-        updateNavigation("home");
+    }
+
+    private void loadStatistics() {
+        try {
+            var all = declarationService.findAll();
+            var approved = all.stream().filter(d -> "APPROUVEE".equals(d.getStatut())).toList();
+            var pending = all.stream().filter(d -> "EN_ATTENTE".equals(d.getStatut())).toList();
+
+            totalReceivedLabel.setText(String.valueOf(all.size()));
+            totalValorizedLabel.setText(String.valueOf(approved.size()));
+            pendingLabel.setText(String.valueOf(pending.size()));
+            
+            int totalPoints = approved.stream().mapToInt(d -> d.getPointsAttribues() != null ? d.getPointsAttribues() : 0).sum();
+            totalPointsLabel.setText(String.valueOf(totalPoints));
+        } catch (SQLException e) {
+            System.err.println("Erreur au chargement des statistiques: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void populateChart() {
+        XYChart.Series<String, Number> series = new XYChart.Series<>();
+        series.setName("Declarations");
+        series.getData().add(new XYChart.Data<>("Janvier", 45));
+        series.getData().add(new XYChart.Data<>("Fevrier", 62));
+        series.getData().add(new XYChart.Data<>("Mars", 58));
+        series.getData().add(new XYChart.Data<>("Avril", 71));
+        series.getData().add(new XYChart.Data<>("Mai", 89));
+        estadisticsChart.getData().setAll(series);
     }
 
     @FXML
@@ -47,49 +91,32 @@ public class DashboardValorizerController {
     }
 
     @FXML
-    public void handleReceivedWaste() {
+    public void handleWasteReceived() {
         Main.showValorizerWasteReceivedPage();
     }
 
     @FXML
-    public void handleValorisation() {
+    public void handleValorization() {
         Main.showValorizerValorizationPage();
     }
 
     @FXML
-    public void handleStats() {
+    public void handleStatistics() {
         Main.showValorizerStatisticsPage();
     }
 
     @FXML
-    public void handleProfile() {
+    public void handleSettings() {
         Main.showValorizerSettingsPage();
     }
 
-    @FXML
-    public void handleEditProfile() {
-        Main.showValorizerSettingsPage();
-    }
-
-    @FXML
-    public void handleLogout() {
-        SessionManager.logout();
-        Main.showLoginPage();
-    }
-
-    /**
-     * Marque le bouton courant comme actif dans la navigation.
-     * @param page "home", "waste", "valorization", "statistics", "settings"
-     */
     private void updateNavigation(String page) {
-        // Réinitialise tous les boutons en "muted"
         if (navHome != null) navHome.getStyleClass().remove("active");
         if (navWasteReceived != null) navWasteReceived.getStyleClass().remove("active");
         if (navValorization != null) navValorization.getStyleClass().remove("active");
         if (navStatistics != null) navStatistics.getStyleClass().remove("active");
         if (navSettings != null) navSettings.getStyleClass().remove("active");
 
-        // Active le bouton courant
         switch (page) {
             case "home":
                 if (navHome != null) navHome.getStyleClass().add("active");
@@ -107,18 +134,6 @@ public class DashboardValorizerController {
                 if (navSettings != null) navSettings.getStyleClass().add("active");
                 break;
         }
-    }
-
-    private void populateChart() {
-        XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName("Valorisation");
-        series.getData().add(new XYChart.Data<>("Declaration #3", 400));
-        series.getData().add(new XYChart.Data<>("Declaration #4", 400));
-        series.getData().add(new XYChart.Data<>("Declaration #5", 400));
-        series.getData().add(new XYChart.Data<>("Declaration #6", 200));
-        series.getData().add(new XYChart.Data<>("Declaration #7", 200));
-        series.getData().add(new XYChart.Data<>("Declaration #8", 200));
-        valorisationChart.getData().setAll(series);
     }
 
     private User resolveValorizerUser() {

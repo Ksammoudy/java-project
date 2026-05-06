@@ -3,16 +3,24 @@ package org.example.utils;
 import javafx.scene.control.Button;
 
 /**
- * Utilitaire pour gérer l'état actif de la sidebar citoyen.
+ * Etat visuel du menu citoyen : un bouton actif, les autres en retrait (theme {@code sidebar-nav}).
  */
-public class CitizenSidebarHelper {
+public final class CitizenSidebarHelper {
 
-    public static void applyActive(Button active, Button... allButtons) {
-        for (Button btn : allButtons) {
-            btn.getStyleClass().removeAll("active");
-        }
-        if (active != null) {
-            active.getStyleClass().add("active");
+    private CitizenSidebarHelper() {
+    }
+
+    /**
+     * @param active le bouton du menu courant
+     * @param all    tous les boutons de navigation (y compris {@code active})
+     */
+    public static void applyActive(Button active, Button... all) {
+        for (Button b : all) {
+            if (b == null) {
+                continue;
+            }
+            b.getStyleClass().removeAll("active", "muted");
+            b.getStyleClass().add(b == active ? "active" : "muted");
         }
     }
 }
