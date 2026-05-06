@@ -55,7 +55,9 @@ public class Main extends Application {
 
             AppShellController shell = loader.getController();
             shell.configureForUser(user);
-            shell.loadContent(initialFragmentPath);
+            if (initialFragmentPath != null) {
+                shell.loadContent(initialFragmentPath);
+            }
 
             Scene scene = new Scene(root, 1280, 800);
             applyGlobalStylesheet(scene);
@@ -94,22 +96,19 @@ public class Main extends Application {
     public static void showDashboardAdmin() {
         User user = SessionManager.getCurrentUser();
         if (user == null) { showLoginPage(); return; }
-        // Admin : page initiale = modération offres (backoffice)
-        showAppShell(user, "/fxml/admin/AdminDashboard.fxml");
+        showAppShell(user, null);
     }
 
     public static void showDashboardCitizen() {
         User user = SessionManager.getCurrentUser();
         if (user == null) { showLoginPage(); return; }
-        // Citoyen : page initiale = dashboard offres (accueil)
-        showAppShell(user, "/fxml/Dashboard.fxml");
+        showAppShell(user, null);
     }
 
     public static void showDashboardValorizer() {
         User user = SessionManager.getCurrentUser();
         if (user == null) { showLoginPage(); return; }
-        // Valorisateur : page initiale = dashboard offres (accueil)
-        showAppShell(user, "/fxml/Dashboard.fxml");
+        showAppShell(user, null);
     }
 
     // ═══════════════════════════════════════════════════════
@@ -149,11 +148,11 @@ public class Main extends Application {
     }
 
     public static void showProfileViewPage() {
-        loadFragment("/org/example/views/fragments/profile_content.fxml");
+        loadFragment("/org/example/views/usser/profile_view.fxml");
     }
 
     public static void showProfileEditPage() {
-        loadFragment("/org/example/views/fragments/profile_content.fxml");
+        loadFragment("/org/example/views/usser/profile_edit.fxml");
     }
 
     // Déclarations citoyen — redirige vers la liste
@@ -163,7 +162,7 @@ public class Main extends Application {
     public static void showCitizenNewsPage()             { loadFragment("/org/example/views/fragments/citizen_dashboard_content.fxml"); }
     public static void showCitizenAirQualityPage()       { loadFragment("/org/example/views/fragments/citizen_dashboard_content.fxml"); }
     public static void showCitizenWithdrawPage()         { loadFragment("/org/example/views/fragments/citizen_dashboard_content.fxml"); }
-    public static void showCitizenSettingsPage()         { loadFragment("/org/example/views/fragments/profile_content.fxml"); }
+    public static void showCitizenSettingsPage()         { loadFragment("/org/example/views/usser/profile_view.fxml"); }
 
     // Admin pages
     public static void showDeclarationListPage(String s) { showDeclarationListPage(); }

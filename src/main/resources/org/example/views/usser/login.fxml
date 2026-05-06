@@ -19,7 +19,7 @@
             fx:controller="org.example.controllers.LoginController"
             prefWidth="1180.0" prefHeight="760.0"
             styleClass="root-pane"
-            stylesheets="@../styles/style.css">
+            stylesheets="/org/example/styles/style.css">
 
     <left>
         <StackPane prefWidth="470.0" minWidth="420.0" styleClass="left-pane">

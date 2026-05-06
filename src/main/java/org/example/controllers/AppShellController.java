@@ -47,6 +47,7 @@ public class AppShellController {
     @FXML private Button cit_profil;
     @FXML private Button cit_offres;
     @FXML private Button cit_reponses;
+    @FXML private Button cit_events;
     @FXML private Button cit_participations;
     @FXML private Button cit_badges;
     @FXML private Button cit_zones;
@@ -64,8 +65,10 @@ public class AppShellController {
     // ── Boutons admin ──
     @FXML private Button adm_profil;
     @FXML private Button adm_offres_mod;
-    @FXML private Button adm_events;
+    @FXML private Button adm_event_dashboard;
+    @FXML private Button adm_event_list;
     @FXML private Button adm_participations;
+    @FXML private Button adm_event_calendar;
     @FXML private Button adm_zones;
     @FXML private Button adm_indicateurs;
     @FXML private Button adm_qr;
@@ -120,32 +123,38 @@ public class AppShellController {
                 show(sectionCitoyen);
                 footerRole.setText("Citoyen");
                 brandSubtitle.setText("Espace Citoyen");
+                nav_cit_profil();
             }
             case "VALORIZER", "VALORISATEUR" -> {
                 show(sectionValorisateur);
                 footerRole.setText("Valorisateur");
                 brandSubtitle.setText("Espace Valorisateur");
+                nav_val_profil();
             }
             case "ADMIN" -> {
                 show(sectionAdmin);
                 footerRole.setText("Administrateur");
                 brandSubtitle.setText("Espace Admin");
+                nav_adm_profil();
             }
             case "ORGANISATEUR", "ORGANIZER" -> {
                 show(sectionOrganisateur);
                 footerRole.setText("Organisateur");
                 brandSubtitle.setText("Espace Organisateur");
+                nav_org_profil();
             }
             case "PARTENAIRE", "PARTNER" -> {
                 show(sectionPartenaire);
                 footerRole.setText("Partenaire");
                 brandSubtitle.setText("Espace Partenaire");
+                nav_par_profil();
             }
             default -> {
                 // Rôle inconnu → afficher section citoyen par défaut
                 show(sectionCitoyen);
                 footerRole.setText(type.isEmpty() ? "Utilisateur" : type);
                 brandSubtitle.setText("WasteWise TN");
+                nav_cit_profil();
             }
         }
     }
@@ -192,15 +201,19 @@ public class AppShellController {
     }
 
     @FXML public void nav_cit_offres() {
-        // Dashboard des offres (Accueil) — page existante branche offres
         setActive(cit_offres);
         loadContent("/fxml/Dashboard.fxml");
     }
 
     @FXML public void nav_cit_reponses() {
-        // Liste des réponses d'offres
         setActive(cit_reponses);
         loadContent("/fxml/reponseoffre/ReponseOffreList.fxml");
+    }
+
+    @FXML public void nav_cit_events() {
+        // Liste de tous les événements
+        setActive(cit_events);
+        loadContent("/org/example/views/event/AfficherEvenement.fxml");
     }
 
     @FXML public void nav_cit_participations() {
@@ -243,13 +256,11 @@ public class AppShellController {
     }
 
     @FXML public void nav_val_offres() {
-        // Dashboard des offres (Accueil)
         setActive(val_offres);
         loadContent("/fxml/Dashboard.fxml");
     }
 
     @FXML public void nav_val_appels() {
-        // Liste des appels d'offre (valorisateur crée des appels)
         setActive(val_appels);
         loadContent("/fxml/appeloffre/AppelOffreList.fxml");
     }
@@ -278,15 +289,23 @@ public class AppShellController {
     }
 
     @FXML public void nav_adm_offres_mod() {
-        // Modération des appels et réponses d'offres (backoffice admin)
         setActive(adm_offres_mod);
         loadContent("/fxml/admin/AdminDashboard.fxml");
     }
 
-    @FXML public void nav_adm_events() {
-        // CRUD events + supervision
-        setActive(adm_events);
-        loadContent("/org/example/views/event/admin.fxml");
+    @FXML public void nav_adm_event_dashboard() {
+        setActive(adm_event_dashboard);
+        loadContent("/org/example/views/event/Dashboard.fxml");
+    }
+
+    @FXML public void nav_adm_event_list() {
+        setActive(adm_event_list);
+        loadContent("/org/example/views/event/AfficherEvenement.fxml");
+    }
+
+    @FXML public void nav_adm_event_calendar() {
+        setActive(adm_event_calendar);
+        loadContent("/org/example/views/event/Calendrier.fxml");
     }
 
     @FXML public void nav_adm_participations() {

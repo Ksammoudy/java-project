@@ -6,195 +6,172 @@
 <?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
-<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="860.0"
-            prefWidth="1400.0"
-            fx:id="root"
-            style="-fx-background-color: linear-gradient(to right, #D8F0E5, #C9ECE8);"
-            xmlns="http://javafx.com/javafx/21"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="controllers.admin.AdminDashboardController">
+<VBox prefHeight="860.0"
+      prefWidth="1400.0"
+      fx:id="root"
+      style="-fx-background-color: linear-gradient(to right, #D8F0E5, #C9ECE8);"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controllers.admin.AdminDashboardController">
 
-    <top>
-        <HBox alignment="CENTER_LEFT"
-              spacing="14.0"
-              style="-fx-background-color: #E7F7EE; -fx-border-color: #BDE0CE; -fx-border-width: 0 0 1 0; -fx-padding: 14 20 14 20;">
-            <Label text="WasteWise" style="-fx-text-fill: #007A47; -fx-font-size: 16px; -fx-font-weight: bold;"/>
-            <Label text="BACK OFFICE" style="-fx-text-fill: #0B5740; -fx-font-size: 12px; -fx-font-weight: bold;"/>
-            <Region HBox.hgrow="ALWAYS"/>
-            <Button mnemonicParsing="false" onAction="#onOpenHome" text="🏠"
-                    prefWidth="44.0"
-                    style="-fx-background-color: #F8FFFB; -fx-text-fill: #007A47; -fx-font-size: 15px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 9 12 9 12; -fx-border-color: #C8E8D6; -fx-border-radius: 10;"/>
-            <Button mnemonicParsing="false" onAction="#onOpenAdminDashboard" text="Dashboard admin"
-                    style="-fx-background-color: #128B57; -fx-text-fill: #FFFFFF; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 9 16 9 16;"/>
-            <Button mnemonicParsing="false" onAction="#onOpenAppels" text="Appels d'offre"
-                    style="-fx-background-color: #F8FFFB; -fx-text-fill: #007A47; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 9 16 9 16; -fx-border-color: #C8E8D6; -fx-border-radius: 10;"/>
-            <Button mnemonicParsing="false" onAction="#onOpenReponses" text="Reponses"
-                    style="-fx-background-color: #F8FFFB; -fx-text-fill: #007A47; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 9 16 9 16; -fx-border-color: #C8E8D6; -fx-border-radius: 10;"/>
-            <Button mnemonicParsing="false" onAction="#onOpenStats" text="Statistiques"
-                    style="-fx-background-color: #F8FFFB; -fx-text-fill: #007A47; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 9 16 9 16; -fx-border-color: #C8E8D6; -fx-border-radius: 10;"/>
-        </HBox>
-    </top>
+    <ScrollPane fitToWidth="true"
+                hbarPolicy="NEVER"
+                VBox.vgrow="ALWAYS"
+                style="-fx-background: transparent; -fx-background-color: transparent;">
+        <content>
+            <StackPane>
+                <padding>
+                    <Insets top="20.0" right="24.0" bottom="24.0" left="24.0"/>
+                </padding>
 
-    <center>
-        <ScrollPane fitToWidth="true"
-                    hbarPolicy="NEVER"
-                    style="-fx-background: transparent; -fx-background-color: transparent;">
-            <content>
-                <StackPane>
-                    <padding>
-                        <Insets top="20.0" right="24.0" bottom="24.0" left="24.0"/>
-                    </padding>
+                <VBox maxWidth="980.0" spacing="12.0">
+                    <HBox alignment="CENTER_LEFT"
+                          spacing="12.0"
+                          style="-fx-background-color: #176D50; -fx-background-radius: 12; -fx-padding: 16 18 16 18;">
+                        <VBox spacing="3.0">
+                            <Label text="Pilotage operationnel"
+                                   style="-fx-text-fill: #FFFFFF; -fx-font-size: 22px; -fx-font-weight: bold;"/>
+                            <Label text="Suivi temps reel des offres, des reponses et de la charge de moderation."
+                                   style="-fx-text-fill: #E8FFF3; -fx-font-size: 12px;"/>
+                            <Label fx:id="lblDerniereMaj" text="Derniere mise a jour: -"
+                                   style="-fx-text-fill: #DFF8EA; -fx-font-size: 11px; -fx-font-weight: bold;"/>
+                        </VBox>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button mnemonicParsing="false" onAction="#onRefresh" text="Rafraichir"
+                                style="-fx-background-color: #E9F7EF; -fx-text-fill: #007A47; -fx-font-weight: bold; -fx-background-radius: 9; -fx-padding: 8 13 8 13; -fx-border-color: #BFE3CF; -fx-border-radius: 9;"/>
+                        <VBox alignment="CENTER"
+                              spacing="4.0"
+                              style="-fx-background-color: rgba(255,255,255,0.16); -fx-border-color: rgba(255,255,255,0.35); -fx-border-radius: 10; -fx-background-radius: 10; -fx-padding: 8 18 8 18;">
+                            <Label text="INDICE SANTE"
+                                   style="-fx-text-fill: #DFF8EA; -fx-font-size: 9px; -fx-font-weight: bold;"/>
+                            <Label fx:id="lblIndiceSante"
+                                   text="0/100"
+                                   style="-fx-text-fill: #FFFFFF; -fx-font-size: 22px; -fx-font-weight: bold;"/>
+                        </VBox>
+                    </HBox>
 
-                    <VBox maxWidth="980.0" spacing="12.0">
-                        <HBox alignment="CENTER_LEFT"
-                              spacing="12.0"
-                              style="-fx-background-color: #176D50; -fx-background-radius: 12; -fx-padding: 16 18 16 18;">
-                            <VBox spacing="3.0">
-                                <Label text="Pilotage operationnel"
-                                       style="-fx-text-fill: #FFFFFF; -fx-font-size: 22px; -fx-font-weight: bold;"/>
-                                <Label text="Suivi temps reel des offres, des reponses et de la charge de moderation."
-                                       style="-fx-text-fill: #E8FFF3; -fx-font-size: 12px;"/>
-                                <Label fx:id="lblDerniereMaj" text="Derniere mise a jour: -"
-                                       style="-fx-text-fill: #DFF8EA; -fx-font-size: 11px; -fx-font-weight: bold;"/>
+                    <VBox spacing="10.0"
+                          style="-fx-background-color: #FFFFFF; -fx-border-color: #CBE6D8; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 12 12 12 12;">
+                        <Label text="KPIs dynamiques" style="-fx-text-fill: #384C45; -fx-font-size: 18px;"/>
+                        <HBox spacing="10.0">
+                            <VBox spacing="5.0" HBox.hgrow="ALWAYS"
+                                  style="-fx-background-color: #EAF4FF; -fx-border-color: #BCD6F5; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10 12 10 12;">
+                                <Label text="Appels actifs" style="-fx-text-fill: #5A768C; -fx-font-size: 11px;"/>
+                                <Label fx:id="lblAppelsActifs" text="0" style="-fx-text-fill: #153047; -fx-font-size: 25px; -fx-font-weight: bold;"/>
+                                <Label text="sur file appels" style="-fx-text-fill: #5A768C; -fx-font-size: 10px;"/>
                             </VBox>
-                            <Region HBox.hgrow="ALWAYS"/>
-                            <Button mnemonicParsing="false" onAction="#onRefresh" text="Rafraichir"
-                                    style="-fx-background-color: #E9F7EF; -fx-text-fill: #007A47; -fx-font-weight: bold; -fx-background-radius: 9; -fx-padding: 8 13 8 13; -fx-border-color: #BFE3CF; -fx-border-radius: 9;"/>
-                            <VBox alignment="CENTER"
-                                  spacing="4.0"
-                                  style="-fx-background-color: rgba(255,255,255,0.16); -fx-border-color: rgba(255,255,255,0.35); -fx-border-radius: 10; -fx-background-radius: 10; -fx-padding: 8 18 8 18;">
-                                <Label text="INDICE SANTE"
-                                       style="-fx-text-fill: #DFF8EA; -fx-font-size: 9px; -fx-font-weight: bold;"/>
-                                <Label fx:id="lblIndiceSante"
-                                       text="0/100"
-                                       style="-fx-text-fill: #FFFFFF; -fx-font-size: 22px; -fx-font-weight: bold;"/>
+                            <VBox spacing="5.0" HBox.hgrow="ALWAYS"
+                                  style="-fx-background-color: #FFF4E4; -fx-border-color: #F4D7A8; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10 12 10 12;">
+                                <Label text="Expirant sous 7 jours" style="-fx-text-fill: #8A6A3A; -fx-font-size: 11px;"/>
+                                <Label fx:id="lblExpirant" text="0" style="-fx-text-fill: #583B10; -fx-font-size: 25px; -fx-font-weight: bold;"/>
+                                <Label text="a traiter bientot" style="-fx-text-fill: #8A6A3A; -fx-font-size: 10px;"/>
+                            </VBox>
+                            <VBox spacing="5.0" HBox.hgrow="ALWAYS"
+                                  style="-fx-background-color: #E9F8EE; -fx-border-color: #BFE3CF; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10 12 10 12;">
+                                <Label text="Reponses (7 jours)" style="-fx-text-fill: #597B67; -fx-font-size: 11px;"/>
+                                <Label fx:id="lblReponsesRecentes" text="0" style="-fx-text-fill: #144E33; -fx-font-size: 25px; -fx-font-weight: bold;"/>
+                                <Label text="periode recente" style="-fx-text-fill: #597B67; -fx-font-size: 10px;"/>
+                            </VBox>
+                            <VBox spacing="5.0" HBox.hgrow="ALWAYS"
+                                  style="-fx-background-color: #F0E9FF; -fx-border-color: #D6C7F8; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10 12 10 12;">
+                                <Label text="Taux de validation" style="-fx-text-fill: #6A5A86; -fx-font-size: 11px;"/>
+                                <Label fx:id="lblTauxValidation" text="0%" style="-fx-text-fill: #2D2045; -fx-font-size: 25px; -fx-font-weight: bold;"/>
+                                <Label text="selon statuts" style="-fx-text-fill: #6A5A86; -fx-font-size: 10px;"/>
                             </VBox>
                         </HBox>
+                    </VBox>
 
-                        <VBox spacing="10.0"
-                              style="-fx-background-color: #FFFFFF; -fx-border-color: #CBE6D8; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 12 12 12 12;">
-                            <Label text="KPIs dynamiques" style="-fx-text-fill: #384C45; -fx-font-size: 18px;"/>
-                            <HBox spacing="10.0">
-                                <VBox spacing="5.0" HBox.hgrow="ALWAYS"
-                                      style="-fx-background-color: #EAF4FF; -fx-border-color: #BCD6F5; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10 12 10 12;">
-                                    <Label text="Appels actifs" style="-fx-text-fill: #5A768C; -fx-font-size: 11px;"/>
-                                    <Label fx:id="lblAppelsActifs" text="0" style="-fx-text-fill: #153047; -fx-font-size: 25px; -fx-font-weight: bold;"/>
-                                    <Label text="sur file appels" style="-fx-text-fill: #5A768C; -fx-font-size: 10px;"/>
-                                </VBox>
-                                <VBox spacing="5.0" HBox.hgrow="ALWAYS"
-                                      style="-fx-background-color: #FFF4E4; -fx-border-color: #F4D7A8; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10 12 10 12;">
-                                    <Label text="Expirant sous 7 jours" style="-fx-text-fill: #8A6A3A; -fx-font-size: 11px;"/>
-                                    <Label fx:id="lblExpirant" text="0" style="-fx-text-fill: #583B10; -fx-font-size: 25px; -fx-font-weight: bold;"/>
-                                    <Label text="a traiter bientot" style="-fx-text-fill: #8A6A3A; -fx-font-size: 10px;"/>
-                                </VBox>
-                                <VBox spacing="5.0" HBox.hgrow="ALWAYS"
-                                      style="-fx-background-color: #E9F8EE; -fx-border-color: #BFE3CF; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10 12 10 12;">
-                                    <Label text="Reponses (7 jours)" style="-fx-text-fill: #597B67; -fx-font-size: 11px;"/>
-                                    <Label fx:id="lblReponsesRecentes" text="0" style="-fx-text-fill: #144E33; -fx-font-size: 25px; -fx-font-weight: bold;"/>
-                                    <Label text="periode recente" style="-fx-text-fill: #597B67; -fx-font-size: 10px;"/>
-                                </VBox>
-                                <VBox spacing="5.0" HBox.hgrow="ALWAYS"
-                                      style="-fx-background-color: #F0E9FF; -fx-border-color: #D6C7F8; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10 12 10 12;">
-                                    <Label text="Taux de validation" style="-fx-text-fill: #6A5A86; -fx-font-size: 11px;"/>
-                                    <Label fx:id="lblTauxValidation" text="0%" style="-fx-text-fill: #2D2045; -fx-font-size: 25px; -fx-font-weight: bold;"/>
-                                    <Label text="selon statuts" style="-fx-text-fill: #6A5A86; -fx-font-size: 10px;"/>
-                                </VBox>
-                            </HBox>
-                        </VBox>
-
-                        <VBox spacing="10.0"
-                              style="-fx-background-color: #FFFFFF; -fx-border-color: #CBE6D8; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 12 12 12 12;">
-                            <Label text="Centre d'alertes" style="-fx-text-fill: #384C45; -fx-font-size: 18px;"/>
-                            <VBox spacing="6.0"
-                                  style="-fx-background-color: #FFF6F6; -fx-border-color: #E06161; -fx-border-width: 0 0 0 4; -fx-background-radius: 8; -fx-border-radius: 8; -fx-padding: 10 12 10 12;">
-                                <HBox alignment="CENTER_LEFT">
-                                    <Label text="Appels expires a traiter" style="-fx-text-fill: #604040; -fx-font-size: 12px;"/>
-                                    <Region HBox.hgrow="ALWAYS"/>
-                                    <Label fx:id="lblAlerteExpires" text="0 expire(s)"
-                                           style="-fx-background-color: #FFE1E1; -fx-text-fill: #B91C1C; -fx-font-size: 10px; -fx-font-weight: bold; -fx-background-radius: 999; -fx-padding: 4 8 4 8;"/>
-                                </HBox>
-                                <Button mnemonicParsing="false" onAction="#onOpenAppels" text="Voir les appels expires"
-                                        style="-fx-background-color: #E9F7EF; -fx-text-fill: #007A47; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 7 12 7 12; -fx-border-color: #BFE3CF; -fx-border-radius: 8;"/>
-                            </VBox>
-                            <VBox spacing="6.0"
-                                  style="-fx-background-color: #FFFBF2; -fx-border-color: #E4AA33; -fx-border-width: 0 0 0 4; -fx-background-radius: 8; -fx-border-radius: 8; -fx-padding: 10 12 10 12;">
-                                <HBox alignment="CENTER_LEFT">
-                                    <Label text="Moderation en retard" style="-fx-text-fill: #604B20; -fx-font-size: 12px;"/>
-                                    <Region HBox.hgrow="ALWAYS"/>
-                                    <Label fx:id="lblAlerteModeration" text="0 en attente"
-                                           style="-fx-background-color: #FFF1C7; -fx-text-fill: #9A6B00; -fx-font-size: 10px; -fx-font-weight: bold; -fx-background-radius: 999; -fx-padding: 4 8 4 8;"/>
-                                </HBox>
-                                <Button mnemonicParsing="false" onAction="#onOpenReponses" text="Traiter la file de moderation"
-                                        style="-fx-background-color: #E9F7EF; -fx-text-fill: #007A47; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 7 12 7 12; -fx-border-color: #BFE3CF; -fx-border-radius: 8;"/>
-                            </VBox>
-                        </VBox>
-
-                        <VBox spacing="8.0"
-                              style="-fx-background-color: #FFFFFF; -fx-border-color: #CBE6D8; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 12 12 12 12;">
-                            <Label text="Distribution des statuts" style="-fx-text-fill: #384C45; -fx-font-size: 18px;"/>
-                            <HBox alignment="CENTER_LEFT" spacing="10.0">
-                                <Label text="Validees" minWidth="90.0" style="-fx-text-fill: #384C45; -fx-font-size: 12px;"/>
-                                <ProgressBar fx:id="barValidees" prefWidth="620.0" progress="0.0"/>
-                                <Label fx:id="lblValidees" minWidth="30.0" text="0" style="-fx-text-fill: #144E33; -fx-font-weight: bold;"/>
-                            </HBox>
-                            <HBox alignment="CENTER_LEFT" spacing="10.0">
-                                <Label text="En attente" minWidth="90.0" style="-fx-text-fill: #384C45; -fx-font-size: 12px;"/>
-                                <ProgressBar fx:id="barEnAttente" prefWidth="620.0" progress="0.0"/>
-                                <Label fx:id="lblEnAttente" minWidth="30.0" text="0" style="-fx-text-fill: #9A6B00; -fx-font-weight: bold;"/>
-                            </HBox>
-                            <HBox alignment="CENTER_LEFT" spacing="10.0">
-                                <Label text="Refusees" minWidth="90.0" style="-fx-text-fill: #384C45; -fx-font-size: 12px;"/>
-                                <ProgressBar fx:id="barRefusees" prefWidth="620.0" progress="0.0"/>
-                                <Label fx:id="lblRefusees" minWidth="30.0" text="0" style="-fx-text-fill: #B91C1C; -fx-font-weight: bold;"/>
-                            </HBox>
-                        </VBox>
-
-                        <VBox spacing="8.0"
-                              style="-fx-background-color: #FFFFFF; -fx-border-color: #CBE6D8; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 12 12 12 12;">
-                            <Label text="Appels d'offre recents" style="-fx-text-fill: #384C45; -fx-font-size: 18px;"/>
-                            <TableView fx:id="tableAppelsRecents" prefHeight="180.0"
-                                       style="-fx-background-color: #FFFFFF; -fx-border-color: #D7EAE0; -fx-border-radius: 8; -fx-background-radius: 8; -fx-fixed-cell-size: 34;">
-                                <columns>
-                                    <TableColumn fx:id="colAppelTitre" prefWidth="210.0" text="Titre"/>
-                                    <TableColumn fx:id="colAppelQuantite" prefWidth="150.0" text="Quantite"/>
-                                    <TableColumn fx:id="colAppelDate" prefWidth="150.0" text="Date limite"/>
-                                    <TableColumn fx:id="colAppelEtat" prefWidth="120.0" text="Etat"/>
-                                    <TableColumn fx:id="colAppelJours" prefWidth="180.0" text="Jours restants"/>
-                                </columns>
-                            </TableView>
-                            <Button mnemonicParsing="false" onAction="#onOpenAppels" text="Gerer les appels d'offre"
-                                    style="-fx-background-color: #128B57; -fx-text-fill: #FFFFFF; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 13 8 13;"/>
-                        </VBox>
-
-                        <VBox spacing="8.0"
-                              style="-fx-background-color: #FFFFFF; -fx-border-color: #CBE6D8; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 12 12 12 12;">
-                            <Label text="Reponses recentes" style="-fx-text-fill: #384C45; -fx-font-size: 18px;"/>
-                            <TableView fx:id="tableReponsesRecentes" prefHeight="180.0"
-                                       style="-fx-background-color: #FFFFFF; -fx-border-color: #D7EAE0; -fx-border-radius: 8; -fx-background-radius: 8; -fx-fixed-cell-size: 34;">
-                                <columns>
-                                    <TableColumn fx:id="colReponseCitoyen" prefWidth="300.0" text="Citoyen"/>
-                                    <TableColumn fx:id="colReponseOffre" prefWidth="320.0" text="Offre"/>
-                                    <TableColumn fx:id="colReponseStatut" prefWidth="190.0" text="Statut"/>
-                                </columns>
-                            </TableView>
+                    <VBox spacing="10.0"
+                          style="-fx-background-color: #FFFFFF; -fx-border-color: #CBE6D8; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 12 12 12 12;">
+                        <Label text="Centre d'alertes" style="-fx-text-fill: #384C45; -fx-font-size: 18px;"/>
+                        <VBox spacing="6.0"
+                              style="-fx-background-color: #FFF6F6; -fx-border-color: #E06161; -fx-border-width: 0 0 0 4; -fx-background-radius: 8; -fx-border-radius: 8; -fx-padding: 10 12 10 12;">
                             <HBox alignment="CENTER_LEFT">
-                                <Button mnemonicParsing="false" onAction="#onOpenReponses" text="Gerer les reponses"
-                                        style="-fx-background-color: #128B57; -fx-text-fill: #FFFFFF; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 13 8 13;"/>
+                                <Label text="Appels expires a traiter" style="-fx-text-fill: #604040; -fx-font-size: 12px;"/>
                                 <Region HBox.hgrow="ALWAYS"/>
-                                <Label fx:id="lblInfo" text="Chargement..."
-                                       style="-fx-background-color: #E9F7EF; -fx-text-fill: #0B5740; -fx-font-size: 12px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 8 12 8 12;"/>
+                                <Label fx:id="lblAlerteExpires" text="0 expire(s)"
+                                       style="-fx-background-color: #FFE1E1; -fx-text-fill: #B91C1C; -fx-font-size: 10px; -fx-font-weight: bold; -fx-background-radius: 999; -fx-padding: 4 8 4 8;"/>
                             </HBox>
+                            <Button mnemonicParsing="false" onAction="#onOpenAppels" text="Voir les appels expires"
+                                    style="-fx-background-color: #E9F7EF; -fx-text-fill: #007A47; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 7 12 7 12; -fx-border-color: #BFE3CF; -fx-border-radius: 8;"/>
+                        </VBox>
+                        <VBox spacing="6.0"
+                              style="-fx-background-color: #FFFBF2; -fx-border-color: #E4AA33; -fx-border-width: 0 0 0 4; -fx-background-radius: 8; -fx-border-radius: 8; -fx-padding: 10 12 10 12;">
+                            <HBox alignment="CENTER_LEFT">
+                                <Label text="Moderation en retard" style="-fx-text-fill: #604B20; -fx-font-size: 12px;"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Label fx:id="lblAlerteModeration" text="0 en attente"
+                                       style="-fx-background-color: #FFF1C7; -fx-text-fill: #9A6B00; -fx-font-size: 10px; -fx-font-weight: bold; -fx-background-radius: 999; -fx-padding: 4 8 4 8;"/>
+                            </HBox>
+                            <Button mnemonicParsing="false" onAction="#onOpenReponses" text="Traiter la file de moderation"
+                                    style="-fx-background-color: #E9F7EF; -fx-text-fill: #007A47; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 7 12 7 12; -fx-border-color: #BFE3CF; -fx-border-radius: 8;"/>
                         </VBox>
                     </VBox>
-                </StackPane>
-            </content>
-        </ScrollPane>
-    </center>
-</BorderPane>
+
+                    <VBox spacing="8.0"
+                          style="-fx-background-color: #FFFFFF; -fx-border-color: #CBE6D8; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 12 12 12 12;">
+                        <Label text="Distribution des statuts" style="-fx-text-fill: #384C45; -fx-font-size: 18px;"/>
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                            <Label text="Validees" minWidth="90.0" style="-fx-text-fill: #384C45; -fx-font-size: 12px;"/>
+                            <ProgressBar fx:id="barValidees" prefWidth="620.0" progress="0.0"/>
+                            <Label fx:id="lblValidees" minWidth="30.0" text="0" style="-fx-text-fill: #144E33; -fx-font-weight: bold;"/>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                            <Label text="En attente" minWidth="90.0" style="-fx-text-fill: #384C45; -fx-font-size: 12px;"/>
+                            <ProgressBar fx:id="barEnAttente" prefWidth="620.0" progress="0.0"/>
+                            <Label fx:id="lblEnAttente" minWidth="30.0" text="0" style="-fx-text-fill: #9A6B00; -fx-font-weight: bold;"/>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                            <Label text="Refusees" minWidth="90.0" style="-fx-text-fill: #384C45; -fx-font-size: 12px;"/>
+                            <ProgressBar fx:id="barRefusees" prefWidth="620.0" progress="0.0"/>
+                            <Label fx:id="lblRefusees" minWidth="30.0" text="0" style="-fx-text-fill: #B91C1C; -fx-font-weight: bold;"/>
+                        </HBox>
+                    </VBox>
+
+                    <VBox spacing="8.0"
+                          style="-fx-background-color: #FFFFFF; -fx-border-color: #CBE6D8; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 12 12 12 12;">
+                        <Label text="Appels d'offre recents" style="-fx-text-fill: #384C45; -fx-font-size: 18px;"/>
+                        <TableView fx:id="tableAppelsRecents" prefHeight="180.0"
+                                   style="-fx-background-color: #FFFFFF; -fx-border-color: #D7EAE0; -fx-border-radius: 8; -fx-background-radius: 8; -fx-fixed-cell-size: 34;">
+                            <columns>
+                                <TableColumn fx:id="colAppelTitre" prefWidth="210.0" text="Titre"/>
+                                <TableColumn fx:id="colAppelQuantite" prefWidth="150.0" text="Quantite"/>
+                                <TableColumn fx:id="colAppelDate" prefWidth="150.0" text="Date limite"/>
+                                <TableColumn fx:id="colAppelEtat" prefWidth="120.0" text="Etat"/>
+                                <TableColumn fx:id="colAppelJours" prefWidth="180.0" text="Jours restants"/>
+                            </columns>
+                        </TableView>
+                        <Button mnemonicParsing="false" onAction="#onOpenAppels" text="Gerer les appels d'offre"
+                                style="-fx-background-color: #128B57; -fx-text-fill: #FFFFFF; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 13 8 13;"/>
+                    </VBox>
+
+                    <VBox spacing="8.0"
+                          style="-fx-background-color: #FFFFFF; -fx-border-color: #CBE6D8; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 12 12 12 12;">
+                        <Label text="Reponses recentes" style="-fx-text-fill: #384C45; -fx-font-size: 18px;"/>
+                        <TableView fx:id="tableReponsesRecentes" prefHeight="180.0"
+                                   style="-fx-background-color: #FFFFFF; -fx-border-color: #D7EAE0; -fx-border-radius: 8; -fx-background-radius: 8; -fx-fixed-cell-size: 34;">
+                            <columns>
+                                <TableColumn fx:id="colReponseCitoyen" prefWidth="300.0" text="Citoyen"/>
+                                <TableColumn fx:id="colReponseOffre" prefWidth="320.0" text="Offre"/>
+                                <TableColumn fx:id="colReponseStatut" prefWidth="190.0" text="Statut"/>
+                            </columns>
+                        </TableView>
+                        <HBox alignment="CENTER_LEFT">
+                            <Button mnemonicParsing="false" onAction="#onOpenReponses" text="Gerer les reponses"
+                                    style="-fx-background-color: #128B57; -fx-text-fill: #FFFFFF; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 13 8 13;"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label fx:id="lblInfo" text="Chargement..."
+                                   style="-fx-background-color: #E9F7EF; -fx-text-fill: #0B5740; -fx-font-size: 12px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 8 12 8 12;"/>
+                        </HBox>
+                    </VBox>
+                </VBox>
+            </StackPane>
+        </content>
+    </ScrollPane>
+</VBox>

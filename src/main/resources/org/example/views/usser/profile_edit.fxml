@@ -14,102 +14,104 @@
             xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="org.example.controllers.ProfileController"
-            prefWidth="1200.0" prefHeight="750.0"
-            styleClass="citizen-root"
-            stylesheets="@../styles/style.css">
+            styleClass="content-scroll"
+            stylesheets="/org/example/styles/style.css">
 
     <center>
-        <VBox spacing="20.0" styleClass="citizen-main">
-            <padding>
-                <Insets top="30.0" right="30.0" bottom="30.0" left="30.0"/>
-            </padding>
+        <VBox spacing="30.0" styleClass="workspace-content">
+            
+            <!-- En-tête de la page -->
+            <VBox spacing="8.0">
+                <HBox alignment="CENTER_LEFT" spacing="16.0">
+                    <Label text="✏️ Modifier mon Profil" styleClass="workspace-title"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                </HBox>
+                <Label text="Mettez à jour vos informations personnelles et votre mot de passe." styleClass="workspace-subtitle-strong"/>
+            </VBox>
 
-            <HBox spacing="20.0" alignment="CENTER_LEFT">
-                <VBox spacing="5.0">
-                    <Label text="✏ Modifier mon profil" styleClass="citizen-h1"/>
-                    <Label text="Mets à jour tes informations et ton mot de passe" styleClass="citizen-sub"/>
-                </VBox>
-
-                <Region HBox.hgrow="ALWAYS"/>
-            </HBox>
-
-            <VBox spacing="18.0" styleClass="citizen-card2">
-                <Label text="Formulaire" styleClass="citizen-card-title"/>
-
-                <HBox spacing="16.0">
-                    <VBox spacing="6.0" HBox.hgrow="ALWAYS">
-                        <Label text="Nom" styleClass="field-label"/>
-                        <TextField fx:id="nomField" promptText="Nom" styleClass="input-field"/>
+            <!-- Formulaire Principal -->
+            <VBox spacing="25.0" styleClass="panel-card" maxWidth="800">
+                <padding>
+                    <Insets top="30" right="40" bottom="30" left="40"/>
+                </padding>
+                
+                <Label text="Informations Générales" styleClass="panel-heading"/>
+                
+                <HBox spacing="24.0">
+                    <VBox spacing="8.0" HBox.hgrow="ALWAYS">
+                        <Label text="Nom de famille" styleClass="field-label"/>
+                        <TextField fx:id="nomField" promptText="Saisissez votre nom" styleClass="input-field"/>
                     </VBox>
 
-                    <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                    <VBox spacing="8.0" HBox.hgrow="ALWAYS">
                         <Label text="Prénom" styleClass="field-label"/>
-                        <TextField fx:id="prenomField" promptText="Prénom" styleClass="input-field"/>
+                        <TextField fx:id="prenomField" promptText="Saisissez votre prénom" styleClass="input-field"/>
                     </VBox>
                 </HBox>
 
-                <HBox spacing="16.0">
-                    <VBox spacing="6.0" HBox.hgrow="ALWAYS">
-                        <Label text="Téléphone" styleClass="field-label"/>
-                        <TextField fx:id="telephoneField" promptText="Téléphone" styleClass="input-field"/>
+                <HBox spacing="24.0">
+                    <VBox spacing="8.0" HBox.hgrow="ALWAYS">
+                        <Label text="Numéro de Téléphone" styleClass="field-label"/>
+                        <TextField fx:id="telephoneField" promptText="Ex: 12345678" styleClass="input-field"/>
                     </VBox>
 
-                    <VBox spacing="6.0" HBox.hgrow="ALWAYS">
-                        <Label text="Email" styleClass="field-label"/>
-                        <TextField fx:id="emailField" promptText="Email" styleClass="input-field"/>
+                    <VBox spacing="8.0" HBox.hgrow="ALWAYS">
+                        <Label text="Adresse Email" styleClass="field-label"/>
+                        <TextField fx:id="emailField" promptText="Ex: email@domaine.com" styleClass="input-field"/>
                     </VBox>
                 </HBox>
 
-                <VBox spacing="14.0" styleClass="small-box">
-                    <Label text="🔐 Sécurité" styleClass="small-box-title"/>
+                <!-- Séparateur horizontal -->
+                <Region style="-fx-background-color: #eef2f3; -fx-pref-height: 1px; -fx-min-height: 1px;"/>
 
-                    <VBox spacing="6.0">
+                <Label text="🔐 Sécurité du Compte" styleClass="panel-heading"/>
+
+                <VBox spacing="16.0">
+                    <VBox spacing="8.0" maxWidth="380">
                         <Label text="Mot de passe actuel" styleClass="field-label"/>
                         <PasswordField fx:id="currentPasswordField"
-                                       promptText="Mot de passe actuel"
+                                       promptText="Saisissez votre mot de passe actuel"
                                        styleClass="input-field"/>
                     </VBox>
 
-                    <HBox spacing="16.0">
-                        <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                    <HBox spacing="24.0">
+                        <VBox spacing="8.0" HBox.hgrow="ALWAYS">
                             <Label text="Nouveau mot de passe" styleClass="field-label"/>
                             <PasswordField fx:id="newPasswordField"
-                                           promptText="Nouveau mot de passe"
+                                           promptText="Nouveau mot de passe (min. 6 caractères)"
                                            styleClass="input-field"/>
                         </VBox>
 
-                        <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                        <VBox spacing="8.0" HBox.hgrow="ALWAYS">
                             <Label text="Confirmer le nouveau mot de passe" styleClass="field-label"/>
                             <PasswordField fx:id="confirmPasswordField"
-                                           promptText="Confirmation"
+                                           promptText="Répétez le mot de passe"
                                            styleClass="input-field"/>
                         </VBox>
                     </HBox>
-
-                    <Label text="Laisse les champs vides si tu ne veux pas changer le mot de passe."
-                           wrapText="true"
-                           styleClass="citizen-note"/>
+                    
+                    <Label text="ℹ️ Laissez les champs vides si vous ne souhaitez pas modifier votre mot de passe."
+                           style="-fx-font-size: 13px; -fx-text-fill: #73808d; -fx-padding: 4 0 0 0;"/>
                 </VBox>
 
+                <!-- Affichage des messages de statut (Succès ou Erreur) -->
                 <Label fx:id="messageLabel"
                        text=""
                        wrapText="true"
-                       styleClass="message-label"/>
+                       styleClass="message-label"
+                       style="-fx-font-size: 14px; -fx-padding: 8 0 0 0;"/>
 
-                <HBox spacing="12.0">
-                    <Button text="✔ Enregistrer"
-                            onAction="#handleSaveProfile"
-                            styleClass="btn-success"/>
-
-                    <Button text="👤 Voir mon profil"
-                            onAction="#handleViewProfilePage"
-                            styleClass="citizen-action-btn"/>
-
-                    <Button text="↩ Retour dashboard"
-                            onAction="#handleBackToDashboard"
-                            styleClass="citizen-action-btn"/>
+                <!-- Actions du bas -->
+                <HBox spacing="15.0" alignment="CENTER_LEFT" style="-fx-padding: 15 0 0 0;">
+                    <Button text="💾 Enregistrer les modifications" onAction="#handleSaveProfile" styleClass="primary-btn"/>
+                    
+                    <Region HBox.hgrow="ALWAYS"/>
+                    
+                    <Button text="👤 Annuler et voir mon profil" onAction="#handleViewProfilePage" styleClass="outline-btn"/>
+                    <Button text="↩ Retour au dashboard" onAction="#handleBackToDashboard" styleClass="ghost-btn"/>
                 </HBox>
             </VBox>
+
         </VBox>
     </center>
 </BorderPane>

@@ -14,7 +14,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import main.navigation.AppRoutes;
 import main.navigation.ViewNavigator;
@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
 public class AdminReponseStatsController {
 
     @FXML
-    private BorderPane root;
+    private VBox root;
     @FXML
     private Button btnExporterPdf;
     @FXML

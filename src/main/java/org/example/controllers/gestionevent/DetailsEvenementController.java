@@ -33,7 +33,7 @@ public class DetailsEvenementController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/views/event/AfficherEvenement.fxml"));
             Parent root = loader.load();
             // Yelzem labels mte3ek ikounou declared bech el lookup tekhdem
-            AnchorPane contentArea = (AnchorPane) lblTitre.getScene().lookup("#contentArea");
+            javafx.scene.layout.StackPane contentArea = (javafx.scene.layout.StackPane) lblTitre.getScene().lookup("#contentArea");
             contentArea.getChildren().clear();
             contentArea.getChildren().add(root);
         } catch (IOException e) {

@@ -128,7 +128,7 @@ public class ParticipationsController implements Initializable {
             Parent root = loader.load();
             ModifierParticipationController controller = loader.getController();
             controller.initData(p);
-            AnchorPane contentArea = (AnchorPane) participationTable.getScene().lookup("#contentArea");
+            javafx.scene.layout.StackPane contentArea = (javafx.scene.layout.StackPane) participationTable.getScene().lookup("#contentArea");
             if (contentArea != null) contentArea.getChildren().setAll(root);
         } catch (IOException e) {
             e.printStackTrace();
@@ -153,7 +153,7 @@ public class ParticipationsController implements Initializable {
     private void handleAjouterParticipant(ActionEvent event) {
         try {
             Parent root = FXMLLoader.load(getClass().getResource("/org/example/views/event/AjouterParticipation.fxml"));
-            AnchorPane contentArea = (AnchorPane) ((Node) event.getSource()).getScene().lookup("#contentArea");
+            javafx.scene.layout.StackPane contentArea = (javafx.scene.layout.StackPane) ((Node) event.getSource()).getScene().lookup("#contentArea");
             if (contentArea != null) contentArea.getChildren().setAll(root);
         } catch (IOException e) {
             e.printStackTrace();

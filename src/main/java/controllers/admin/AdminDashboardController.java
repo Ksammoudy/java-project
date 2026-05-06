@@ -9,7 +9,7 @@ import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TableCell;
@@ -35,7 +35,7 @@ public class AdminDashboardController {
     private static final int AUTO_REFRESH_SECONDS = 8;
 
     @FXML
-    private BorderPane root;
+    private VBox root;
     @FXML
     private Label lblIndiceSante;
     @FXML

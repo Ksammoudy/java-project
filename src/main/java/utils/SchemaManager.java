@@ -100,7 +100,32 @@ public final class SchemaManager {
 
     private static void ensureTableExists(Connection cnx, String tableName) throws SQLException {
         if (!tableExists(cnx, tableName)) {
-            throw new SQLException("Table introuvable: " + tableName);
+            if (tableName.equalsIgnoreCase("appel_offre")) {
+                try (Statement st = cnx.createStatement()) {
+                    st.execute("CREATE TABLE appel_offre (" +
+                            "id INT AUTO_INCREMENT PRIMARY KEY, " +
+                            "titre VARCHAR(255) NOT NULL, " +
+                            "description TEXT NOT NULL, " +
+                            "quantite_demandee DOUBLE NOT NULL, " +
+                            "date_limite DATETIME NOT NULL, " +
+                            "valorisateur_id INT NOT NULL" +
+                            ")");
+                }
+            } else if (tableName.equalsIgnoreCase("reponse_offre")) {
+                try (Statement st = cnx.createStatement()) {
+                    st.execute("CREATE TABLE reponse_offre (" +
+                            "id INT AUTO_INCREMENT PRIMARY KEY, " +
+                            "quantite_proposee DOUBLE NOT NULL, " +
+                            "date_soumis DATETIME NOT NULL, " +
+                            "statut VARCHAR(50) NOT NULL, " +
+                            "message TEXT, " +
+                            "appel_offre_id INT NOT NULL, " +
+                            "citoyen_id INT NOT NULL" +
+                            ")");
+                }
+            } else {
+                throw new SQLException("Table introuvable: " + tableName);
+            }
         }
     }
 
