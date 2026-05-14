@@ -39,9 +39,9 @@
         <VBox styleClass="workspace-main">
             <HBox spacing="12.0" alignment="CENTER_LEFT" styleClass="workspace-topbar">
                 <Button text="Menu" styleClass="crumb-button"/>
-                <Label text="Valorisateur &gt;" styleClass="crumb-text"/>
+                <Label text="Valorisateur >" styleClass="crumb-text"/>
                 <Label text="Validation" styleClass="crumb-text"/>
-                <Label text="QR Code" styleClass="crumb-current"/>
+                <Label text="QR Declaration" styleClass="crumb-current"/>
                 <Region HBox.hgrow="ALWAYS"/>
                 <VBox alignment="CENTER_RIGHT" spacing="3.0">
                     <Label fx:id="headerEmailLabel" text="—" styleClass="workspace-title"/>
@@ -52,18 +52,31 @@
                 <content>
                     <VBox spacing="18.0" styleClass="workspace-content">
                         <VBox spacing="10.0" styleClass="hero-panel">
-                            <Label text="Validation QR Code" styleClass="hero-title"/>
-                            <Label text="Scannez un QR code ou entrez un ID de declaration pour la valider." styleClass="hero-subtitle"/>
+                            <Label text="Validation QR Declaration" styleClass="hero-title"/>
+                            <Label text="Validez via code, lien API ou image QR importee." styleClass="hero-subtitle"/>
                         </VBox>
 
                         <VBox spacing="14.0" styleClass="panel-card">
-                            <Label text="Scanner QR Code" styleClass="panel-heading"/>
-                            <VBox spacing="8.0">
-                                <Label text="Code QR ou ID Declaration" styleClass="input-label"/>
-                                <TextField fx:id="qrCodeField" promptText="Scanner ou entrer un ID..." styleClass="input-field"/>
-                                <Label fx:id="scanResultLabel" text="" wrapText="true" styleClass="input-label"/>
-                            </VBox>
+                            <Label text="A) Code QR manuel" styleClass="panel-heading"/>
+                            <TextField fx:id="manualQrCodeField" promptText="DECL-123-xxxx" styleClass="input-field"/>
+                            <Button text="Valider" onAction="#handleValidateManualQr" styleClass="primary-btn"/>
                         </VBox>
+
+                        <VBox spacing="14.0" styleClass="panel-card">
+                            <Label text="B) Lien QR" styleClass="panel-heading"/>
+                            <TextField fx:id="qrLinkField" promptText="https://api.qrserver.com/v1/create-qr-code/?size=200x200&amp;data=DECL-123-xxxx" styleClass="input-field"/>
+                            <Button text="Valider lien" onAction="#handleValidateQrLink" styleClass="primary-btn"/>
+                        </VBox>
+
+                        <VBox spacing="14.0" styleClass="panel-card">
+                            <Label text="C) Image QR (PNG/JPG)" styleClass="panel-heading"/>
+                            <HBox spacing="10.0" alignment="CENTER_LEFT">
+                                <Button text="Importer image" onAction="#handleUploadQrImage" styleClass="outline-btn"/>
+                                <Label fx:id="uploadedImageLabel" text="Aucune image" styleClass="input-label"/>
+                            </HBox>
+                        </VBox>
+
+                        <Label fx:id="validationResultLabel" text="" wrapText="true" styleClass="input-label"/>
 
                         <VBox spacing="14.0" styleClass="panel-card">
                             <Label text="Details de la declaration" styleClass="panel-heading"/>
@@ -97,8 +110,6 @@
                         </VBox>
 
                         <HBox spacing="12.0" alignment="CENTER_LEFT">
-                            <Button text="✓ Approuver" onAction="#handleValidate" styleClass="primary-btn"/>
-                            <Button text="✗ Rejeter" styleClass="danger-btn"/>
                             <Button text="Effacer" onAction="#handleClear" styleClass="outline-btn"/>
                             <Region HBox.hgrow="ALWAYS"/>
                         </HBox>

@@ -4,6 +4,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
@@ -44,7 +45,7 @@
                 <Label text="Nouveautes" styleClass="crumb-current"/>
                 <Region HBox.hgrow="ALWAYS"/>
                 <VBox alignment="CENTER_RIGHT" spacing="3.0">
-                    <Label fx:id="headerEmailLabel" text="—" styleClass="workspace-title"/>
+                    <Label fx:id="headerEmailLabel" text="--" styleClass="workspace-title"/>
                     <Label text="Citoyen" styleClass="workspace-subtitle-strong"/>
                 </VBox>
             </HBox>
@@ -53,7 +54,12 @@
                     <VBox spacing="18.0" styleClass="workspace-content">
                         <VBox spacing="10.0" styleClass="hero-panel">
                             <Label text="Nouveautes" styleClass="hero-title"/>
-                            <Label text="Actualites environnement et initiatives WasteWise." styleClass="hero-subtitle"/>
+                            <Label text="Actualites personnalisees sur le recyclage, les dechets et l'environnement." styleClass="hero-subtitle"/>
+                            <HBox spacing="10.0" alignment="CENTER_LEFT">
+                                <TextField fx:id="searchField" promptText="Rechercher un mot-cle..." styleClass="input-field" HBox.hgrow="ALWAYS"/>
+                                <Button fx:id="refreshNewsButton" text="Actualiser" onAction="#handleRefreshNews" styleClass="primary-btn"/>
+                            </HBox>
+                            <Label fx:id="newsStatusLabel" text="" styleClass="workspace-subtitle"/>
                         </VBox>
                         <VBox fx:id="articlesBox" spacing="14.0"/>
                     </VBox>

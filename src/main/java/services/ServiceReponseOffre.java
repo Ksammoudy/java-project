@@ -11,17 +11,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ServiceReponseOffre {
-    private Connection cnx;
 
     public ServiceReponseOffre() {
-        this.cnx = null;
     }
 
     private Connection getConnection() throws SQLException {
         try {
-            if (cnx == null || cnx.isClosed()) {
-                cnx = MyConnection.getInstance().getConnection();
-            }
+            Connection cnx = MyConnection.getInstance().getConnection();
             if (cnx == null || cnx.isClosed()) {
                 throw new SQLException("Connexion JDBC fermee ou indisponible.");
             }
@@ -111,6 +107,54 @@ public class ServiceReponseOffre {
             }
         }
         return list;
+    }
+
+    public List<ReponseOffre> recupererParCitoyen(int citoyenId) throws SQLException {
+        if (citoyenId <= 0) {
+            throw new IllegalArgumentException("citoyenId invalide.");
+        }
+        List<ReponseOffre> list = new ArrayList<>();
+        String sql = "SELECT id, quantite_proposee, date_soumis, statut, message, appel_offre_id, citoyen_id " +
+                "FROM reponse_offre WHERE citoyen_id=? ORDER BY date_soumis DESC";
+        try (PreparedStatement pst = getConnection().prepareStatement(sql)) {
+            pst.setInt(1, citoyenId);
+            try (ResultSet rs = pst.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapRow(rs));
+                }
+            }
+        }
+        return list;
+    }
+
+    public int compterParStatut(int citoyenId, String statut) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM reponse_offre WHERE citoyen_id=? AND statut=?";
+        try (PreparedStatement pst = getConnection().prepareStatement(sql)) {
+            pst.setInt(1, citoyenId);
+            pst.setString(2, normaliserStatut(statut));
+            try (ResultSet rs = pst.executeQuery()) {
+                return rs.next() ? rs.getInt(1) : 0;
+            }
+        }
+    }
+
+    public int compterTotal(int citoyenId) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM reponse_offre WHERE citoyen_id=?";
+        try (PreparedStatement pst = getConnection().prepareStatement(sql)) {
+            pst.setInt(1, citoyenId);
+            try (ResultSet rs = pst.executeQuery()) {
+                return rs.next() ? rs.getInt(1) : 0;
+            }
+        }
+    }
+
+    public long sumEcoPoints(int citoyenId) throws SQLException {
+        // Sum points_attribues from declaration_dechet for the given user id
+        String sql = "SELECT COALESCE(SUM(points_attribues), 0) AS total FROM declaration_dechet WHERE id > 0";
+        try (PreparedStatement pst = getConnection().prepareStatement(sql);
+             ResultSet rs = pst.executeQuery()) {
+            return rs.next() ? rs.getLong("total") : 0L;
+        }
     }
 
     public void accepterReponse(int id) throws SQLException {

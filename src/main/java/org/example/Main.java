@@ -5,12 +5,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import org.example.controllers.AppShellController;
-import org.example.controllers.TwoFactorVerifyController;
-import org.example.controllers.UserController;
-import org.example.controllers.ZonePollueeController;
-import org.example.models.User;
-import org.example.services.SessionManager;
+import org.example.utils.DBConnection;
+import org.example.utils.DatabaseConfig;
 
 import java.io.IOException;
 import java.net.URL;
@@ -32,14 +28,33 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) {
         primaryStage = stage;
-        primaryStage.setMinWidth(900);
-        primaryStage.setMinHeight(600);
-        showLoginPage();
+        
+        // Test de connexion à la base de données au démarrage
+        testDatabaseConnection();
+        
+        showDevLauncher();
     }
 
-    // ═══════════════════════════════════════════════════════
-    // CHARGEMENT DE L'APP SHELL (sidebar fixe)
-    // ═══════════════════════════════════════════════════════
+    private void testDatabaseConnection() {
+        DatabaseConfig config = DatabaseConfig.load();
+        System.out.println("=== Configuration Base de Données ===");
+        System.out.println("URL: " + config.url());
+        System.out.println("Username: " + config.username());
+        System.out.println("Database: " + config.databaseName());
+        
+        boolean isConnected = DBConnection.getInstance().testConnection();
+        if (isConnected) {
+            System.out.println("✓ Connexion à la base de données réussie!");
+        } else {
+            System.err.println("✗ Erreur: Impossible de se connecter à la base de données.");
+            System.err.println("  Vérifiez que MySQL est en cours d'exécution et que la base de données 'pidev' existe.");
+        }
+        System.out.println("=====================================\n");
+    }
+
+    private void showDevLauncher() {
+        Text title = new Text("Mode Developpement");
+        title.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-fill: #2d3748;");
 
     /**
      * Charge l'AppShell pour un utilisateur connecté.
@@ -156,19 +171,24 @@ public class Main extends Application {
     }
 
     // Déclarations citoyen — redirige vers la liste
-    public static void showDeclarationCitizenFormPage()  { loadFragment("/org/example/views/fragments/declarations_content.fxml"); }
-    public static void showCitizenMyDeclarationsPage()   { loadFragment("/org/example/views/fragments/declarations_content.fxml"); }
-    public static void showCitizenStatisticsPage()       { loadFragment("/org/example/views/fragments/citizen_dashboard_content.fxml"); }
-    public static void showCitizenNewsPage()             { loadFragment("/org/example/views/fragments/citizen_dashboard_content.fxml"); }
-    public static void showCitizenAirQualityPage()       { loadFragment("/org/example/views/fragments/citizen_dashboard_content.fxml"); }
-    public static void showCitizenWithdrawPage()         { loadFragment("/org/example/views/fragments/citizen_dashboard_content.fxml"); }
-    public static void showCitizenSettingsPage()         { loadFragment("/org/example/views/usser/profile_view.fxml"); }
+    public static void showDeclarationCitizenFormPage()  { loadFragment("/org/example/views/declaration_dechet_citizen_form.fxml"); }
+    public static void showCitizenMyDeclarationsPage()   { loadFragment("/org/example/views/citizen_my_declarations.fxml"); }
+    public static void showCitizenStatisticsPage()       { loadFragment("/org/example/views/citizen_statistics.fxml"); }
+    public static void showCitizenNewsPage()             { loadFragment("/org/example/views/citizen_news.fxml"); }
+    public static void showCitizenAirQualityPage()       { loadFragment("/org/example/views/citizen_air_quality.fxml"); }
+    public static void showCitizenWithdrawPage()         { loadFragment("/org/example/views/citizen_withdraw.fxml"); }
+    public static void showCitizenSettingsPage()         { loadFragment("/org/example/views/citizen_settings.fxml"); }
+    public static void showValorizerWasteReceivedPage()  { loadFragment("/org/example/views/valorizer_waste_received.fxml"); }
+    public static void showValorizerValorizationPage()   { loadFragment("/org/example/views/valorizer_valorization.fxml"); }
+    public static void showValorizerStatisticsPage()     { loadFragment("/org/example/views/valorizer_statistics.fxml"); }
+    public static void showValorizerSettingsPage()       { loadFragment("/org/example/views/valorizer_settings.fxml"); }
+    public static void showValorizerValidateQrPage()     { loadFragment("/org/example/views/valorizer_validate_qr.fxml"); }
 
     // Admin pages
     public static void showDeclarationListPage(String s) { showDeclarationListPage(); }
     public static void showTypeDechetFormPage()          { loadFragment("/org/example/views/fragments/type_dechet_content.fxml"); }
     public static void showTypeDechetDetailPage()        { loadFragment("/org/example/views/fragments/type_dechet_content.fxml"); }
-    public static void showDeclarationDetailPage()       { loadFragment("/org/example/views/fragments/declarations_content.fxml"); }
+    public static void showDeclarationDetailPage()       { loadFragment("/org/example/views/declaration_dechet_detail.fxml"); }
 
     public static void showAdminUserEditPage(User user) {
         AppShellController shell = AppShellController.getInstance();
@@ -293,6 +313,30 @@ public class Main extends Application {
     // Méthodes conservées pour compatibilité avec les controllers existants
     public static void navigateTo(String fxmlPath, String title, double width, double height) {
         loadFullScreen(fxmlPath, title, (int) width, (int) height);
+    }
+
+    // ============================================================
+    // Pages Valorisateur
+    // ============================================================
+
+    public static void showValorizerWasteReceivedPage() {
+        navigateTo("/org/example/views/valorizer_waste_received.fxml", "Dechets recus", 1200, 750);
+    }
+
+    public static void showValorizerValidateQRPage() {
+        navigateTo("/org/example/views/valorizer_validate_qr.fxml", "Validation QR", 1200, 750);
+    }
+
+    public static void showValorizerValorizationPage() {
+        navigateTo("/org/example/views/valorizer_valorization.fxml", "Valorisation", 1200, 750);
+    }
+
+    public static void showValorizerStatisticsPage() {
+        navigateTo("/org/example/views/valorizer_statistics.fxml", "Statistiques", 1200, 750);
+    }
+
+    public static void showValorizerSettingsPage() {
+        navigateTo("/org/example/views/valorizer_settings.fxml", "Parametres", 1200, 750);
     }
 
     public static void main(String[] args) {

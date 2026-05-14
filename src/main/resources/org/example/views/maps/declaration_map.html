@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Waste Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            background: #f4f7fb;
+        }
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+<script>
+    const map = L.map("map", {
+        zoomControl: true,
+        attributionControl: true
+    }).setView([36.8065, 10.1815], 12);
+
+    const layers = [
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            maxZoom: 19,
+            attribution: "&copy; OpenStreetMap contributors"
+        }),
+        L.tileLayer("https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", {
+            maxZoom: 19,
+            attribution: "&copy; OpenStreetMap contributors, HOT"
+        })
+    ];
+
+    let activeLayerIndex = 0;
+    let activeLayer = null;
+    let marker = null;
+
+    function applyLayer(index) {
+        if (activeLayer) {
+            map.removeLayer(activeLayer);
+        }
+        activeLayerIndex = index;
+        activeLayer = layers[index];
+        activeLayer.addTo(map);
+    }
+
+    layers[0].on("tileerror", function () {
+        if (activeLayerIndex === 0) {
+            applyLayer(1);
+        }
+    });
+
+    applyLayer(0);
+
+    map.on("click", function (event) {
+        const lat = event.latlng.lat;
+        const lng = event.latlng.lng;
+        if (marker) {
+            marker.setLatLng(event.latlng);
+        } else {
+            marker = L.marker(event.latlng).addTo(map);
+        }
+        alert("LOCATION:" + lat + "," + lng);
+    });
+
+    window.fixMapSize = function () {
+        setTimeout(function () {
+            map.invalidateSize(true);
+        }, 120);
+    };
+
+    window.addEventListener("resize", window.fixMapSize);
+    window.fixMapSize();
+</script>
+</body>
+</html>

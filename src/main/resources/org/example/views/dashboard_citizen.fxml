@@ -49,13 +49,20 @@
 
                     <HBox spacing="18.0">
                         <VBox HBox.hgrow="ALWAYS" spacing="8.0" styleClass="strip-card weather-card">
-                            <Label text="Meteo actuelle - Tunis" styleClass="weather-title"/>
-                            <Label text="20C" styleClass="weather-value"/>
+                            <HBox alignment="CENTER_LEFT" spacing="12.0">
+                                <Label fx:id="weatherTitleLabel" text="Meteo actuelle - Tunis" styleClass="weather-title"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Button fx:id="refreshWeatherButton" text="Actualiser" onAction="#handleRefreshWeather" styleClass="primary-btn"/>
+                            </HBox>
+                            <Label fx:id="weatherTemperatureLabel" text="--°C" styleClass="weather-value"/>
+                            <Label fx:id="weatherDescriptionLabel" text="Meteo indisponible" styleClass="weather-meta"/>
+                            <Label fx:id="weatherUpdatedLabel" text="Maj: --" styleClass="weather-meta"/>
                         </VBox>
                         <VBox alignment="CENTER_RIGHT" spacing="8.0" styleClass="strip-card weather-card" prefWidth="320.0">
-                            <Label text="Vent: 16.7 km/h" styleClass="weather-meta"/>
-                            <Label text="Code meteo: 2" styleClass="weather-meta"/>
-                            <Label text="Maj: 2026-03-04T12:45" styleClass="weather-meta"/>
+                            <Label fx:id="weatherFeelsLikeLabel" text="Ressenti: --°C" styleClass="weather-meta"/>
+                            <Label fx:id="weatherHumidityLabel" text="Humidite: --%" styleClass="weather-meta"/>
+                            <Label fx:id="weatherWindLabel" text="Vent: -- km/h" styleClass="weather-meta"/>
+                            <Label fx:id="weatherRainLabel" text="Pluie: -- mm" styleClass="weather-meta"/>
                         </VBox>
                     </HBox>
 

@@ -6,11 +6,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public class WalletJdbcService extends AbstractJdbcService implements BaseCrudService<Wallet> {
+    private static final String GAIN_TYPE = "Gain";
+    private static final String GAIN_MOTIF_PREFIX = "Gain declaration #";
 
     @Override
     public List<Wallet> findAll() throws SQLException {
@@ -91,5 +94,122 @@ public class WalletJdbcService extends AbstractJdbcService implements BaseCrudSe
         wallet.setSoldeActuel(resultSet.getObject("solde_actuel", Integer.class));
         wallet.setDateMj(getLocalDateTime(resultSet, "date_mj"));
         return wallet;
+    }
+
+    /**
+     * Synchronise les points gagnés (déclarations APPROUVEE/VALIDATED) vers le wallet citoyen.
+     * Idempotent: chaque déclaration est créditée une seule fois via wallet_transaction.
+     */
+    public Wallet syncCitizenWalletPoints(int citoyenId) throws SQLException {
+        Wallet wallet = findByUtilisateurId(citoyenId).orElse(null);
+        if (wallet == null) {
+            Wallet created = new Wallet();
+            created.setUtilisateurId(citoyenId);
+            created.setSoldeActuel(0);
+            created.setDateMj(LocalDateTime.now());
+            wallet = create(created);
+        }
+
+        int walletId = wallet.getId();
+        int currentBalance = wallet.getSoldeActuel() == null ? 0 : wallet.getSoldeActuel();
+        int addedPoints = 0;
+
+        String declarationsSql = """
+                SELECT d.id,
+                       d.points_attribues,
+                       d.quantite,
+                       td.valeur_points_kg
+                FROM declaration_dechet d
+                LEFT JOIN type_dechet td ON td.id = d.type_dechet_id
+                WHERE d.citoyen_id = ?
+                  AND d.deleted_at IS NULL
+                  AND UPPER(COALESCE(d.statut, '')) IN ('APPROUVEE', 'VALIDATED')
+                ORDER BY d.id ASC
+                """;
+
+        try (PreparedStatement declarationStatement = getConnection().prepareStatement(declarationsSql)) {
+            declarationStatement.setInt(1, citoyenId);
+            try (ResultSet declarationRows = declarationStatement.executeQuery()) {
+                while (declarationRows.next()) {
+                    int declarationId = declarationRows.getInt("id");
+                    Integer pointsDb = declarationRows.getObject("points_attribues", Integer.class);
+                    Double quantite = declarationRows.getObject("quantite", Double.class);
+                    Double pointsKg = declarationRows.getObject("valeur_points_kg", Double.class);
+
+                    int points = pointsDb == null ? 0 : pointsDb;
+                    if (points <= 0 && quantite != null && quantite > 0 && pointsKg != null && pointsKg > 0) {
+                        points = (int) Math.round(quantite * pointsKg);
+                        if (points > 0) {
+                            updateDeclarationPoints(declarationId, points);
+                        }
+                    }
+                    if (points <= 0) {
+                        continue;
+                    }
+
+                    String motif = GAIN_MOTIF_PREFIX + declarationId;
+                    if (gainTransactionExists(walletId, motif)) {
+                        continue;
+                    }
+
+                    insertGainTransaction(walletId, points, motif);
+                    addedPoints += points;
+                }
+            }
+        }
+
+        if (addedPoints > 0) {
+            wallet.setSoldeActuel(currentBalance + addedPoints);
+            wallet.setDateMj(LocalDateTime.now());
+            update(wallet);
+        } else if (wallet.getDateMj() == null) {
+            wallet.setDateMj(LocalDateTime.now());
+            update(wallet);
+        }
+
+        return findById(walletId).orElse(wallet);
+    }
+
+    private void updateDeclarationPoints(int declarationId, int points) throws SQLException {
+        String sql = "UPDATE declaration_dechet SET points_attribues = ? WHERE id = ? AND (points_attribues IS NULL OR points_attribues <= 0)";
+        try (PreparedStatement statement = getConnection().prepareStatement(sql)) {
+            statement.setInt(1, points);
+            statement.setInt(2, declarationId);
+            statement.executeUpdate();
+        }
+    }
+
+    private boolean gainTransactionExists(int walletId, String motif) throws SQLException {
+        String sql = """
+                SELECT 1
+                FROM wallet_transaction
+                WHERE wallet_id = ?
+                  AND type = ?
+                  AND motif = ?
+                LIMIT 1
+                """;
+        try (PreparedStatement statement = getConnection().prepareStatement(sql)) {
+            statement.setInt(1, walletId);
+            statement.setString(2, GAIN_TYPE);
+            statement.setString(3, motif);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                return resultSet.next();
+            }
+        }
+    }
+
+    private void insertGainTransaction(int walletId, int points, String motif) throws SQLException {
+        String sql = """
+                INSERT INTO wallet_transaction (wallet_id, montant, type, motif, date_transaction)
+                VALUES (?, ?, ?, ?, ?)
+                """;
+        try (PreparedStatement statement = getConnection().prepareStatement(sql)) {
+            statement.setInt(1, walletId);
+            statement.setInt(2, points);
+            statement.setString(3, GAIN_TYPE);
+            statement.setString(4, motif);
+            statement.setTimestamp(5, toTimestamp(LocalDateTime.now()));
+            statement.executeUpdate();
+        }
     }
 }

@@ -4,6 +4,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -11,6 +12,10 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
+import javafx.stage.FileChooser;
 import org.example.Main;
 import org.example.entities.DeclarationDechet;
 import org.example.models.User;
@@ -27,6 +32,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.net.URL;
 
 public class CitizenMyDeclarationsController {
 
@@ -75,6 +84,8 @@ public class CitizenMyDeclarationsController {
     @FXML
     private TableColumn<DeclarationDechet, String> quantiteColumn;
     @FXML
+    private TableColumn<DeclarationDechet, Void> qrPreviewColumn;
+    @FXML
     private TableColumn<DeclarationDechet, Void> actionColumn;
 
     @FXML
@@ -87,7 +98,7 @@ public class CitizenMyDeclarationsController {
                 navHome, navDeclare, navMyDeclarations, navStatistics, navNews, navAir, navWithdraw, navSettings);
 
         statusFilter.setItems(FXCollections.observableArrayList(
-                "Tous", "En attente", "Approuvee", "Refusee"));
+                "Tous", "En attente", "Approuvee", "Refusee", "Validee"));
         statusFilter.setValue("Tous");
         statusFilter.valueProperty().addListener((obs, o, n) -> applyFilters());
 
@@ -107,15 +118,58 @@ public class CitizenMyDeclarationsController {
         ));
         statutColumn.setCellValueFactory(data -> new SimpleStringProperty(formatStatut(data.getValue().getStatut())));
         quantiteColumn.setCellValueFactory(data -> new SimpleStringProperty(formatQuantite(data.getValue())));
+        qrPreviewColumn.setCellFactory(col -> new TableCell<>() {
+            private final ImageView imageView = new ImageView();
+            {
+                imageView.setFitWidth(52);
+                imageView.setFitHeight(52);
+                imageView.setPreserveRatio(true);
+                imageView.setSmooth(true);
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || getTableRow() == null || getTableRow().getItem() == null) {
+                    setGraphic(null);
+                    return;
+                }
+                DeclarationDechet declaration = getTableRow().getItem();
+                if (declaration.getQrUrl() == null || declaration.getQrUrl().isBlank()) {
+                    setGraphic(null);
+                    return;
+                }
+                imageView.setImage(new Image(declaration.getQrUrl(), true));
+                setGraphic(imageView);
+            }
+        });
 
         actionColumn.setCellFactory(col -> new TableCell<>() {
             private final Button btn = new Button("Voir");
+            private final Button viewQrBtn = new Button("Voir QR");
+            private final Button downloadQrBtn = new Button("Telecharger QR");
+            private final HBox actions = new HBox(6.0);
             {
                 btn.getStyleClass().add("outline-btn");
+                viewQrBtn.getStyleClass().add("outline-btn");
+                downloadQrBtn.getStyleClass().add("outline-btn");
+                actions.getChildren().addAll(btn, viewQrBtn, downloadQrBtn);
                 btn.setOnAction(e -> {
                     DeclarationDechet row = getTableRow().getItem();
                     if (row != null) {
                         openDetail(row);
+                    }
+                });
+                viewQrBtn.setOnAction(e -> {
+                    DeclarationDechet row = getTableRow().getItem();
+                    if (row != null) {
+                        showQrPreview(row);
+                    }
+                });
+                downloadQrBtn.setOnAction(e -> {
+                    DeclarationDechet row = getTableRow().getItem();
+                    if (row != null) {
+                        downloadQrImage(row);
                     }
                 });
             }
@@ -123,7 +177,7 @@ public class CitizenMyDeclarationsController {
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
-                setGraphic(empty ? null : btn);
+                setGraphic(empty ? null : actions);
             }
         });
     }
@@ -197,6 +251,7 @@ public class CitizenMyDeclarationsController {
             case "En attente" -> "EN_ATTENTE".equals(norm);
             case "Approuvee" -> "APPROUVEE".equals(norm);
             case "Refusee" -> "REFUSEE".equals(norm);
+            case "Validee" -> "VALIDATED".equals(norm);
             default -> true;
         };
     }
@@ -231,6 +286,7 @@ public class CitizenMyDeclarationsController {
             case "APPROUVEE" -> "Approuvee";
             case "EN_ATTENTE" -> "En attente";
             case "REFUSEE" -> "Refusee";
+            case "VALIDATED" -> "Validee";
             default -> raw;
         };
     }
@@ -241,6 +297,55 @@ public class CitizenMyDeclarationsController {
         }
         String u = d.getUnite() == null ? "" : " " + d.getUnite();
         return d.getQuantite() + u;
+    }
+
+    private void showQrPreview(DeclarationDechet declaration) {
+        if (declaration.getQrUrl() == null || declaration.getQrUrl().isBlank()) {
+            showError("QR indisponible pour cette declaration.");
+            return;
+        }
+
+        ImageView imageView = new ImageView(new Image(declaration.getQrUrl(), true));
+        imageView.setFitWidth(220);
+        imageView.setFitHeight(220);
+        imageView.setPreserveRatio(true);
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("QR Declaration");
+        alert.setHeaderText("Declaration #" + declaration.getId());
+        alert.setContentText(declaration.getQrCode() == null ? "" : declaration.getQrCode());
+        alert.getDialogPane().setGraphic(imageView);
+        alert.showAndWait();
+    }
+
+    private void downloadQrImage(DeclarationDechet declaration) {
+        if (declaration.getQrUrl() == null || declaration.getQrUrl().isBlank()) {
+            showError("QR indisponible pour cette declaration.");
+            return;
+        }
+
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Telecharger QR");
+        chooser.setInitialFileName("qr_declaration_" + declaration.getId() + ".png");
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image PNG", "*.png"));
+        var file = chooser.showSaveDialog(declarationsTable.getScene().getWindow());
+        if (file == null) {
+            return;
+        }
+
+        try (InputStream inputStream = new URL(declaration.getQrUrl()).openStream()) {
+            Files.copy(inputStream, Path.of(file.toURI()), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+        } catch (Exception e) {
+            showError("Echec du telechargement QR.");
+        }
+    }
+
+    private void showError(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Erreur");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
     @FXML

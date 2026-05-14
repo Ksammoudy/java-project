@@ -11,17 +11,14 @@ import java.util.List;
 
 public class ParticipationServices implements CRUD<Participation> {
 
-    private Connection connection;
-
-    public ParticipationServices() {
-        connection = DBConnection.getInstance().getConnection();
+    private Connection getConn() {
+        return DBConnection.getInstance().getConnection();
     }
 
     @Override
     public void create(Participation p) throws SQLException {
-        // ✅ Salla7na el requête: zedna el colonne 'email' fil INSERT
         String req = "INSERT INTO participation (dateInscription, evenement_id, nomCitoyen, email) VALUES (?, ?, ?, ?)";
-        try (PreparedStatement ps = connection.prepareStatement(req)) {
+        try (PreparedStatement ps = getConn().prepareStatement(req)) {
             ps.setDate(1, p.getDateInscription());
             ps.setInt(2, p.getIdEvenement());
             ps.setString(3, p.getNomCitoyen());
@@ -47,7 +44,7 @@ public class ParticipationServices implements CRUD<Participation> {
         String req = "SELECT p.*, e.title AS nom_ev FROM participation p " +
                 "JOIN evenement e ON p.evenement_id = e.id";
 
-        try (Statement st = connection.createStatement();
+        try (Statement st = getConn().createStatement();
              ResultSet rs = st.executeQuery(req)) {
 
             while (rs.next()) {
@@ -71,7 +68,7 @@ public class ParticipationServices implements CRUD<Participation> {
     public void update(Participation p) throws SQLException {
         // ✅ Zidna el email fil update zeda bech tnajjem tbadlou ken lzem
         String req = "UPDATE participation SET dateInscription=?, evenement_id=?, nomCitoyen=?, email=? WHERE id=?";
-        try (PreparedStatement ps = connection.prepareStatement(req)) {
+        try (PreparedStatement ps = getConn().prepareStatement(req)) {
             ps.setDate(1, p.getDateInscription());
             ps.setInt(2, p.getIdEvenement());
             ps.setString(3, p.getNomCitoyen());
@@ -85,7 +82,7 @@ public class ParticipationServices implements CRUD<Participation> {
     @Override
     public void delete(int id) throws SQLException {
         String req = "DELETE FROM participation WHERE id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(req)) {
+        try (PreparedStatement ps = getConn().prepareStatement(req)) {
             ps.setInt(1, id);
             ps.executeUpdate();
             System.out.println("✅ Participation supprimée");

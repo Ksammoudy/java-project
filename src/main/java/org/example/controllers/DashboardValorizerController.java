@@ -35,8 +35,12 @@ public class DashboardValorizerController {
     public void initialize() {
         User user = resolveValorizerUser();
         String name = fullName(user);
-        valorizerNameLabel.setText(name);
-        valorizerHeaderNameLabel.setText(name);
+        if (valorizerNameLabel != null) {
+            valorizerNameLabel.setText(name);
+        }
+        if (valorizerHeaderNameLabel != null) {
+            valorizerHeaderNameLabel.setText(name);
+        }
         populateChart();
         updateNavigation("home");
     }
@@ -110,6 +114,9 @@ public class DashboardValorizerController {
     }
 
     private void populateChart() {
+        if (valorisationChart == null) {
+            return;
+        }
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         series.setName("Valorisation");
         series.getData().add(new XYChart.Data<>("Declaration #3", 400));

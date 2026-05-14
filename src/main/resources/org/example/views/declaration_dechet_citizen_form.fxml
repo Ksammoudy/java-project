@@ -7,10 +7,12 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.web.WebView?>
 
 <BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="org.example.controllers.DeclarationDechetCitizenFormController"
@@ -57,7 +59,7 @@
                     <VBox spacing="18.0" styleClass="workspace-content">
                         <VBox spacing="10.0" styleClass="hero-panel">
                             <Label text="Declarer un dechet" styleClass="hero-title"/>
-                            <Label text="Decrivez le dechet, ajoutez une photo et la localisation pour faciliter la collecte."
+                            <Label text="Decrivez le dechet, ajoutez une photo et fixez la position directement sur la carte."
                                    styleClass="hero-subtitle"/>
                         </VBox>
 
@@ -95,30 +97,23 @@
                             </VBox>
 
                             <VBox spacing="8.0">
-                                <Label text="Photo (optionnelle)" styleClass="field-label"/>
+                                <Label text="Photo *" styleClass="field-label"/>
                                 <HBox spacing="12.0" alignment="CENTER_LEFT">
                                     <Button text="Parcourir..." onAction="#handleBrowsePhoto" styleClass="outline-btn"/>
                                     <Button text="Retirer" onAction="#handleClearPhoto" styleClass="outline-btn"/>
                                     <Label fx:id="photoHintLabel" text="Aucun fichier selectionne" styleClass="workspace-subtitle-strong"/>
                                 </HBox>
+                                <ImageView fx:id="photoPreview" fitHeight="160.0" preserveRatio="true" managed="false" visible="false"/>
+                                <Label fx:id="photoErrorLabel" managed="false" visible="false" text="" styleClass="error-text"/>
                             </VBox>
 
-                            <HBox spacing="16.0">
-                                <VBox spacing="8.0" HBox.hgrow="ALWAYS">
-                                    <Label text="Latitude *" styleClass="field-label"/>
-                                    <TextField fx:id="latitudeField" promptText="-90 a 90" styleClass="input-field"/>
-                                </VBox>
-                                <VBox spacing="8.0" HBox.hgrow="ALWAYS">
-                                    <Label text="Longitude *" styleClass="field-label"/>
-                                    <TextField fx:id="longitudeField" promptText="-180 a 180" styleClass="input-field"/>
-                                </VBox>
-                            </HBox>
-                            <Label fx:id="geoErrorLabel" managed="false" visible="false" text="" styleClass="error-text"/>
-
                             <VBox spacing="8.0">
-                                <Label text="Score IA (optionnel, 0 a 1)" styleClass="field-label"/>
-                                <TextField fx:id="scoreIaField" promptText="Ex: 0.85" styleClass="input-field"/>
-                                <Label fx:id="scoreErrorLabel" managed="false" visible="false" text="" styleClass="error-text"/>
+                                <Label text="Localisation *" styleClass="field-label"/>
+                                <Label fx:id="geoSelectionLabel" text="Position selectionnee : --" styleClass="workspace-subtitle-strong"/>
+                                <VBox prefHeight="290.0" minHeight="260.0" styleClass="stat-card">
+                                    <WebView fx:id="mapWebView" VBox.vgrow="ALWAYS" prefHeight="280.0"/>
+                                </VBox>
+                                <Label fx:id="geoErrorLabel" managed="false" visible="false" text="" styleClass="error-text"/>
                             </VBox>
 
                             <HBox spacing="12.0">
@@ -134,5 +129,3 @@
         </VBox>
     </center>
 </BorderPane>
-
-

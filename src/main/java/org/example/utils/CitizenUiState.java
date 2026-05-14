@@ -1,13 +1,12 @@
 package org.example.utils;
 
 /**
- * Etat UI partage pour les vues citoyen.
+ * Etat transitoire pour les ecrans citoyen (placeholder, retour navigation detail).
  */
 public final class CitizenUiState {
 
     private static String placeholderTitle = "Section";
-    private static Integer selectedDeclarationId;
-    private static boolean returnFromDetailToMyDeclarations;
+    private static boolean detailBackToMyDeclarations;
 
     private CitizenUiState() {
     }
@@ -20,27 +19,13 @@ public final class CitizenUiState {
         return placeholderTitle;
     }
 
-    public static Integer getSelectedDeclarationId() {
-        return selectedDeclarationId;
-    }
-
-    public static void setSelectedDeclarationId(Integer id) {
-        selectedDeclarationId = id;
-    }
-
     public static void setReturnFromDetailToMyDeclarations(boolean value) {
-        returnFromDetailToMyDeclarations = value;
+        detailBackToMyDeclarations = value;
     }
 
     public static boolean consumeReturnFromDetailToMyDeclarations() {
-        boolean value = returnFromDetailToMyDeclarations;
-        returnFromDetailToMyDeclarations = false;
-        return value;
-    }
-
-    public static void clear() {
-        placeholderTitle = "Section";
-        selectedDeclarationId = null;
-        returnFromDetailToMyDeclarations = false;
+        boolean v = detailBackToMyDeclarations;
+        detailBackToMyDeclarations = false;
+        return v;
     }
 }

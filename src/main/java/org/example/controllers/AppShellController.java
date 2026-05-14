@@ -70,10 +70,19 @@ public class AppShellController {
     @FXML private Button val_appels;
     @FXML private Button val_zones;
     @FXML private Button val_advanced;
+    @FXML private Button val_decl_home;
+    @FXML private Button val_decl_received;
+    @FXML private Button val_decl_valorization;
+    @FXML private Button val_decl_stats;
+    @FXML private Button val_decl_qr;
     // ── Boutons admin ──
 
     // ── Boutons admin ──
     @FXML private Button adm_profil;
+    @FXML private Button adm_quick_dashboard;
+    @FXML private Button adm_quick_types;
+    @FXML private Button adm_quick_declarations;
+    @FXML private Button adm_quick_users;
     @FXML private Button adm_offres_mod;
     @FXML private Button adm_event_dashboard;
     @FXML private Button adm_event_list;
@@ -139,13 +148,13 @@ public class AppShellController {
                 show(sectionValorisateur);
                 footerRole.setText("Valorisateur");
                 brandSubtitle.setText("Espace Valorisateur");
-                nav_val_profil();
+                nav_val_decl_home();
             }
             case "ADMIN" -> {
                 show(sectionAdmin);
                 footerRole.setText("Administrateur");
                 brandSubtitle.setText("Espace Admin");
-                nav_adm_profil();
+                nav_adm_quick_dashboard();
             }
             case "ORGANISATEUR", "ORGANIZER" -> {
                 show(sectionOrganisateur);
@@ -310,15 +319,17 @@ public class AppShellController {
     // NAVIGATION — VALORISATEUR
     // Profil, Offres(accueil+appels), Zones+Dashboard avancé
     // ═══════════════════════════════════════════════════════
-
+    @FXML public void nav_val_home() {
+        setActive(val_offres);
+        loadContent("/fxml/Dashboard.fxml");
+    }
     @FXML public void nav_val_profil() {
         setActive(val_profil);
         loadContent("/org/example/views/usser/profile_view.fxml");
     }
 
     @FXML public void nav_val_offres() {
-        setActive(val_offres);
-        loadContent("/fxml/Dashboard.fxml");
+        nav_val_home();
     }
 
     @FXML public void nav_val_appels() {
@@ -327,15 +338,38 @@ public class AppShellController {
     }
 
     @FXML public void nav_val_zones() {
-        // Zones polluées (CRUD valorisateur)
         setActive(val_zones);
         loadContent("/org/example/views/zone_polluee_list.fxml");
     }
 
     @FXML public void nav_val_advanced() {
-        // Dashboard avancé
         setActive(val_advanced);
         loadContent("/org/example/views/advanced_dashboard.fxml");
+    }
+
+    @FXML public void nav_val_decl_home() {
+        setActive(val_decl_home);
+        loadContent("/org/example/views/usser/dashboard_valorizer.fxml");
+    }
+
+    @FXML public void nav_val_decl_received() {
+        setActive(val_decl_received);
+        loadContent("/org/example/views/valorizer_waste_received.fxml");
+    }
+
+    @FXML public void nav_val_decl_valorization() {
+        setActive(val_decl_valorization);
+        loadContent("/org/example/views/valorizer_valorization.fxml");
+    }
+
+    @FXML public void nav_val_decl_stats() {
+        setActive(val_decl_stats);
+        loadContent("/org/example/views/valorizer_statistics.fxml");
+    }
+
+    @FXML public void nav_val_decl_qr() {
+        setActive(val_decl_qr);
+        loadContent("/org/example/views/valorizer_validate_qr.fxml");
     }
 
     // ═══════════════════════════════════════════════════════
@@ -347,6 +381,26 @@ public class AppShellController {
     @FXML public void nav_adm_profil() {
         setActive(adm_profil);
         loadContent("/org/example/views/usser/profile_view.fxml");
+    }
+
+    @FXML public void nav_adm_quick_dashboard() {
+        setActive(adm_quick_dashboard);
+        loadContent("/org/example/views/fragments/dashboard_admin_content.fxml");
+    }
+
+    @FXML public void nav_adm_quick_types() {
+        setActive(adm_quick_types);
+        loadContent("/org/example/views/fragments/type_dechet_content.fxml");
+    }
+
+    @FXML public void nav_adm_quick_declarations() {
+        setActive(adm_quick_declarations);
+        loadContent("/org/example/views/fragments/declarations_content.fxml");
+    }
+
+    @FXML public void nav_adm_quick_users() {
+        setActive(adm_quick_users);
+        loadContent("/org/example/views/fragments/users_content.fxml");
     }
 
     @FXML public void nav_adm_offres_mod() {
@@ -483,3 +537,5 @@ public class AppShellController {
         section.setManaged(false);
     }
 }
+
+

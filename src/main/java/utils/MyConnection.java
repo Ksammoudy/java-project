@@ -30,7 +30,7 @@ public class MyConnection {
 
     public synchronized Connection getConnection() {
         try {
-            if (connection == null || connection.isClosed()) {
+            if (connection == null || connection.isClosed() || !connection.isValid(3)) {
                 reconnect();
             }
             return connection;

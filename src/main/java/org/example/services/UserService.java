@@ -661,7 +661,7 @@ public class UserService implements CRUD<User> {
 
         boolean passwordOk = PasswordUtil.checkPassword(plainPassword, user.getPassword());
         if (!passwordOk) {
-            System.out.println("❌ Mot de passe incorrect.");
+            System.out.println("❌ Mot de passe incorrect (ou hash invalide en base).");
             return null;
         }
 

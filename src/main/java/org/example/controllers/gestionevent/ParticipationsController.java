@@ -82,8 +82,13 @@ public class ParticipationsController implements Initializable {
         try {
             List<Participation> data = ps.read();
             masterData.setAll(data);
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Erreur de chargement");
+            alert.setHeaderText("Impossible de charger les participations");
+            alert.setContentText(e.getMessage());
+            alert.showAndWait();
         }
     }
 

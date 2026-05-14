@@ -2,9 +2,11 @@ package org.example.services;
 
 import org.example.entities.DeclarationDechet;
 
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,25 +16,40 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
 public class DeclarationDechetJdbcService extends AbstractJdbcService implements BaseCrudService<DeclarationDechet> {
     private static final String TABLE_NAME = "declaration_dechet";
+    private static final String QR_API_BASE_URL = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=";
+
+    private static volatile boolean qrSchemaInitialized;
 
     private static final String SELECT_WITH_JOINS = """
         SELECT d.id, d.description, d.statut, d.type_dechet_id, td.libelle AS type_dechet_libelle,
                d.photo, d.latitude, d.longitude, d.quantite, d.unite, d.created_at, d.score_ia,
-               d.points_attribues, d.qr_code, d.citoyen_id, u.email AS citoyen_email,
+               d.points_attribues, d.qr_code, d.qr_url, d.validated_by_qr, d.validated_at, d.valorisateur_id,
+               d.citoyen_id, u.email AS citoyen_email,
                d.valorisateur_confirmateur_id, d.date_confirmation, d.statut_historique, d.deleted_at
         FROM declaration_dechet d
         LEFT JOIN type_dechet td ON td.id = d.type_dechet_id
         LEFT JOIN `user` u ON u.id = d.citoyen_id
         """;
 
+    public enum QrValidationStatus {
+        INVALID,
+        ALREADY_VALIDATED,
+        VALIDATED
+    }
+
+    public record QrValidationResult(QrValidationStatus status, DeclarationDechet declaration) {
+    }
+
     @Override
     public List<DeclarationDechet> findAll() throws SQLException {
+        ensureQrSchemaAndBackfill();
         List<DeclarationDechet> declarations = new ArrayList<>();
         try (PreparedStatement statement = getConnection().prepareStatement(SELECT_WITH_JOINS + " ORDER BY d.created_at DESC, d.id DESC");
              ResultSet resultSet = statement.executeQuery()) {
@@ -45,6 +62,7 @@ public class DeclarationDechetJdbcService extends AbstractJdbcService implements
 
     @Override
     public Optional<DeclarationDechet> findById(int id) throws SQLException {
+        ensureQrSchemaAndBackfill();
         try (PreparedStatement statement = getConnection().prepareStatement(SELECT_WITH_JOINS + " WHERE d.id = ?")) {
             statement.setInt(1, id);
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -57,6 +75,7 @@ public class DeclarationDechetJdbcService extends AbstractJdbcService implements
      * Declarations d'un citoyen (hors fiches archivees / soft-delete).
      */
     public List<DeclarationDechet> findByCitoyenId(int citoyenId) throws SQLException {
+        ensureQrSchemaAndBackfill();
         List<DeclarationDechet> list = new ArrayList<>();
         String sql = SELECT_WITH_JOINS + " WHERE d.citoyen_id = ? AND d.deleted_at IS NULL ORDER BY d.created_at DESC, d.id DESC";
         try (PreparedStatement statement = getConnection().prepareStatement(sql)) {
@@ -70,9 +89,72 @@ public class DeclarationDechetJdbcService extends AbstractJdbcService implements
         return list;
     }
 
+    public Optional<DeclarationDechet> findByQrCode(String qrCode) throws SQLException {
+        ensureQrSchemaAndBackfill();
+        String normalizedQrCode = normalizeQrCodeValue(qrCode);
+        if (normalizedQrCode == null) {
+            return Optional.empty();
+        }
+
+        String sql = SELECT_WITH_JOINS + " WHERE d.qr_code = ? LIMIT 1";
+        try (PreparedStatement statement = getConnection().prepareStatement(sql)) {
+            statement.setString(1, normalizedQrCode);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                return resultSet.next() ? Optional.of(mapRow(resultSet)) : Optional.empty();
+            }
+        }
+    }
+
+    public QrValidationResult validateDeclarationByQrCode(String qrCode, int valorisateurId) throws SQLException {
+        ensureQrSchemaAndBackfill();
+        String normalizedQrCode = normalizeQrCodeValue(qrCode);
+        if (normalizedQrCode == null) {
+            return new QrValidationResult(QrValidationStatus.INVALID, null);
+        }
+
+        Optional<DeclarationDechet> found = findByQrCode(normalizedQrCode);
+        if (found.isEmpty()) {
+            return new QrValidationResult(QrValidationStatus.INVALID, null);
+        }
+
+        DeclarationDechet declaration = found.get();
+        if (isAlreadyValidated(declaration)) {
+            return new QrValidationResult(QrValidationStatus.ALREADY_VALIDATED, declaration);
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        String sql = """
+                UPDATE declaration_dechet
+                SET statut = ?,
+                    validated_by_qr = 1,
+                    validated_at = ?,
+                    valorisateur_id = ?,
+                    valorisateur_confirmateur_id = ?,
+                    date_confirmation = ?
+                WHERE id = ?
+                """;
+
+        try (PreparedStatement statement = getConnection().prepareStatement(sql)) {
+            statement.setString(1, "VALIDATED");
+            statement.setTimestamp(2, toTimestamp(now));
+            statement.setInt(3, valorisateurId);
+            statement.setInt(4, valorisateurId);
+            statement.setTimestamp(5, toTimestamp(now));
+            statement.setInt(6, declaration.getId());
+            int affected = statement.executeUpdate();
+            if (affected <= 0) {
+                return new QrValidationResult(QrValidationStatus.INVALID, null);
+            }
+        }
+
+        DeclarationDechet updated = findById(declaration.getId()).orElse(declaration);
+        return new QrValidationResult(QrValidationStatus.VALIDATED, updated);
+    }
+
     @Override
     public DeclarationDechet create(DeclarationDechet entity) throws SQLException {
-        System.out.println("[DeclarationDechet][DEBUG] Methode create() appelee");
+        ensureQrSchemaAndBackfill();
+
         if (entity == null) {
             throw new SQLException("DeclarationDechet null.");
         }
@@ -86,6 +168,9 @@ public class DeclarationDechetJdbcService extends AbstractJdbcService implements
         if (entity.getPointsAttribues() == null) {
             entity.setPointsAttribues(0);
         }
+        if (entity.getValidatedByQr() == null) {
+            entity.setValidatedByQr(false);
+        }
 
         validateMandatoryEntity(entity);
 
@@ -96,77 +181,18 @@ public class DeclarationDechetJdbcService extends AbstractJdbcService implements
         logConnectionDiagnostics(connection);
         ensureTypeDechetExists(connection, entity.getTypeDechetId());
 
-        String sql = """
-            INSERT INTO declaration_dechet (
-                description,
-                statut,
-                photo,
-                latitude,
-                longitude,
-                quantite,
-                unite,
-                created_at,
-                type_dechet_id,
-                score_ia,
-                citoyen_id,
-                points_attribues,
-                qr_code,
-                valorisateur_confirmateur_id,
-                date_confirmation,
-                statut_historique,
-                deleted_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """;
+        TableSchema schema = loadTableSchema(connection);
+        InsertPlan plan = buildInsertPlan(schema.columns());
+        applyDefaultsForSchema(entity, schema, connection, plan);
+        validateNotNullColumns(entity, schema, plan);
+        logBeforeInsert(entity, plan);
 
-        Date createdAtDate = Date.valueOf(entity.getCreatedAt().toLocalDate());
-
-        System.out.println("[DeclarationDechet][DEBUG] Requete INSERT fixe: " + sql.replace('\n', ' ').replace('\r', ' '));
-        System.out.println("[DeclarationDechet][DEBUG] p1 description=" + entity.getDescription());
-        System.out.println("[DeclarationDechet][DEBUG] p2 statut=" + entity.getStatut());
-        System.out.println("[DeclarationDechet][DEBUG] p3 photo=" + entity.getPhoto());
-        System.out.println("[DeclarationDechet][DEBUG] p4 latitude=" + entity.getLatitude());
-        System.out.println("[DeclarationDechet][DEBUG] p5 longitude=" + entity.getLongitude());
-        System.out.println("[DeclarationDechet][DEBUG] p6 quantite=" + entity.getQuantite());
-        System.out.println("[DeclarationDechet][DEBUG] p7 unite=" + entity.getUnite());
-        System.out.println("[DeclarationDechet][DEBUG] p8 created_at(Date)=" + createdAtDate);
-        System.out.println("[DeclarationDechet][DEBUG] p9 type_dechet_id=" + entity.getTypeDechetId());
-        System.out.println("[DeclarationDechet][DEBUG] p10 score_ia=" + entity.getScoreIa());
-        System.out.println("[DeclarationDechet][DEBUG] p11 citoyen_id=" + entity.getCitoyenId());
-        System.out.println("[DeclarationDechet][DEBUG] p12 points_attribues=" + entity.getPointsAttribues());
-        System.out.println("[DeclarationDechet][DEBUG] p13 qr_code=" + entity.getQrCode());
-        System.out.println("[DeclarationDechet][DEBUG] p14 valorisateur_confirmateur_id=" + entity.getValorisateurConfirmateurId());
-        System.out.println("[DeclarationDechet][DEBUG] p15 date_confirmation=" + entity.getDateConfirmation());
-        System.out.println("[DeclarationDechet][DEBUG] p16 statut_historique=" + entity.getStatutHistoriqueJson());
-        System.out.println("[DeclarationDechet][DEBUG] p17 deleted_at=" + entity.getDeletedAt());
-
-        try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            statement.setString(1, entity.getDescription());
-            statement.setString(2, entity.getStatut());
-            statement.setString(3, entity.getPhoto());
-            statement.setDouble(4, entity.getLatitude());
-            statement.setDouble(5, entity.getLongitude());
-            statement.setDouble(6, entity.getQuantite());
-            statement.setString(7, entity.getUnite());
-            statement.setDate(8, createdAtDate);
-            statement.setInt(9, entity.getTypeDechetId());
-            statement.setObject(10, entity.getScoreIa());
-            statement.setObject(11, entity.getCitoyenId());
-            statement.setInt(12, entity.getPointsAttribues());
-            statement.setString(13, entity.getQrCode());
-            statement.setObject(14, entity.getValorisateurConfirmateurId());
-            statement.setTimestamp(15, toTimestamp(entity.getDateConfirmation()));
-            statement.setString(16, entity.getStatutHistoriqueJson());
-            statement.setTimestamp(17, toTimestamp(entity.getDeletedAt()));
-
-            boolean autoCommit = connection.getAutoCommit();
-            System.out.println("[DeclarationDechet][DEBUG] AutoCommit = " + autoCommit);
-            System.out.println("[DeclarationDechet][DEBUG] Avant executeUpdate");
-            int affected = statement.executeUpdate();
-            if (!autoCommit) {
-                connection.commit();
-                System.out.println("[DeclarationDechet][DEBUG] commit() execute (autoCommit=false)");
+        try (PreparedStatement statement = connection.prepareStatement(plan.sql(), Statement.RETURN_GENERATED_KEYS)) {
+            for (int i = 0; i < plan.binders().size(); i++) {
+                plan.binders().get(i).bind(statement, i + 1, entity);
             }
-            System.out.println("[DeclarationDechet][DEBUG] executeUpdate affectedRows=" + affected);
+
+            int affected = statement.executeUpdate();
             if (affected <= 0) {
                 throw new SQLException("Aucune ligne n'a ete inseree dans declaration_dechet.");
             }
@@ -174,51 +200,47 @@ public class DeclarationDechetJdbcService extends AbstractJdbcService implements
             try (ResultSet keys = statement.getGeneratedKeys()) {
                 if (keys.next()) {
                     entity.setId(keys.getInt(1));
-                    System.out.println("[DeclarationDechet][DEBUG] ID genere=" + entity.getId());
                 }
+            }
+
+            if (entity.getId() != null) {
+                String qrCode = buildQrCode(entity.getId(), System.currentTimeMillis());
+                String qrUrl = buildQrUrl(qrCode);
+                updateQrFields(connection, entity.getId(), qrCode, qrUrl);
+                entity.setQrCode(qrCode);
+                entity.setQrUrl(qrUrl);
             }
 
             logLastInsertedRow(connection);
+            return entity;
         } catch (SQLException ex) {
-            try {
-                if (!connection.getAutoCommit()) {
-                    connection.rollback();
-                    System.err.println("[DeclarationDechet][DEBUG] rollback() execute suite a erreur SQL");
-                }
-            } catch (SQLException rollbackEx) {
-                System.err.println("[DeclarationDechet][DEBUG] Echec rollback: " + rollbackEx.getMessage());
-                rollbackEx.printStackTrace();
-            }
-            System.err.println("[DeclarationDechet][SQL] SQL ERROR: " + ex.getMessage());
-            System.err.println("[DeclarationDechet][SQL] SQL STATE = " + ex.getSQLState());
-            System.err.println("[DeclarationDechet][SQL] ERROR CODE = " + ex.getErrorCode());
-            ex.printStackTrace();
+            logSqlException(ex);
             throw ex;
         }
-
-        return entity;
     }
 
     @Override
     public boolean update(DeclarationDechet entity) throws SQLException {
+        ensureQrSchemaAndBackfill();
         String sql = """
             UPDATE declaration_dechet
             SET description = ?, statut = ?, type_dechet_id = ?, photo = ?, latitude = ?, longitude = ?,
                 quantite = ?, unite = ?, created_at = ?, score_ia = ?, points_attribues = ?, qr_code = ?,
-                citoyen_id = ?, valorisateur_confirmateur_id = ?, date_confirmation = ?, statut_historique = ?,
-                deleted_at = ?
+                qr_url = ?, validated_by_qr = ?, validated_at = ?, valorisateur_id = ?, citoyen_id = ?,
+                valorisateur_confirmateur_id = ?, date_confirmation = ?, statut_historique = ?, deleted_at = ?
             WHERE id = ?
             """;
 
         try (PreparedStatement statement = getConnection().prepareStatement(sql)) {
             bindEntity(statement, entity);
-            statement.setInt(18, entity.getId());
+            statement.setInt(22, entity.getId());
             return statement.executeUpdate() > 0;
         }
     }
 
     @Override
     public boolean delete(int id) throws SQLException {
+        ensureQrSchemaAndBackfill();
         try (PreparedStatement statement = getConnection().prepareStatement("DELETE FROM declaration_dechet WHERE id = ?")) {
             statement.setInt(1, id);
             return statement.executeUpdate() > 0;
@@ -238,11 +260,15 @@ public class DeclarationDechetJdbcService extends AbstractJdbcService implements
         statement.setObject(10, entity.getScoreIa());
         statement.setObject(11, entity.getPointsAttribues());
         statement.setString(12, entity.getQrCode());
-        statement.setObject(13, entity.getCitoyenId());
-        statement.setObject(14, entity.getValorisateurConfirmateurId());
-        statement.setTimestamp(15, toTimestamp(entity.getDateConfirmation()));
-        statement.setString(16, entity.getStatutHistoriqueJson());
-        statement.setTimestamp(17, toTimestamp(entity.getDeletedAt()));
+        statement.setString(13, entity.getQrUrl());
+        statement.setInt(14, toTinyInt(entity.getValidatedByQr()));
+        statement.setTimestamp(15, toTimestamp(entity.getValidatedAt()));
+        statement.setObject(16, entity.getValorisateurId());
+        statement.setObject(17, entity.getCitoyenId());
+        statement.setObject(18, entity.getValorisateurConfirmateurId());
+        statement.setTimestamp(19, toTimestamp(entity.getDateConfirmation()));
+        statement.setString(20, entity.getStatutHistoriqueJson());
+        statement.setTimestamp(21, toTimestamp(entity.getDeletedAt()));
     }
 
     private void validateMandatoryEntity(DeclarationDechet entity) throws SQLException {
@@ -302,7 +328,7 @@ public class DeclarationDechetJdbcService extends AbstractJdbcService implements
 
     private void logLastInsertedRow(Connection connection) {
         String sql = """
-            SELECT id, description, statut, latitude, longitude, quantite, unite, created_at, type_dechet_id, points_attribues
+            SELECT id, description, statut, latitude, longitude, quantite, unite, created_at, type_dechet_id, points_attribues, qr_code, qr_url
             FROM declaration_dechet
             ORDER BY id DESC
             LIMIT 1
@@ -319,7 +345,9 @@ public class DeclarationDechetJdbcService extends AbstractJdbcService implements
                         + ", unite=" + rs.getString("unite")
                         + ", created_at=" + rs.getDate("created_at")
                         + ", type_dechet_id=" + rs.getInt("type_dechet_id")
-                        + ", points_attribues=" + rs.getInt("points_attribues"));
+                        + ", points_attribues=" + rs.getInt("points_attribues")
+                        + ", qr_code=" + rs.getString("qr_code")
+                        + ", qr_url=" + rs.getString("qr_url"));
             } else {
                 System.out.println("[DeclarationDechet][DEBUG] Aucune ligne trouvee apres INSERT.");
             }
@@ -358,13 +386,7 @@ public class DeclarationDechetJdbcService extends AbstractJdbcService implements
         addRequired(insertColumns, binders, columns, "unite", (s, i, e) -> s.setString(i, e.getUnite()));
 
         insertColumns.add(dateColumn);
-        binders.add((s, i, e) -> {
-            if ("date_declaration".equals(dateColumn)) {
-                s.setTimestamp(i, toTimestamp(e.getCreatedAt()));
-            } else {
-                s.setTimestamp(i, toTimestamp(e.getCreatedAt()));
-            }
-        });
+        binders.add((s, i, e) -> s.setTimestamp(i, toTimestamp(e.getCreatedAt())));
 
         if (columns.contains("citoyen_id")) {
             insertColumns.add("citoyen_id");
@@ -374,6 +396,12 @@ public class DeclarationDechetJdbcService extends AbstractJdbcService implements
             insertColumns.add("score_ia");
             binders.add((s, i, e) -> s.setObject(i, e.getScoreIa()));
         }
+        String aiLabelColumn = preferExisting(columns,
+                "ai_detected_label", "label_ia", "prediction_label", "detected_label", "ai_label");
+        if (aiLabelColumn != null) {
+            insertColumns.add(aiLabelColumn);
+            binders.add((s, i, e) -> s.setString(i, e.getAiDetectedLabel()));
+        }
         if (columns.contains("points_attribues")) {
             insertColumns.add("points_attribues");
             binders.add((s, i, e) -> s.setObject(i, e.getPointsAttribues()));
@@ -381,6 +409,22 @@ public class DeclarationDechetJdbcService extends AbstractJdbcService implements
         if (columns.contains("qr_code")) {
             insertColumns.add("qr_code");
             binders.add((s, i, e) -> s.setString(i, e.getQrCode()));
+        }
+        if (columns.contains("qr_url")) {
+            insertColumns.add("qr_url");
+            binders.add((s, i, e) -> s.setString(i, e.getQrUrl()));
+        }
+        if (columns.contains("validated_by_qr")) {
+            insertColumns.add("validated_by_qr");
+            binders.add((s, i, e) -> s.setInt(i, toTinyInt(e.getValidatedByQr())));
+        }
+        if (columns.contains("validated_at")) {
+            insertColumns.add("validated_at");
+            binders.add((s, i, e) -> s.setTimestamp(i, toTimestamp(e.getValidatedAt())));
+        }
+        if (columns.contains("valorisateur_id")) {
+            insertColumns.add("valorisateur_id");
+            binders.add((s, i, e) -> s.setObject(i, e.getValorisateurId()));
         }
         if (columns.contains("valorisateur_confirmateur_id")) {
             insertColumns.add("valorisateur_confirmateur_id");
@@ -415,7 +459,7 @@ public class DeclarationDechetJdbcService extends AbstractJdbcService implements
             while (rs.next()) {
                 String col = rs.getString("COLUMN_NAME");
                 if (col != null) {
-                    String key = col.toLowerCase();
+                    String key = col.toLowerCase(Locale.ROOT);
                     columns.add(key);
                     int nullableCode = rs.getInt("NULLABLE");
                     boolean nullable = nullableCode == DatabaseMetaData.columnNullable;
@@ -434,7 +478,7 @@ public class DeclarationDechetJdbcService extends AbstractJdbcService implements
 
     private static String preferExisting(Set<String> columns, String... candidates) {
         for (String c : candidates) {
-            if (columns.contains(c.toLowerCase())) {
+            if (columns.contains(c.toLowerCase(Locale.ROOT))) {
                 return c;
             }
         }
@@ -446,7 +490,7 @@ public class DeclarationDechetJdbcService extends AbstractJdbcService implements
                                     Set<String> tableColumns,
                                     String column,
                                     Binder binder) throws SQLException {
-        String normalized = column.toLowerCase();
+        String normalized = column.toLowerCase(Locale.ROOT);
         if (!tableColumns.contains(normalized)) {
             throw new SQLException("Colonne obligatoire absente dans declaration_dechet: " + column);
         }
@@ -475,6 +519,11 @@ public class DeclarationDechetJdbcService extends AbstractJdbcService implements
             entity.setPointsAttribues(0);
         }
 
+        ColumnMeta validatedByQr = schema.meta("validated_by_qr");
+        if (validatedByQr != null && validatedByQr.notNullableWithoutDefault() && entity.getValidatedByQr() == null) {
+            entity.setValidatedByQr(false);
+        }
+
         ColumnMeta citoyen = schema.meta("citoyen_id");
         if (citoyen != null && citoyen.notNullableWithoutDefault() && entity.getCitoyenId() == null) {
             entity.setCitoyenId(resolveFallbackCitoyenId(connection));
@@ -482,6 +531,16 @@ public class DeclarationDechetJdbcService extends AbstractJdbcService implements
     }
 
     private Integer resolveFallbackCitoyenId(Connection connection) {
+        String sqlDemo = "SELECT id FROM `user` WHERE id = 1 LIMIT 1";
+        try (PreparedStatement ps = connection.prepareStatement(sqlDemo);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException ignored) {
+            // fallback below
+        }
+
         String sqlCitizen = "SELECT id FROM `user` WHERE UPPER(type) IN ('CITIZEN','CITOYEN') ORDER BY id ASC LIMIT 1";
         try (PreparedStatement ps = connection.prepareStatement(sqlCitizen);
              ResultSet rs = ps.executeQuery()) {
@@ -532,8 +591,14 @@ public class DeclarationDechetJdbcService extends AbstractJdbcService implements
             case "unite" -> entity.getUnite();
             case "created_at", "date_declaration" -> entity.getCreatedAt();
             case "score_ia" -> entity.getScoreIa();
+            case "ai_detected_label", "label_ia", "prediction_label", "detected_label", "ai_label" ->
+                    entity.getAiDetectedLabel();
             case "points_attribues" -> entity.getPointsAttribues();
             case "qr_code" -> entity.getQrCode();
+            case "qr_url" -> entity.getQrUrl();
+            case "validated_by_qr" -> entity.getValidatedByQr();
+            case "validated_at" -> entity.getValidatedAt();
+            case "valorisateur_id" -> entity.getValorisateurId();
             case "citoyen_id" -> entity.getCitoyenId();
             case "valorisateur_confirmateur_id" -> entity.getValorisateurConfirmateurId();
             case "date_confirmation" -> entity.getDateConfirmation();
@@ -557,12 +622,226 @@ public class DeclarationDechetJdbcService extends AbstractJdbcService implements
                 + ", photo=" + entity.getPhoto()
                 + ", statut=" + entity.getStatut()
                 + ", createdAt=" + entity.getCreatedAt()
-                + ", citoyenId=" + entity.getCitoyenId());
+                + ", citoyenId=" + entity.getCitoyenId()
+                + ", qrCode=" + entity.getQrCode()
+                + ", qrUrl=" + entity.getQrUrl());
     }
 
     private void logSqlException(SQLException ex) {
         System.err.println("[DeclarationDechet][SQL] Erreur SQL : " + ex.getMessage());
         System.err.println("[DeclarationDechet][SQL] SQLState=" + ex.getSQLState() + ", ErrorCode=" + ex.getErrorCode());
+    }
+
+    private void ensureQrSchemaAndBackfill() throws SQLException {
+        if (qrSchemaInitialized) {
+            return;
+        }
+
+        synchronized (DeclarationDechetJdbcService.class) {
+            if (qrSchemaInitialized) {
+                return;
+            }
+
+            Connection connection = getConnection();
+            ensureColumnExists(connection, "qr_code", "VARCHAR(255) NULL");
+            ensureColumnExists(connection, "qr_url", "TEXT NULL");
+            ensureColumnExists(connection, "validated_by_qr", "TINYINT DEFAULT 0");
+            ensureColumnExists(connection, "validated_at", "DATETIME NULL");
+            ensureColumnExists(connection, "valorisateur_id", "INT NULL");
+
+            normalizeDuplicateQrCodes(connection);
+            ensureUniqueIndexOnQrCode(connection);
+            backfillQrFields(connection);
+
+            qrSchemaInitialized = true;
+        }
+    }
+
+    private void ensureColumnExists(Connection connection, String column, String ddlDefinition) throws SQLException {
+        if (columnExists(connection, TABLE_NAME, column)) {
+            return;
+        }
+        String sql = "ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + column + " " + ddlDefinition;
+        try (Statement statement = connection.createStatement()) {
+            statement.execute(sql);
+        }
+    }
+
+    private void ensureUniqueIndexOnQrCode(Connection connection) throws SQLException {
+        if (hasUniqueIndexOnColumn(connection, TABLE_NAME, "qr_code")) {
+            return;
+        }
+
+        String sql = "CREATE UNIQUE INDEX uq_declaration_dechet_qr_code ON declaration_dechet (qr_code)";
+        try (Statement statement = connection.createStatement()) {
+            statement.execute(sql);
+        }
+    }
+
+    private boolean hasUniqueIndexOnColumn(Connection connection, String table, String column) throws SQLException {
+        String sql = """
+                SELECT COUNT(*)
+                FROM information_schema.statistics
+                WHERE table_schema = DATABASE()
+                  AND LOWER(table_name) = LOWER(?)
+                  AND LOWER(column_name) = LOWER(?)
+                  AND non_unique = 0
+                """;
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, table);
+            statement.setString(2, column);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                return resultSet.next() && resultSet.getInt(1) > 0;
+            }
+        }
+    }
+
+    private boolean columnExists(Connection connection, String table, String column) throws SQLException {
+        String sql = """
+                SELECT COUNT(*)
+                FROM information_schema.columns
+                WHERE table_schema = DATABASE()
+                  AND LOWER(table_name) = LOWER(?)
+                  AND LOWER(column_name) = LOWER(?)
+                """;
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, table);
+            statement.setString(2, column);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                return resultSet.next() && resultSet.getInt(1) > 0;
+            }
+        }
+    }
+
+    private void normalizeDuplicateQrCodes(Connection connection) throws SQLException {
+        String duplicatesSql = """
+                SELECT qr_code
+                FROM declaration_dechet
+                WHERE qr_code IS NOT NULL AND TRIM(qr_code) <> ''
+                GROUP BY qr_code
+                HAVING COUNT(*) > 1
+                """;
+
+        List<String> duplicates = new ArrayList<>();
+        try (PreparedStatement statement = connection.prepareStatement(duplicatesSql);
+             ResultSet resultSet = statement.executeQuery()) {
+            while (resultSet.next()) {
+                duplicates.add(resultSet.getString(1));
+            }
+        }
+
+        for (String duplicate : duplicates) {
+            String selectIds = "SELECT id FROM declaration_dechet WHERE qr_code = ? ORDER BY id ASC";
+            List<Integer> ids = new ArrayList<>();
+            try (PreparedStatement statement = connection.prepareStatement(selectIds)) {
+                statement.setString(1, duplicate);
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    while (resultSet.next()) {
+                        ids.add(resultSet.getInt(1));
+                    }
+                }
+            }
+
+            for (int i = 1; i < ids.size(); i++) {
+                Integer id = ids.get(i);
+                String newQrCode = buildQrCode(id, System.currentTimeMillis() + i);
+                String newQrUrl = buildQrUrl(newQrCode);
+                updateQrFields(connection, id, newQrCode, newQrUrl);
+            }
+        }
+    }
+
+    private void backfillQrFields(Connection connection) throws SQLException {
+        String sql = "SELECT id, qr_code, qr_url FROM declaration_dechet ORDER BY id ASC";
+        try (PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+            while (resultSet.next()) {
+                Integer id = resultSet.getObject("id", Integer.class);
+                if (id == null) {
+                    continue;
+                }
+
+                String qrCode = normalizeQrCodeValue(resultSet.getString("qr_code"));
+                String qrUrl = normalizeQrCodeValue(resultSet.getString("qr_url"));
+
+                boolean needsUpdate = false;
+                if (qrCode == null) {
+                    qrCode = buildQrCode(id, System.currentTimeMillis() + id);
+                    needsUpdate = true;
+                }
+
+                String expectedQrUrl = buildQrUrl(qrCode);
+                if (qrUrl == null || !qrUrl.equals(expectedQrUrl)) {
+                    qrUrl = expectedQrUrl;
+                    needsUpdate = true;
+                }
+
+                if (needsUpdate) {
+                    updateQrFields(connection, id, qrCode, qrUrl);
+                }
+            }
+        }
+    }
+
+    private void updateQrFields(Connection connection, int id, String qrCode, String qrUrl) throws SQLException {
+        String sql = "UPDATE declaration_dechet SET qr_code = ?, qr_url = ? WHERE id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, qrCode);
+            statement.setString(2, qrUrl);
+            statement.setInt(3, id);
+            statement.executeUpdate();
+        }
+    }
+
+    public static String extractQrCodeFromQrLink(String input) {
+        String normalized = normalizeQrCodeValue(input);
+        if (normalized == null) {
+            return null;
+        }
+
+        if (normalized.startsWith("DECL-")) {
+            return normalized;
+        }
+
+        int dataIndex = normalized.indexOf("data=");
+        if (dataIndex < 0) {
+            return normalized.startsWith("DECL-") ? normalized : null;
+        }
+
+        String data = normalized.substring(dataIndex + 5);
+        int amp = data.indexOf('&');
+        if (amp >= 0) {
+            data = data.substring(0, amp);
+        }
+        String decoded = URLDecoder.decode(data, StandardCharsets.UTF_8);
+        return normalizeQrCodeValue(decoded);
+    }
+
+    private static String buildQrCode(int declarationId, long timestampMillis) {
+        return "DECL-" + declarationId + "-" + timestampMillis;
+    }
+
+    public static String buildQrUrl(String qrCode) {
+        return QR_API_BASE_URL + URLEncoder.encode(qrCode, StandardCharsets.UTF_8);
+    }
+
+    private static String normalizeQrCodeValue(String value) {
+        if (value == null) {
+            return null;
+        }
+        String normalized = value.trim();
+        return normalized.isEmpty() ? null : normalized;
+    }
+
+    private boolean isAlreadyValidated(DeclarationDechet declaration) {
+        String status = declaration.getStatut() == null ? "" : declaration.getStatut().trim().toUpperCase(Locale.ROOT);
+        return Boolean.TRUE.equals(declaration.getValidatedByQr())
+                || "VALIDATED".equals(status)
+                || declaration.getValidatedAt() != null;
+    }
+
+    private int toTinyInt(Boolean value) {
+        return Boolean.TRUE.equals(value) ? 1 : 0;
     }
 
     @FunctionalInterface
@@ -575,7 +854,7 @@ public class DeclarationDechetJdbcService extends AbstractJdbcService implements
 
     private record TableSchema(Set<String> columns, Map<String, ColumnMeta> metas) {
         private ColumnMeta meta(String column) {
-            return metas.get(column.toLowerCase());
+            return metas.get(column.toLowerCase(Locale.ROOT));
         }
     }
 
@@ -598,9 +877,18 @@ public class DeclarationDechetJdbcService extends AbstractJdbcService implements
         declaration.setQuantite(resultSet.getObject("quantite", Double.class));
         declaration.setUnite(resultSet.getString("unite"));
         declaration.setCreatedAt(getLocalDateTime(resultSet, "created_at"));
+        declaration.setAiDetectedLabel(readFirstExistingString(resultSet,
+                "ai_detected_label", "label_ia", "prediction_label", "detected_label", "ai_label"));
         declaration.setScoreIa(resultSet.getObject("score_ia", Double.class));
         declaration.setPointsAttribues(resultSet.getObject("points_attribues", Integer.class));
         declaration.setQrCode(resultSet.getString("qr_code"));
+        declaration.setQrUrl(resultSet.getString("qr_url"));
+
+        Integer validatedByQrInt = resultSet.getObject("validated_by_qr", Integer.class);
+        declaration.setValidatedByQr(validatedByQrInt != null && validatedByQrInt == 1);
+
+        declaration.setValidatedAt(getLocalDateTime(resultSet, "validated_at"));
+        declaration.setValorisateurId(resultSet.getObject("valorisateur_id", Integer.class));
         declaration.setCitoyenId(resultSet.getObject("citoyen_id", Integer.class));
         declaration.setCitoyenEmail(resultSet.getString("citoyen_email"));
         declaration.setValorisateurConfirmateurId(resultSet.getObject("valorisateur_confirmateur_id", Integer.class));
@@ -608,5 +896,16 @@ public class DeclarationDechetJdbcService extends AbstractJdbcService implements
         declaration.setStatutHistoriqueJson(resultSet.getString("statut_historique"));
         declaration.setDeletedAt(getLocalDateTime(resultSet, "deleted_at"));
         return declaration;
+    }
+
+    private String readFirstExistingString(ResultSet resultSet, String... columns) {
+        for (String column : columns) {
+            try {
+                return resultSet.getString(column);
+            } catch (SQLException ignored) {
+                // Try next candidate.
+            }
+        }
+        return null;
     }
 }

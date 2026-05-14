@@ -66,13 +66,18 @@
                     <Label text="Mon espace" styleClass="sidebar-section"/>
                     <Button fx:id="val_profil"         text="👤 Mon Profil"            onAction="#nav_val_profil"         maxWidth="Infinity" styleClass="sidebar-nav"/>
 
-                    <Label text="Offres" styleClass="sidebar-section"/>
+                    <Label text="Fonctionnalites Main" styleClass="sidebar-section"/>
                     <Button fx:id="val_offres"         text="🏠 Accueil Offres"        onAction="#nav_val_offres"         maxWidth="Infinity" styleClass="sidebar-nav"/>
                     <Button fx:id="val_appels"         text="📢 Appels d'Offre"        onAction="#nav_val_appels"         maxWidth="Infinity" styleClass="sidebar-nav"/>
-
-                    <Label text="Zones polluées" styleClass="sidebar-section"/>
                     <Button fx:id="val_zones"          text="📍 Zones Polluées"        onAction="#nav_val_zones"          maxWidth="Infinity" styleClass="sidebar-nav"/>
                     <Button fx:id="val_advanced"       text="📊 Dashboard Avancé"      onAction="#nav_val_advanced"       maxWidth="Infinity" styleClass="sidebar-nav"/>
+
+                    <Label text="Déclarations" styleClass="sidebar-section"/>
+                    <Button fx:id="val_decl_home"          text="Accueil"                  onAction="#nav_val_decl_home"          maxWidth="Infinity" styleClass="sidebar-nav"/>
+                    <Button fx:id="val_decl_received"      text="Déchets reçus"            onAction="#nav_val_decl_received"      maxWidth="Infinity" styleClass="sidebar-nav"/>
+                    <Button fx:id="val_decl_valorization"  text="Valorisation"             onAction="#nav_val_decl_valorization"  maxWidth="Infinity" styleClass="sidebar-nav"/>
+                    <Button fx:id="val_decl_stats"         text="Statistiques"             onAction="#nav_val_decl_stats"         maxWidth="Infinity" styleClass="sidebar-nav"/>
+                    <Button fx:id="val_decl_qr"            text="Validation QR"            onAction="#nav_val_decl_qr"            maxWidth="Infinity" styleClass="sidebar-nav"/>
                 </VBox>
 
                 <!-- ══════════════════════════════
@@ -82,6 +87,12 @@
                 <VBox fx:id="sectionAdmin" managed="false" visible="false" spacing="0">
                     <Label text="Mon espace" styleClass="sidebar-section"/>
                     <Button fx:id="adm_profil"         text="👤 Mon Profil"            onAction="#nav_adm_profil"         maxWidth="Infinity" styleClass="sidebar-nav"/>
+
+                    <Label text="Administration rapide" styleClass="sidebar-section"/>
+                    <Button fx:id="adm_quick_dashboard"    text="📊 Dashboard"          onAction="#nav_adm_quick_dashboard"    maxWidth="Infinity" styleClass="sidebar-nav"/>
+                    <Button fx:id="adm_quick_types"        text="🧩 Types dechets"      onAction="#nav_adm_quick_types"        maxWidth="Infinity" styleClass="sidebar-nav"/>
+                    <Button fx:id="adm_quick_declarations" text="📋 Declarations"       onAction="#nav_adm_quick_declarations" maxWidth="Infinity" styleClass="sidebar-nav"/>
+                    <Button fx:id="adm_quick_users"        text="👥 Utilisateur"        onAction="#nav_adm_quick_users"        maxWidth="Infinity" styleClass="sidebar-nav"/>
 
                     <Label text="Offres" styleClass="sidebar-section"/>
                     <Button fx:id="adm_offres_mod"     text="🛡 Modération Offres"     onAction="#nav_adm_offres_mod"     maxWidth="Infinity" styleClass="sidebar-nav"/>
@@ -148,4 +159,5 @@
     </center>
 
 </BorderPane>
+
 

@@ -79,7 +79,7 @@ public class CitizenWithdrawController {
             return;
         }
         try {
-            Wallet w = walletService.findByUtilisateurId(cid).orElse(null);
+            Wallet w = walletService.syncCitizenWalletPoints(cid);
             if (w == null || w.getSoldeActuel() == null) {
                 balanceLabel.setText("0 pts");
             } else {
@@ -121,7 +121,7 @@ public class CitizenWithdrawController {
         }
 
         try {
-            Wallet wallet = walletService.findByUtilisateurId(cid).orElse(null);
+            Wallet wallet = walletService.syncCitizenWalletPoints(cid);
             if (wallet == null) {
                 messageLabel.getStyleClass().add("error-text");
                 messageLabel.setText("Aucun portefeuille wallet pour ce compte.");

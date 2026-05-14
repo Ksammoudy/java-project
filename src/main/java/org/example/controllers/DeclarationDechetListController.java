@@ -117,7 +117,9 @@ public class DeclarationDechetListController {
 
     @FXML
     public void initialize() {
-        declarationTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
+        if (declarationTable != null) {
+            declarationTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
+        }
         configureFilters();
         configureColumns();
         loadDeclarations();
@@ -133,12 +135,12 @@ public class DeclarationDechetListController {
 
     @FXML
     private void resetFilters() {
-        searchField.clear();
-        quantityMinField.clear();
-        quantityMaxField.clear();
-        statusFilter.setValue("Tous statuts");
-        typeFilter.setValue("Tous types");
-        sortFilter.setValue("Date desc");
+        if (searchField != null) searchField.clear();
+        if (quantityMinField != null) quantityMinField.clear();
+        if (quantityMaxField != null) quantityMaxField.clear();
+        if (statusFilter != null) statusFilter.setValue("Tous statuts");
+        if (typeFilter != null) typeFilter.setValue("Tous types");
+        if (sortFilter != null) sortFilter.setValue("Date desc");
         applyFilters();
     }
 
@@ -159,56 +161,69 @@ public class DeclarationDechetListController {
 
     @FXML
     private void closeFlash() {
+        if (flashMessageBox == null) {
+            return;
+        }
         flashMessageBox.setManaged(false);
         flashMessageBox.setVisible(false);
     }
 
     private void configureFilters() {
-        statusFilter.setItems(FXCollections.observableArrayList("Tous statuts", "APPROUVEE", "EN_ATTENTE", "REFUSEE"));
-        statusFilter.setValue("Tous statuts");
-        typeFilter.setItems(FXCollections.observableArrayList("Tous types", "Plastique", "Papier / Carton", "Verre"));
-        typeFilter.setValue("Tous types");
-        sortFilter.setItems(FXCollections.observableArrayList("Date desc", "Date asc", "Quantite desc", "Quantite asc"));
-        sortFilter.setValue("Date desc");
+        if (statusFilter != null) {
+            statusFilter.setItems(FXCollections.observableArrayList("Tous statuts", "APPROUVEE", "VALIDATED", "EN_ATTENTE", "REFUSEE"));
+            statusFilter.setValue("Tous statuts");
+        }
+        if (typeFilter != null) {
+            typeFilter.setItems(FXCollections.observableArrayList("Tous types", "Plastique", "Papier / Carton", "Verre"));
+            typeFilter.setValue("Tous types");
+        }
+        if (sortFilter != null) {
+            sortFilter.setItems(FXCollections.observableArrayList("Date desc", "Date asc", "Quantite desc", "Quantite asc"));
+            sortFilter.setValue("Date desc");
+        }
     }
 
     private void attachFilterListeners() {
-        searchField.textProperty().addListener((obs, oldValue, newValue) -> applyFilters());
-        quantityMinField.textProperty().addListener((obs, oldValue, newValue) -> applyFilters());
-        quantityMaxField.textProperty().addListener((obs, oldValue, newValue) -> applyFilters());
-        statusFilter.valueProperty().addListener((obs, oldValue, newValue) -> applyFilters());
-        typeFilter.valueProperty().addListener((obs, oldValue, newValue) -> applyFilters());
-        sortFilter.valueProperty().addListener((obs, oldValue, newValue) -> applyFilters());
+        if (searchField != null) searchField.textProperty().addListener((obs, oldValue, newValue) -> applyFilters());
+        if (quantityMinField != null) quantityMinField.textProperty().addListener((obs, oldValue, newValue) -> applyFilters());
+        if (quantityMaxField != null) quantityMaxField.textProperty().addListener((obs, oldValue, newValue) -> applyFilters());
+        if (statusFilter != null) statusFilter.valueProperty().addListener((obs, oldValue, newValue) -> applyFilters());
+        if (typeFilter != null) typeFilter.valueProperty().addListener((obs, oldValue, newValue) -> applyFilters());
+        if (sortFilter != null) sortFilter.valueProperty().addListener((obs, oldValue, newValue) -> applyFilters());
     }
 
     private void configureColumns() {
-        idColumn.setCellValueFactory(data -> new SimpleStringProperty("#" + data.getValue().getId()));
-        photoColumn.setCellValueFactory(data -> new SimpleStringProperty(resolvePhotoCode(data.getValue().getTypeDechetLibelle())));
-        citoyenColumn.setCellValueFactory(data -> new SimpleStringProperty(resolveCitizenLabel(data.getValue())));
-        typeColumn.setCellValueFactory(data -> new SimpleStringProperty(resolveTypeLabel(data.getValue())));
-        quantiteColumn.setCellValueFactory(data -> new SimpleStringProperty(formatQuantite(data.getValue())));
-        dateColumn.setCellValueFactory(data -> new SimpleStringProperty(formatDate(data.getValue().getCreatedAt())));
-        statutColumn.setCellValueFactory(data -> new SimpleStringProperty(normalizeStatus(data.getValue().getStatut())));
-        statutColumn.setCellFactory(column -> new StatusCell());
-        riskColumn.setCellValueFactory(data -> new SimpleStringProperty(resolveRiskLabel(data.getValue())));
-        riskColumn.setCellFactory(column -> new RiskCell());
-        actionsColumn.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue()));
-        actionsColumn.setCellFactory(column -> new ActionsCell(this));
+        if (idColumn != null) idColumn.setCellValueFactory(data -> new SimpleStringProperty("#" + data.getValue().getId()));
+        if (photoColumn != null) photoColumn.setCellValueFactory(data -> new SimpleStringProperty(resolvePhotoCode(data.getValue().getTypeDechetLibelle())));
+        if (citoyenColumn != null) citoyenColumn.setCellValueFactory(data -> new SimpleStringProperty(resolveCitizenLabel(data.getValue())));
+        if (typeColumn != null) typeColumn.setCellValueFactory(data -> new SimpleStringProperty(resolveTypeLabel(data.getValue())));
+        if (quantiteColumn != null) quantiteColumn.setCellValueFactory(data -> new SimpleStringProperty(formatQuantite(data.getValue())));
+        if (dateColumn != null) dateColumn.setCellValueFactory(data -> new SimpleStringProperty(formatDate(data.getValue().getCreatedAt())));
+        if (statutColumn != null) {
+            statutColumn.setCellValueFactory(data -> new SimpleStringProperty(normalizeStatus(data.getValue().getStatut())));
+            statutColumn.setCellFactory(column -> new StatusCell());
+        }
+        if (riskColumn != null) {
+            riskColumn.setCellValueFactory(data -> new SimpleStringProperty(resolveRiskLabel(data.getValue())));
+            riskColumn.setCellFactory(column -> new RiskCell());
+        }
+        if (actionsColumn != null) {
+            actionsColumn.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue()));
+            actionsColumn.setCellFactory(column -> new ActionsCell(this));
+        }
     }
 
     private void loadDeclarations() {
         masterData.clear();
         try {
-            masterData.addAll(
-                declarationService.findAll().stream()
-                    .filter(item -> item.getDeletedAt() == null)
-                    .collect(Collectors.toList())
-            );
+            masterData.addAll(declarationService.findAll());
         } catch (SQLException | IllegalStateException exception) {
             masterData.addAll(buildOfflineSamples());
         }
 
-        syncLabel.setText("Derniere sync: 28/02/2026 16:14:54");
+        if (syncLabel != null) {
+            syncLabel.setText("Derniere sync: 28/02/2026 16:14:54");
+        }
         updateSummary(masterData);
         populateChart(masterData);
         applyFilters();
@@ -216,12 +231,12 @@ public class DeclarationDechetListController {
 
     private void applyFilters() {
         List<DeclarationDechet> filtered = new ArrayList<>(masterData);
-        String search = lower(searchField.getText());
-        String selectedStatus = statusFilter.getValue();
-        String selectedType = typeFilter.getValue();
-        String selectedSort = sortFilter.getValue();
-        Double minQuantity = parseDouble(quantityMinField.getText());
-        Double maxQuantity = parseDouble(quantityMaxField.getText());
+        String search = lower(searchField == null ? "" : searchField.getText());
+        String selectedStatus = statusFilter == null ? "Tous statuts" : statusFilter.getValue();
+        String selectedType = typeFilter == null ? "Tous types" : typeFilter.getValue();
+        String selectedSort = sortFilter == null ? "Date desc" : sortFilter.getValue();
+        Double minQuantity = parseDouble(quantityMinField == null ? null : quantityMinField.getText());
+        Double maxQuantity = parseDouble(quantityMaxField == null ? null : quantityMaxField.getText());
 
         if (!search.isBlank()) {
             filtered = filtered.stream()
@@ -269,11 +284,16 @@ public class DeclarationDechetListController {
         }
 
         filtered.sort(comparator);
-        declarationTable.setItems(FXCollections.observableArrayList(filtered));
+        if (declarationTable != null) {
+            declarationTable.setItems(FXCollections.observableArrayList(filtered));
+        }
     }
 
     private void updateSummary(List<DeclarationDechet> declarations) {
-        long approved = declarations.stream().filter(d -> "APPROUVEE".equals(normalizeStatus(d.getStatut()))).count();
+        long approved = declarations.stream().filter(d -> {
+            String status = normalizeStatus(d.getStatut());
+            return "APPROUVEE".equals(status) || "VALIDATED".equals(status);
+        }).count();
         long pending = declarations.stream().filter(d -> "EN_ATTENTE".equals(normalizeStatus(d.getStatut()))).count();
         int ecoPoints = declarations.stream()
             .map(DeclarationDechet::getPointsAttribues)
@@ -281,17 +301,22 @@ public class DeclarationDechetListController {
             .mapToInt(Integer::intValue)
             .sum();
 
-        totalLabel.setText(String.valueOf(declarations.size()));
-        approvedCountLabel.setText(String.valueOf(approved));
-        pendingCountLabel.setText(String.valueOf(pending));
-        ecoPointsLabel.setText(String.valueOf(ecoPoints));
-        topTypeLabel.setText(resolveTopType(declarations));
-        suspectCountLabel.setText(String.valueOf(
-            declarations.stream().filter(d -> resolveRiskScore(d) >= 70).count()
-        ));
+        if (totalLabel != null) totalLabel.setText(String.valueOf(declarations.size()));
+        if (approvedCountLabel != null) approvedCountLabel.setText(String.valueOf(approved));
+        if (pendingCountLabel != null) pendingCountLabel.setText(String.valueOf(pending));
+        if (ecoPointsLabel != null) ecoPointsLabel.setText(String.valueOf(ecoPoints));
+        if (topTypeLabel != null) topTypeLabel.setText(resolveTopType(declarations));
+        if (suspectCountLabel != null) {
+            suspectCountLabel.setText(String.valueOf(
+                declarations.stream().filter(d -> resolveRiskScore(d) >= 70).count()
+            ));
+        }
     }
 
     private void populateChart(List<DeclarationDechet> declarations) {
+        if (typeChart == null) {
+            return;
+        }
         long plastique = declarations.stream().filter(d -> safe(d.getTypeDechetLibelle()).contains("Plastique")).count();
         long papier = declarations.stream().filter(d -> safe(d.getTypeDechetLibelle()).contains("Papier")).count();
         long verre = declarations.stream().filter(d -> safe(d.getTypeDechetLibelle()).contains("Verre")).count();
@@ -304,6 +329,9 @@ public class DeclarationDechetListController {
     }
 
     private void showFlashIfPresent() {
+        if (flashMessageBox == null || flashMessageLabel == null) {
+            return;
+        }
         String message = AdminUiState.consumeFlashMessage();
         boolean error = AdminUiState.consumeFlashError();
         if (message == null || message.isBlank()) {
@@ -370,15 +398,23 @@ public class DeclarationDechetListController {
             return;
         }
         try {
-            declaration.setDeletedAt(LocalDateTime.now());
-            if (declaration.getId() != null && declarationService.update(declaration)) {
-                AdminUiState.setFlash("Declaration archivee avec succes.", false);
+            boolean deleted = false;
+            if (declaration.getId() != null) {
+                deleted = declarationService.delete(declaration.getId());
+            }
+
+            if (deleted) {
+                AdminUiState.setFlash("Declaration supprimee avec succes.", false);
             } else {
-                AdminUiState.setFlash("Archivage impossible pour cette declaration.", true);
+                declaration.setDeletedAt(LocalDateTime.now());
+                if (declaration.getId() != null && declarationService.update(declaration)) {
+                    AdminUiState.setFlash("Declaration archivee avec succes.", false);
+                } else {
+                    AdminUiState.setFlash("Suppression impossible pour cette declaration.", true);
+                }
             }
         } catch (SQLException | IllegalStateException exception) {
-            masterData.removeIf(item -> item.getId() != null && item.getId().equals(declaration.getId()));
-            AdminUiState.setFlash("Archivage effectue en mode local.", true);
+            AdminUiState.setFlash("Suppression impossible (erreur DB).", true);
         }
 
         loadDeclarations();
@@ -570,10 +606,10 @@ public class DeclarationDechetListController {
     }
 
     private static final class ActionsCell extends TableCell<DeclarationDechet, DeclarationDechet> {
-        private final Button viewButton = new Button("Voir");
-        private final Button userButton = new Button("User");
-        private final Button assignButton = new Button("Affect");
-        private final Button deleteButton = new Button("Suppr");
+        private final Button viewButton = new Button("👁");
+        private final Button userButton = new Button("👤");
+        private final Button assignButton = new Button("✅");
+        private final Button deleteButton = new Button("🗑");
         private final HBox box = new HBox(6.0, viewButton, userButton, assignButton, deleteButton);
 
         private ActionsCell(DeclarationDechetListController controller) {

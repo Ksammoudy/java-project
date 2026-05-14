@@ -48,7 +48,7 @@
                             <Label text="Reponses totales" style="-fx-text-fill: #5E7A6A; -fx-font-size: 14px;"/>
                             <Pane HBox.hgrow="ALWAYS"/>
                         </HBox>
-                        <Label text="6" style="-fx-text-fill: #1B6B4B; -fx-font-size: 42px; -fx-font-weight: bold;"/>
+                        <Label fx:id="lblReponsesTotales" text="0" style="-fx-text-fill: #1B6B4B; -fx-font-size: 42px; -fx-font-weight: bold;"/>
                     </VBox>
 
                     <VBox spacing="14.0"
@@ -58,7 +58,7 @@
                             <Label text="Validees" style="-fx-text-fill: #5E7A6A; -fx-font-size: 14px;"/>
                             <Pane HBox.hgrow="ALWAYS"/>
                         </HBox>
-                        <Label text="4" style="-fx-text-fill: #1B6B4B; -fx-font-size: 42px; -fx-font-weight: bold;"/>
+                        <Label fx:id="lblReponseValidees" text="0" style="-fx-text-fill: #1B6B4B; -fx-font-size: 42px; -fx-font-weight: bold;"/>
                     </VBox>
 
                     <VBox spacing="14.0"
@@ -68,7 +68,7 @@
                             <Label text="En attente" style="-fx-text-fill: #5E7A6A; -fx-font-size: 14px;"/>
                             <Pane HBox.hgrow="ALWAYS"/>
                         </HBox>
-                        <Label text="2" style="-fx-text-fill: #1B6B4B; -fx-font-size: 42px; -fx-font-weight: bold;"/>
+                        <Label fx:id="lblReponseEnAttente" text="0" style="-fx-text-fill: #1B6B4B; -fx-font-size: 42px; -fx-font-weight: bold;"/>
                     </VBox>
 
                     <VBox spacing="14.0"
@@ -78,7 +78,7 @@
                             <Label text="Eco points" style="-fx-text-fill: #5E7A6A; -fx-font-size: 14px;"/>
                             <Pane HBox.hgrow="ALWAYS"/>
                         </HBox>
-                        <Label text="82690" style="-fx-text-fill: #1B6B4B; -fx-font-size: 42px; -fx-font-weight: bold;"/>
+                        <Label fx:id="lblEcoPoints" text="0" style="-fx-text-fill: #1B6B4B; -fx-font-size: 42px; -fx-font-weight: bold;"/>
                     </VBox>
                 </GridPane>
 
@@ -115,12 +115,12 @@
                     <Label text="Dernieres reponses"
                            style="-fx-text-fill: #0D2B40; -fx-font-size: 24px; -fx-font-weight: 500;"/>
                     <Separator/>
-                    <TableView prefHeight="230.0" style="-fx-background-radius: 10;">
+                    <TableView fx:id="tableReponses" prefHeight="230.0" style="-fx-background-radius: 10;">
                         <columns>
-                            <TableColumn prefWidth="170.0" text="Date"/>
-                            <TableColumn prefWidth="430.0" text="Offre"/>
-                            <TableColumn prefWidth="200.0" text="Quantite"/>
-                            <TableColumn prefWidth="200.0" text="Statut"/>
+                            <TableColumn fx:id="colDate" prefWidth="170.0" text="Date"/>
+                            <TableColumn fx:id="colOffre" prefWidth="430.0" text="Offre"/>
+                            <TableColumn fx:id="colQuantite" prefWidth="200.0" text="Quantite"/>
+                            <TableColumn fx:id="colStatut" prefWidth="200.0" text="Statut"/>
                         </columns>
                     </TableView>
                 </VBox>

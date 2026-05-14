@@ -75,7 +75,11 @@ CREATE TABLE IF NOT EXISTS declaration_dechet (
     created_at                  DATETIME DEFAULT CURRENT_TIMESTAMP,
     score_ia                    DOUBLE,
     points_attribues            INT DEFAULT 0,
-    qr_code                     VARCHAR(255),
+    qr_code                     VARCHAR(255) UNIQUE,
+    qr_url                      TEXT,
+    validated_by_qr             TINYINT DEFAULT 0,
+    validated_at                DATETIME,
+    valorisateur_id             INT,
     citoyen_id                  INT,
     valorisateur_confirmateur_id INT,
     date_confirmation           DATETIME,
@@ -247,3 +251,31 @@ INSERT INTO type_dechet (libelle, valeur_points_kg, description_tri) VALUES
 ('Métal',         12.0, 'Canettes, boîtes de conserve'),
 ('Organique',     3.0,  'Déchets alimentaires, végétaux'),
 ('Électronique',  20.0, 'Appareils électroniques usagés');
+
+-- ============================================================
+-- 14. TABLE APPEL_OFFRE
+-- ============================================================
+CREATE TABLE IF NOT EXISTS appel_offre (
+    id                  INT AUTO_INCREMENT PRIMARY KEY,
+    titre               VARCHAR(255) NOT NULL,
+    description         TEXT NOT NULL,
+    quantite_demandee   DOUBLE NOT NULL,
+    date_limite         DATETIME NOT NULL,
+    valorisateur_id     INT NOT NULL,
+    FOREIGN KEY (valorisateur_id) REFERENCES `user`(id) ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ============================================================
+-- 15. TABLE REPONSE_OFFRE
+-- ============================================================
+CREATE TABLE IF NOT EXISTS reponse_offre (
+    id                  INT AUTO_INCREMENT PRIMARY KEY,
+    quantite_proposee   DOUBLE NOT NULL,
+    date_soumis         DATETIME NOT NULL,
+    statut              VARCHAR(50) NOT NULL DEFAULT 'en attente',
+    message             TEXT,
+    appel_offre_id      INT NOT NULL,
+    citoyen_id          INT NOT NULL,
+    FOREIGN KEY (appel_offre_id) REFERENCES appel_offre(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (citoyen_id) REFERENCES `user`(id) ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

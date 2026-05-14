@@ -11,6 +11,7 @@ import org.example.services.DeclarationDechetJdbcService;
 import org.example.services.SessionManager;
 
 import java.sql.SQLException;
+import java.util.Locale;
 
 public class ValorizerStatisticsController {
 
@@ -48,7 +49,7 @@ public class ValorizerStatisticsController {
     public void initialize() {
         User user = resolveValorizerUser();
         valorizerNameLabel.setText(fullName(user));
-        headerEmailLabel.setText(user.getEmail() != null ? user.getEmail() : "—");
+        headerEmailLabel.setText(user.getEmail() != null ? user.getEmail() : "-");
 
         updateNavigation("statistics");
 
@@ -59,19 +60,31 @@ public class ValorizerStatisticsController {
     private void loadStatistics() {
         try {
             var all = declarationService.findAll();
-            var approved = all.stream().filter(d -> "APPROUVEE".equals(d.getStatut())).toList();
-            var pending = all.stream().filter(d -> "EN_ATTENTE".equals(d.getStatut())).toList();
+            var valorized = all.stream().filter(d -> isValorizedStatus(d.getStatut())).toList();
+            var pending = all.stream().filter(d -> "EN_ATTENTE".equals(normalizeStatus(d.getStatut()))).toList();
 
             totalReceivedLabel.setText(String.valueOf(all.size()));
-            totalValorizedLabel.setText(String.valueOf(approved.size()));
+            totalValorizedLabel.setText(String.valueOf(valorized.size()));
             pendingLabel.setText(String.valueOf(pending.size()));
-            
-            int totalPoints = approved.stream().mapToInt(d -> d.getPointsAttribues() != null ? d.getPointsAttribues() : 0).sum();
+
+            int totalPoints = valorized.stream().mapToInt(d -> d.getPointsAttribues() != null ? d.getPointsAttribues() : 0).sum();
             totalPointsLabel.setText(String.valueOf(totalPoints));
         } catch (SQLException e) {
             System.err.println("Erreur au chargement des statistiques: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    private boolean isValorizedStatus(String status) {
+        String normalized = normalizeStatus(status);
+        return "APPROUVEE".equals(normalized) || "VALIDATED".equals(normalized);
+    }
+
+    private String normalizeStatus(String status) {
+        if (status == null || status.isBlank()) {
+            return "EN_ATTENTE";
+        }
+        return status.trim().toUpperCase(Locale.ROOT);
     }
 
     private void populateChart() {
@@ -132,6 +145,8 @@ public class ValorizerStatisticsController {
                 break;
             case "settings":
                 if (navSettings != null) navSettings.getStyleClass().add("active");
+                break;
+            default:
                 break;
         }
     }

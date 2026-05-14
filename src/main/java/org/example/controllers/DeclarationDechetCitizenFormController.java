@@ -1,14 +1,20 @@
 package org.example.controllers;
 
 import javafx.collections.FXCollections;
+import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
 import org.example.Main;
@@ -22,8 +28,11 @@ import org.example.services.TypeDechetJdbcService;
 import org.example.utils.AdminUiState;
 import org.example.utils.CitizenSession;
 import org.example.utils.CitizenSidebarHelper;
+import org.example.utils.WeatherLocationState;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -31,6 +40,7 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 
 public class DeclarationDechetCitizenFormController {
@@ -38,12 +48,16 @@ public class DeclarationDechetCitizenFormController {
     private static final int DESCRIPTION_MIN = 10;
     private static final int DESCRIPTION_MAX = 2000;
     private static final long MAX_PHOTO_BYTES = 5L * 1024 * 1024;
+    private static final String LOCATION_ALERT_PREFIX = "LOCATION:";
 
     private final TypeDechetJdbcService typeDechetService = new TypeDechetJdbcService();
     private final DeclarationDechetJdbcService declarationService = new DeclarationDechetJdbcService();
     private final HuggingFaceService huggingFaceService = new HuggingFaceService();
 
     private Path selectedPhotoPath;
+    private Double selectedLatitude;
+    private Double selectedLongitude;
+    private WebEngine webEngine;
 
     @FXML
     private Button navHome;
@@ -94,18 +108,17 @@ public class DeclarationDechetCitizenFormController {
 
     @FXML
     private Label photoHintLabel;
+    @FXML
+    private ImageView photoPreview;
+    @FXML
+    private Label photoErrorLabel;
 
     @FXML
-    private TextField latitudeField;
+    private WebView mapWebView;
     @FXML
-    private TextField longitudeField;
+    private Label geoSelectionLabel;
     @FXML
     private Label geoErrorLabel;
-
-    @FXML
-    private TextField scoreIaField;
-    @FXML
-    private Label scoreErrorLabel;
 
     @FXML
     public void initialize() {
@@ -118,9 +131,15 @@ public class DeclarationDechetCitizenFormController {
 
         uniteCombo.setItems(FXCollections.observableArrayList("kg", "g", "L", "m3", "unite"));
         uniteCombo.getSelectionModel().selectFirst();
-
         configureTypeCombo();
         loadTypes();
+
+        setGeoSelection(null, null);
+        if (photoPreview != null) {
+            photoPreview.setManaged(false);
+            photoPreview.setVisible(false);
+        }
+        initializeMapWebView();
     }
 
     private void configureTypeCombo() {
@@ -163,6 +182,76 @@ public class DeclarationDechetCitizenFormController {
         }
     }
 
+    private void initializeMapWebView() {
+        if (mapWebView == null) {
+            setSummaryError("Composant carte introuvable dans le formulaire.");
+            return;
+        }
+
+        webEngine = mapWebView.getEngine();
+        webEngine.setJavaScriptEnabled(true);
+        webEngine.setOnAlert(event -> handleMapAlert(event.getData()));
+        webEngine.getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
+            if (newState == Worker.State.SUCCEEDED) {
+                forceMapResize();
+            }
+        });
+
+        mapWebView.widthProperty().addListener((obs, oldV, newV) -> forceMapResize());
+        mapWebView.heightProperty().addListener((obs, oldV, newV) -> forceMapResize());
+
+        URL mapUrl = getClass().getResource("/org/example/views/maps/declaration_map.html");
+        if (mapUrl == null) {
+            setSummaryError("Fichier de carte introuvable.");
+            return;
+        }
+        webEngine.load(mapUrl.toExternalForm());
+    }
+
+    private void forceMapResize() {
+        if (webEngine == null) {
+            return;
+        }
+        try {
+            webEngine.executeScript("if (window.fixMapSize) { window.fixMapSize(); }");
+        } catch (Exception ignored) {
+            // Ignore if script is not ready yet.
+        }
+    }
+
+    private void handleMapAlert(String data) {
+        if (data == null || !data.startsWith(LOCATION_ALERT_PREFIX)) {
+            return;
+        }
+        String payload = data.substring(LOCATION_ALERT_PREFIX.length()).trim();
+        String[] parts = payload.split(",");
+        if (parts.length != 2) {
+            return;
+        }
+        try {
+            double lat = Double.parseDouble(parts[0].trim());
+            double lng = Double.parseDouble(parts[1].trim());
+            selectedLatitude = lat;
+            selectedLongitude = lng;
+            WeatherLocationState.updateSelectedLocation(lat, lng);
+            setGeoSelection(lat, lng);
+            clearFieldError(geoErrorLabel);
+        } catch (NumberFormatException ignored) {
+            // Ignore malformed payload.
+        }
+    }
+
+    private void setGeoSelection(Double lat, Double lng) {
+        if (geoSelectionLabel == null) {
+            return;
+        }
+        if (lat == null || lng == null) {
+            geoSelectionLabel.setText("Position selectionnee : --");
+            return;
+        }
+        geoSelectionLabel.setText(String.format(Locale.ROOT, "Position selectionnee : %.6f, %.6f", lat, lng));
+    }
+
     @FXML
     public void handleBrowsePhoto() {
         FileChooser chooser = new FileChooser();
@@ -170,7 +259,7 @@ public class DeclarationDechetCitizenFormController {
         chooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Images", "*.jpg", "*.jpeg", "*.png", "*.gif", "*.webp")
         );
-        var file = chooser.showOpenDialog(validationLabel.getScene().getWindow());
+        File file = chooser.showOpenDialog(validationLabel.getScene().getWindow());
         if (file == null) {
             return;
         }
@@ -180,30 +269,41 @@ public class DeclarationDechetCitizenFormController {
         }
         selectedPhotoPath = file.toPath();
         photoHintLabel.setText(file.getName());
+        clearFieldError(photoErrorLabel);
         clearSummaryError();
+        showPhotoPreview(file);
     }
 
     @FXML
     public void handleClearPhoto() {
         selectedPhotoPath = null;
         photoHintLabel.setText("Aucun fichier selectionne");
+        if (photoPreview != null) {
+            photoPreview.setImage(null);
+            photoPreview.setManaged(false);
+            photoPreview.setVisible(false);
+        }
+    }
+
+    private void showPhotoPreview(File file) {
+        if (photoPreview == null) {
+            return;
+        }
+        Image image = new Image(file.toURI().toString(), true);
+        photoPreview.setImage(image);
+        photoPreview.setManaged(true);
+        photoPreview.setVisible(true);
     }
 
     @FXML
     public void handleSubmit() {
-        System.out.println("Methode ajouterDeclaration appelee");
         clearAllErrors();
 
         boolean ok = true;
 
         TypeDechet type = typeDechetCombo.getSelectionModel().getSelectedItem();
-        System.out.println("[DeclarationDechet][DEBUG] type_dechet selectionne depuis ComboBox id="
-                + (type == null ? null : type.getId()));
-        if (type == null || type.getId() == null) {
+        if (type == null || type.getId() == null || type.getId() <= 0) {
             setFieldError(typeErrorLabel, "Choisissez un type de dechet.");
-            ok = false;
-        } else if (type.getId() <= 0) {
-            setFieldError(typeErrorLabel, "Type de dechet invalide.");
             ok = false;
         }
 
@@ -242,43 +342,14 @@ public class DeclarationDechetCitizenFormController {
             ok = false;
         }
 
-        String latText = latitudeField != null ? latitudeField.getText().trim() : "";
-        String lonText = longitudeField != null ? longitudeField.getText().trim() : "";
-        Double lat = null;
-        Double lon = null;
-        if (latText.isEmpty() || lonText.isEmpty()) {
-            setFieldError(geoErrorLabel, "Latitude et longitude sont obligatoires.");
+        if (selectedPhotoPath == null) {
+            setFieldError(photoErrorLabel, "La photo est obligatoire.");
             ok = false;
-        } else {
-            lat = parseCoordinate(latText, true);
-            lon = parseCoordinate(lonText, false);
-            if (lat == null || lon == null) {
-                setFieldError(geoErrorLabel, "Coordonnees invalides (lat -90..90, lon -180..180).");
-                ok = false;
-            } else if (Math.abs(lat) < 0.000001 && Math.abs(lon) < 0.000001) {
-                setFieldError(geoErrorLabel, "Coordonnees 0,0 detectees: veuillez verifier la position.");
-                ok = false;
-            }
         }
 
-        Double scoreIa = null;
-        if (selectedPhotoPath != null) {
-            HuggingFaceService.Result ia = huggingFaceService.classifyImage(selectedPhotoPath);
-            if (!ia.success()) {
-                setFieldError(scoreErrorLabel, ia.error() == null ? "Analyse image impossible." : ia.error());
-                ok = false;
-            } else {
-                scoreIa = ia.score();
-                if (scoreIaField != null && scoreIa != null) {
-                    scoreIaField.setText(String.format(Locale.ROOT, "%.4f", scoreIa));
-                }
-                String selectedTypeLabel = type != null && type.getLibelle() != null ? type.getLibelle() : "";
-                boolean typeMatches = isTypeMatchingLabel(selectedTypeLabel, ia.label());
-                if (scoreIa != null && scoreIa > 0.6d && !typeMatches) {
-                    setFieldError(scoreErrorLabel, "IA: image '" + ia.label() + "' incoherente avec le type selectionne.");
-                    ok = false;
-                }
-            }
+        if (selectedLatitude == null || selectedLongitude == null) {
+            setFieldError(geoErrorLabel, "Cliquez sur la carte pour fixer la position.");
+            ok = false;
         }
 
         if (!ok || type == null || quantite == null || unite == null) {
@@ -286,175 +357,116 @@ public class DeclarationDechetCitizenFormController {
             return;
         }
 
-        String photoRelative = null;
-        if (selectedPhotoPath != null) {
-            try {
-                photoRelative = copyPhotoToUploads(selectedPhotoPath);
-            } catch (IOException e) {
-                setSummaryError("Photo : " + e.getMessage());
-                return;
-            }
+        HuggingFaceService.Result ia = huggingFaceService.classifyImage(selectedPhotoPath);
+        if (!ia.success()) {
+            showApiFailurePopup();
+            return;
+        }
+
+        String detectedLabel = ia.label();
+        Double detectedScore = ia.score();
+        if (!isTypeCompatible(type.getLibelle(), detectedLabel)) {
+            showIncompatibleTypePopup(type.getLibelle(), detectedLabel, detectedScore);
+            return;
+        }
+
+        String photoRelative;
+        try {
+            photoRelative = copyPhotoToUploads(selectedPhotoPath);
+        } catch (IOException e) {
+            setSummaryError("Photo : " + e.getMessage());
+            return;
         }
 
         DeclarationDechet entity = new DeclarationDechet();
         entity.setDescription(descTrim);
         entity.setStatut("EN_ATTENTE");
-        entity.setTypeDechetId(type != null ? type.getId() : null);
+        entity.setTypeDechetId(type.getId());
         entity.setPhoto(photoRelative);
-        entity.setLatitude(lat);
-        entity.setLongitude(lon);
+        entity.setLatitude(selectedLatitude);
+        entity.setLongitude(selectedLongitude);
         entity.setQuantite(quantite);
-        entity.setUnite(unite != null ? unite.trim() : null);
+        entity.setUnite(unite.trim());
         entity.setCreatedAt(LocalDateTime.now());
-        entity.setScoreIa(null);
+        entity.setAiDetectedLabel(detectedLabel);
+        entity.setScoreIa(detectedScore);
         entity.setPointsAttribues(0);
-        entity.setCitoyenId(CitizenSession.resolveCitizenDatabaseId());
+        entity.setCitoyenId(resolveCitizenId());
         entity.setQrCode(null);
+        entity.setQrUrl(null);
+        entity.setValidatedByQr(false);
+        entity.setValidatedAt(null);
+        entity.setValorisateurId(null);
         entity.setValorisateurConfirmateurId(null);
         entity.setDateConfirmation(null);
         entity.setStatutHistoriqueJson(null);
         entity.setDeletedAt(null);
 
-        logFormPayload(entity);
-
         try {
             declarationService.create(entity);
+            showSuccessPopup(type.getLibelle(), detectedLabel, detectedScore);
             AdminUiState.setFlash("Declaration enregistree avec succes.", false);
             Main.showDashboardCitizen();
         } catch (SQLException e) {
-            System.err.println("Erreur SQL : " + e.getMessage());
-            System.err.println("SQLState : " + e.getSQLState() + ", ErrorCode : " + e.getErrorCode());
-            e.printStackTrace();
-            setSummaryError(mapSqlErrorMessage(e));
+            showSimpleErrorPopup("Erreur lors de l'enregistrement de la declaration.");
         } catch (RuntimeException e) {
-            System.err.println("Runtime ERROR: " + e.getMessage());
-            e.printStackTrace();
-            setSummaryError("Erreur lors de l'enregistrement en base. Verifiez la connexion JDBC.");
+            showSimpleErrorPopup("Erreur lors de l'enregistrement de la declaration.");
         }
     }
 
-    private boolean isTypeMatchingLabel(String selectedType, String label) {
+    private Integer resolveCitizenId() {
+        Integer resolved = CitizenSession.resolveCitizenDatabaseId();
+        return resolved != null ? resolved : 1;
+    }
+
+    private boolean isTypeCompatible(String selectedType, String label) {
         String type = normalizeText(selectedType);
-        String predicted = normalizeText(label);
-        if (type.isBlank() || predicted.isBlank()) {
+        String detected = normalizeText(label);
+        if (type.isBlank() || detected.isBlank()) {
             return false;
         }
-        if (predicted.contains(type) || type.contains(predicted)) {
-            return true;
-        }
 
-        String[][] aliases = new String[][]{
-                {"plastique", "plastic", "bottle", "pet", "container"},
-                {"carton", "cardboard", "box"},
-                {"papier", "paper", "newspaper", "notebook"},
-                {"verre", "glass", "bottle"},
-                {"metal", "metal", "can", "aluminum", "steel"},
-                {"canette", "can", "aluminum"}
-        };
-        for (String[] family : aliases) {
-            if (!type.contains(family[0])) {
+        Map<String, List<String>> aliases = Map.of(
+                "plastique", List.of("plastic", "bottle", "bag", "container", "packaging"),
+                "papier/carton", List.of("paper", "cardboard", "carton", "box"),
+                "verre", List.of("glass", "bottle", "jar"),
+                "metal", List.of("metal", "can", "tin", "aluminum"),
+                "organique", List.of("food", "fruit", "vegetable", "organic", "garbage"),
+                "electronique", List.of("electronic", "computer", "phone", "battery")
+        );
+
+        for (Map.Entry<String, List<String>> entry : aliases.entrySet()) {
+            String family = entry.getKey();
+            if (!containsTypeFamily(type, family)) {
                 continue;
             }
-            for (int i = 1; i < family.length; i++) {
-                if (predicted.contains(family[i])) {
+            for (String keyword : entry.getValue()) {
+                if (detected.contains(keyword)) {
                     return true;
                 }
             }
+            return false;
         }
-        return false;
+
+        return detected.contains(type) || type.contains(detected);
+    }
+
+    private boolean containsTypeFamily(String normalizedType, String familyKey) {
+        if ("papier/carton".equals(familyKey)) {
+            return normalizedType.contains("papier") || normalizedType.contains("carton") || normalizedType.contains("paper");
+        }
+        if ("metal".equals(familyKey)) {
+            return normalizedType.contains("metal") || normalizedType.contains("metall") || normalizedType.contains("metallique");
+        }
+        if ("electronique".equals(familyKey)) {
+            return normalizedType.contains("electronique") || normalizedType.contains("electronic");
+        }
+        return normalizedType.contains(familyKey);
     }
 
     private String normalizeText(String value) {
         String normalized = value == null ? "" : value.trim().toLowerCase(Locale.ROOT);
         return normalized.replaceAll("\\s+", " ");
-    }
-
-    private String mapSqlErrorMessage(SQLException e) {
-        String raw = e.getMessage();
-        if (raw == null || raw.isBlank()) {
-            return "Erreur SQL lors de l'enregistrement de la declaration.";
-        }
-
-        String msg = raw.toLowerCase(Locale.ROOT);
-        String column = extractColumnName(raw);
-        String suffix = column == null ? "" : " (colonne: " + column + ").";
-        if (msg.contains("citoyen_id") && (msg.contains("null") || msg.contains("constraint"))) {
-            return "Enregistrement refuse par la base: citoyen_id est obligatoire dans votre schema.";
-        }
-        if (msg.contains("type_dechet_id")) {
-            return "Enregistrement refuse: type_dechet_id invalide ou absent.";
-        }
-        if (msg.contains("unknown column")) {
-            return "Schema DB incompatible avec le service declaration_dechet (colonnes SQL).";
-        }
-        if (msg.contains("foreign key")) {
-            return "Contrainte de relation invalide (type de dechet ou citoyen).";
-        }
-        if (msg.contains("cannot be null") || msg.contains("null value")) {
-            return "Enregistrement refuse: un champ obligatoire est NULL en base" + suffix;
-        }
-        if (msg.contains("data truncation") || msg.contains("incorrect")) {
-            return "Enregistrement refuse: type/format d'une valeur invalide" + suffix;
-        }
-        return "Erreur SQL lors de l'enregistrement de la declaration.";
-    }
-
-    private void logFormPayload(DeclarationDechet entity) {
-        System.out.println("DEBUG DECLARATION : " + entity);
-        System.out.println("[DeclarationDechet][DEBUG] Soumission formulaire citoyen");
-        System.out.println("[DeclarationDechet][DEBUG] type=" + entity.getTypeDechetId()
-                + ", quantite=" + entity.getQuantite()
-                + ", unite=" + entity.getUnite()
-                + ", description=" + entity.getDescription()
-                + ", latitude=" + entity.getLatitude()
-                + ", longitude=" + entity.getLongitude()
-                + ", photo=" + entity.getPhoto()
-                + ", statut=" + entity.getStatut()
-                + ", createdAt=" + entity.getCreatedAt()
-                + ", citoyenId=" + entity.getCitoyenId());
-    }
-
-    private String extractColumnName(String sqlMessage) {
-        String raw = sqlMessage == null ? "" : sqlMessage;
-        String lower = raw.toLowerCase(Locale.ROOT);
-
-        int p = lower.indexOf("column '");
-        if (p >= 0) {
-            int start = p + "column '".length();
-            int end = raw.indexOf('\'', start);
-            if (end > start) {
-                return raw.substring(start, end);
-            }
-        }
-
-        p = lower.indexOf("for key '");
-        if (p >= 0) {
-            int start = p + "for key '".length();
-            int end = raw.indexOf('\'', start);
-            if (end > start) {
-                return raw.substring(start, end);
-            }
-        }
-
-        return null;
-    }
-
-    private Double parseCoordinate(String raw, boolean latitude) {
-        try {
-            double v = Double.parseDouble(raw.replace(',', '.'));
-            if (latitude) {
-                if (v < -90 || v > 90) {
-                    return null;
-                }
-            } else {
-                if (v < -180 || v > 180) {
-                    return null;
-                }
-            }
-            return v;
-        } catch (NumberFormatException e) {
-            return null;
-        }
     }
 
     @FXML
@@ -562,9 +574,55 @@ public class DeclarationDechetCitizenFormController {
         clearFieldError(quantiteErrorLabel);
         clearFieldError(uniteErrorLabel);
         clearFieldError(descriptionErrorLabel);
+        clearFieldError(photoErrorLabel);
         clearFieldError(geoErrorLabel);
-        clearFieldError(scoreErrorLabel);
+    }
+
+    private void showSuccessPopup(String selectedType, String detectedLabel, Double score) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Succès");
+        alert.setHeaderText("Déclaration ajoutée avec succès");
+        alert.setContentText(
+                "Type choisi : " + safeValue(selectedType) + "\n" +
+                        "Détecté par IA : " + safeValue(detectedLabel) + "\n" +
+                        "Score : " + formatScore(score)
+        );
+        alert.showAndWait();
+    }
+
+    private void showIncompatibleTypePopup(String selectedType, String detectedLabel, Double score) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Erreur");
+        alert.setHeaderText("Le type choisi ne correspond pas à l’image");
+        alert.setContentText(
+                "Type choisi : " + safeValue(selectedType) + "\n" +
+                        "Détecté par IA : " + safeValue(detectedLabel) + "\n" +
+                        "Score : " + formatScore(score)
+        );
+        alert.showAndWait();
+    }
+
+    private void showApiFailurePopup() {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Erreur");
+        alert.setHeaderText(null);
+        alert.setContentText("Erreur lors de l’analyse de l’image.");
+        alert.showAndWait();
+    }
+
+    private void showSimpleErrorPopup(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Erreur");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    private String safeValue(String value) {
+        return (value == null || value.isBlank()) ? "--" : value;
+    }
+
+    private String formatScore(Double score) {
+        return score == null ? "--" : String.format(Locale.ROOT, "%.4f", score);
     }
 }
-
-

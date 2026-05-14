@@ -8,6 +8,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.web.WebView?>
 
 <BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="org.example.controllers.CitizenAirQualityController"
@@ -44,7 +45,7 @@
                 <Label text="Air Quality" styleClass="crumb-current"/>
                 <Region HBox.hgrow="ALWAYS"/>
                 <VBox alignment="CENTER_RIGHT" spacing="3.0">
-                    <Label fx:id="headerEmailLabel" text="—" styleClass="workspace-title"/>
+                    <Label fx:id="headerEmailLabel" text="--" styleClass="workspace-title"/>
                     <Label text="Citoyen" styleClass="workspace-subtitle-strong"/>
                 </VBox>
             </HBox>
@@ -55,7 +56,7 @@
                             <Label text="Qualite de l'air" styleClass="hero-title"/>
                             <Label text="Stations OpenAQ autour de Tunis (PM2.5 / PM10)." styleClass="hero-subtitle"/>
                             <HBox spacing="12.0">
-                                <Button fx:id="refreshButton" text="Actualiser" onAction="#handleRefresh" styleClass="primary-btn"/>
+                                <Button fx:id="refreshButton" text="Actualiser les donnees" onAction="#handleRefresh" styleClass="primary-btn"/>
                             </HBox>
                         </VBox>
 
@@ -64,17 +65,24 @@
                         <HBox spacing="18.0">
                             <VBox HBox.hgrow="ALWAYS" spacing="8.0" styleClass="stat-card">
                                 <Label text="PM2.5" styleClass="stat-title"/>
-                                <Label fx:id="pm25Label" text="—" styleClass="stat-value-large"/>
+                                <Label fx:id="pm25Label" text="--" styleClass="stat-value-large"/>
                             </VBox>
                             <VBox HBox.hgrow="ALWAYS" spacing="8.0" styleClass="stat-card">
                                 <Label text="PM10" styleClass="stat-title"/>
-                                <Label fx:id="pm10Label" text="—" styleClass="stat-value-large"/>
+                                <Label fx:id="pm10Label" text="--" styleClass="stat-value-large"/>
                             </VBox>
                             <VBox HBox.hgrow="ALWAYS" spacing="8.0" styleClass="stat-card">
                                 <Label text="Stations chargees" styleClass="stat-title"/>
-                                <Label fx:id="updatedLabel" text="—" styleClass="weather-meta"/>
+                                <Label fx:id="updatedLabel" text="--" styleClass="weather-meta"/>
                             </VBox>
                         </HBox>
+
+                        <VBox spacing="10.0" styleClass="panel-card">
+                            <Label text="Carte des stations OpenAQ" styleClass="panel-heading"/>
+                            <VBox prefHeight="420.0" minHeight="320.0" maxWidth="Infinity" styleClass="stat-card">
+                                <WebView fx:id="stationsMapView" VBox.vgrow="ALWAYS" prefHeight="400.0" prefWidth="900.0"/>
+                            </VBox>
+                        </VBox>
                     </VBox>
                 </content>
             </ScrollPane>

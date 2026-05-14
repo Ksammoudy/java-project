@@ -80,7 +80,8 @@
                                     <TableColumn fx:id="typeColumn" text="Type" prefWidth="180.0"/>
                                     <TableColumn fx:id="statutColumn" text="Statut" prefWidth="120.0"/>
                                     <TableColumn fx:id="quantiteColumn" text="Quantite" prefWidth="100.0"/>
-                                    <TableColumn fx:id="actionColumn" text=" " prefWidth="100.0"/>
+                                    <TableColumn fx:id="qrPreviewColumn" text="QR" prefWidth="90.0"/>
+                                    <TableColumn fx:id="actionColumn" text="Actions" prefWidth="260.0"/>
                                 </columns>
                             </TableView>
                         </VBox>

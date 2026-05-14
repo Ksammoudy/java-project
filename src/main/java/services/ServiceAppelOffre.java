@@ -12,17 +12,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ServiceAppelOffre {
-    private Connection cnx;
 
     public ServiceAppelOffre() {
-        this.cnx = null;
     }
 
     private Connection getConnection() throws SQLException {
         try {
-            if (cnx == null || cnx.isClosed()) {
-                cnx = MyConnection.getInstance().getConnection();
-            }
+            Connection cnx = MyConnection.getInstance().getConnection();
             if (cnx == null || cnx.isClosed()) {
                 throw new SQLException("Connexion JDBC fermee ou indisponible.");
             }

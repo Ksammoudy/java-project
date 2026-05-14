@@ -122,7 +122,7 @@ public class CitizenStatisticsController {
             List<DeclarationDechet> declarations = declarationService.findByCitoyenId(cid);
             totalDeclarationsLabel.setText(String.valueOf(declarations.size()));
 
-            Wallet wallet = walletService.findByUtilisateurId(cid).orElse(null);
+            Wallet wallet = walletService.syncCitizenWalletPoints(cid);
             int balance = wallet != null && wallet.getSoldeActuel() != null ? wallet.getSoldeActuel() : 0;
             walletBalanceLabel.setText(balance + " pts");
 
@@ -167,7 +167,7 @@ public class CitizenStatisticsController {
     }
 
     private void populateStatusPie(List<DeclarationDechet> list) {
-        long ap = list.stream().filter(d -> "APPROUVEE".equals(normalizeStatus(d.getStatut()))).count();
+        long ap = list.stream().filter(d -> isValidatedStatus(d.getStatut())).count();
         long att = list.stream().filter(d -> "EN_ATTENTE".equals(normalizeStatus(d.getStatut()))).count();
         long ref = list.stream().filter(d -> "REFUSEE".equals(normalizeStatus(d.getStatut()))).count();
         if (ap + att + ref == 0) {
@@ -176,7 +176,7 @@ public class CitizenStatisticsController {
             ));
         } else {
             statusPieChart.setData(FXCollections.observableArrayList(
-                    new PieChart.Data("Approuvees", ap),
+                    new PieChart.Data("Validees", ap),
                     new PieChart.Data("En attente", att),
                     new PieChart.Data("Refusees", ref)
             ));
@@ -204,6 +204,11 @@ public class CitizenStatisticsController {
             return "EN_ATTENTE";
         }
         return status.trim().toUpperCase(Locale.ROOT);
+    }
+
+    private static boolean isValidatedStatus(String status) {
+        String normalized = normalizeStatus(status);
+        return "APPROUVEE".equals(normalized) || "VALIDATED".equals(normalized);
     }
 
     public static class TransactionRow {

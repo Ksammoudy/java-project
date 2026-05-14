@@ -1,5 +1,6 @@
 package org.example.controllers.gestionevent;
 
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -10,7 +11,6 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -19,6 +19,7 @@ import org.example.services.gestionevent.EvenementServices;
 
 import java.net.URL;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ResourceBundle;
 
 public class AfficherEvenementsController implements Initializable {
@@ -26,10 +27,12 @@ public class AfficherEvenementsController implements Initializable {
     @FXML private TableView<Evenement> eventTable;
     @FXML private TableColumn<Evenement, String> colTitre;
     @FXML private TableColumn<Evenement, String> colAdresse;
-    @FXML private TableColumn<Evenement, Integer> colImpactIA;
+    @FXML private TableColumn<Evenement, String> colImpactIA;
     @FXML private TableColumn<Evenement, String> colDate;
     @FXML private TableColumn<Evenement, String> colOrganisateur;
     @FXML private TableColumn<Evenement, Void> colActions;
+
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
     @FXML private TextField searchField;
     @FXML private ComboBox<String> sortComboBox;
@@ -40,17 +43,22 @@ public class AfficherEvenementsController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        colTitre.setCellValueFactory(new PropertyValueFactory<>("titre"));
-        colAdresse.setCellValueFactory(new PropertyValueFactory<>("lieu"));
-        colDate.setCellValueFactory(new PropertyValueFactory<>("date"));
-        colOrganisateur.setCellValueFactory(new PropertyValueFactory<>("nomOrganisateur"));
+        // Use lambda-based cell value factories to ensure correct type binding
+        colTitre.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getTitre()));
+        colAdresse.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getLieu()));
+        colOrganisateur.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getNomOrganisateur()));
+        colDate.setCellValueFactory(data -> {
+            java.sql.Date d = data.getValue().getDate();
+            return new SimpleStringProperty(d != null ? DATE_FORMAT.format(d) : "");
+        });
 
-        // Impact IA avec Design dynamic (kima el tsawer)
+        // Impact IA avec Design dynamic
+        colImpactIA.setCellValueFactory(data -> new SimpleStringProperty(""));
         colImpactIA.setCellFactory(column -> new TableCell<>() {
             @Override
-            protected void updateItem(Integer item, boolean empty) {
+            protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty || getIndex() >= getTableView().getItems().size()) {
+                if (empty || getIndex() < 0 || getIndex() >= getTableView().getItems().size()) {
                     setGraphic(null);
                 } else {
                     Evenement ev = getTableView().getItems().get(getIndex());
@@ -59,7 +67,7 @@ public class AfficherEvenementsController implements Initializable {
                     Label lbl = new Label("~" + predicted + " pers. attendues");
                     lbl.setStyle("-fx-background-color: #00d2ff; -fx-text-fill: black; -fx-padding: 2 10; -fx-background-radius: 15; -fx-font-weight: bold;");
 
-                    ProgressBar pb = new ProgressBar(predicted / 100.0);
+                    ProgressBar pb = new ProgressBar(Math.min(predicted / 100.0, 1.0));
                     pb.setPrefWidth(100);
                     pb.setStyle("-fx-accent: #2d5a27;");
 

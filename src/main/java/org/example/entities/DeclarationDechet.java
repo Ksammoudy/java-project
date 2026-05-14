@@ -15,9 +15,14 @@ public class DeclarationDechet {
     private Double quantite;
     private String unite;
     private LocalDateTime createdAt;
+    private String aiDetectedLabel;
     private Double scoreIa;
     private Integer pointsAttribues;
     private String qrCode;
+    private String qrUrl;
+    private Boolean validatedByQr;
+    private LocalDateTime validatedAt;
+    private Integer valorisateurId;
     private Integer citoyenId;
     private String citoyenEmail;
     private Integer valorisateurConfirmateurId;
@@ -121,6 +126,14 @@ public class DeclarationDechet {
         this.scoreIa = scoreIa;
     }
 
+    public String getAiDetectedLabel() {
+        return aiDetectedLabel;
+    }
+
+    public void setAiDetectedLabel(String aiDetectedLabel) {
+        this.aiDetectedLabel = aiDetectedLabel;
+    }
+
     public Integer getPointsAttribues() {
         return pointsAttribues;
     }
@@ -135,6 +148,38 @@ public class DeclarationDechet {
 
     public void setQrCode(String qrCode) {
         this.qrCode = qrCode;
+    }
+
+    public String getQrUrl() {
+        return qrUrl;
+    }
+
+    public void setQrUrl(String qrUrl) {
+        this.qrUrl = qrUrl;
+    }
+
+    public Boolean getValidatedByQr() {
+        return validatedByQr;
+    }
+
+    public void setValidatedByQr(Boolean validatedByQr) {
+        this.validatedByQr = validatedByQr;
+    }
+
+    public LocalDateTime getValidatedAt() {
+        return validatedAt;
+    }
+
+    public void setValidatedAt(LocalDateTime validatedAt) {
+        this.validatedAt = validatedAt;
+    }
+
+    public Integer getValorisateurId() {
+        return valorisateurId;
+    }
+
+    public void setValorisateurId(Integer valorisateurId) {
+        this.valorisateurId = valorisateurId;
     }
 
     public Integer getCitoyenId() {
@@ -198,6 +243,7 @@ public class DeclarationDechet {
                 ", quantite=" + quantite +
                 ", unite='" + unite + '\'' +
                 ", createdAt=" + createdAt +
+                ", aiDetectedLabel='" + aiDetectedLabel + '\'' +
                 ", scoreIa=" + scoreIa +
                 ", citoyenId=" + citoyenId +
                 '}';

@@ -6,6 +6,7 @@ import javafx.scene.control.Label;
 import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import utils.SchemaManager;
 
 import java.net.URL;
 
@@ -13,6 +14,14 @@ public class MainApp extends Application {
 
     @Override
     public void start(Stage stage) {
+        // Ensure DB tables and foreign keys exist before loading any UI
+        try {
+            SchemaManager.ensureCoreForeignKeys();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Warning: SchemaManager initialization failed: " + e.getMessage());
+        }
+
         try {
             URL fxmlUrl = MainApp.class.getResource("/fxml/Dashboard.fxml");
             if (fxmlUrl == null) {
